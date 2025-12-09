@@ -2,6 +2,8 @@
 
 A production-ready URL shortener built with Next.js 14, TypeScript, and PostgreSQL. Features include custom aliases, QR codes, click analytics, link expiration, password protection, bulk shortening, and a complete REST API.
 
+![Home Page](screenshots/01-home-en.png)
+
 ## Features
 
 - **URL Shortening** - Generate short, memorable URLs instantly
@@ -16,6 +18,23 @@ A production-ready URL shortener built with Next.js 14, TypeScript, and PostgreS
 - **Responsive Design** - Works on all devices
 - **Dark/Light Mode** - Theme toggle support
 - **REST API** - Full API for integration
+
+## Screenshots
+
+### Desktop View
+![Desktop English](screenshots/10-desktop-en.png)
+
+### Mobile View
+![Mobile English](screenshots/07-mobile-en.png)
+
+### Arabic RTL Support
+![Arabic](screenshots/06-home-ar.png)
+
+### Dashboard
+![Dashboard](screenshots/12-dashboard-desktop.png)
+
+### QR Code Generation
+![QR Code](screenshots/04-qr-code.png)
 
 ## Tech Stack
 

@@ -45,10 +45,10 @@ test.describe('Internationalization', () => {
 
     // Bulk - English
     await page.goto('/en/bulk');
-    await expect(page.locator('h1, [class*="CardTitle"]').first()).toContainText('Bulk URL Shortener');
+    await expect(page.getByRole('heading', { name: 'Bulk URL Shortener' })).toBeVisible();
 
     // Bulk - Arabic
     await page.goto('/ar/bulk');
-    await expect(page.locator('h1, [class*="CardTitle"]').first()).toContainText('اختصار متعدد');
+    await expect(page.getByRole('heading', { name: 'اختصار متعدد' })).toBeVisible();
   });
 });
