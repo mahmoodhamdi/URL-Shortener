@@ -49,7 +49,7 @@ export interface CreateLinkInput {
 export interface UpdateLinkInput {
   originalUrl?: string;
   customAlias?: string;
-  password?: string;
+  password?: string | null;
   expiresAt?: string | null;
   title?: string;
   description?: string;
