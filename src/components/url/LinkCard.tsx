@@ -22,25 +22,31 @@ import {
   ExternalLink,
   Lock,
   Clock,
+  Tag,
+  Folder,
 } from 'lucide-react';
 import { Link } from '@/i18n/routing';
 import { formatDate, formatNumber, getBaseUrl, cn } from '@/lib/utils';
+import { LinkEditDialog } from './LinkEditDialog';
 import type { Link as LinkType } from '@/types';
 
 interface LinkCardProps {
   link: LinkType;
   locale: string;
   onDelete?: (id: string) => void;
+  onUpdate?: (updatedLink: LinkType) => void;
 }
 
-export function LinkCard({ link, locale, onDelete }: LinkCardProps) {
+export function LinkCard({ link, locale, onDelete, onUpdate }: LinkCardProps) {
   const t = useTranslations();
   const [copied, setCopied] = useState(false);
+  const [editDialogOpen, setEditDialogOpen] = useState(false);
+  const [currentLink, setCurrentLink] = useState(link);
 
-  const shortCode = link.customAlias || link.shortCode;
+  const shortCode = currentLink.customAlias || currentLink.shortCode;
   const shortUrl = `${getBaseUrl()}/${shortCode}`;
-  const isExpired = link.expiresAt && new Date(link.expiresAt) < new Date();
-  const clickCount = link._count?.clicks ?? 0;
+  const isExpired = currentLink.expiresAt && new Date(currentLink.expiresAt) < new Date();
+  const clickCount = currentLink._count?.clicks ?? 0;
 
   const handleCopy = async () => {
     try {
@@ -54,7 +60,14 @@ export function LinkCard({ link, locale, onDelete }: LinkCardProps) {
 
   const handleDelete = async () => {
     if (onDelete) {
-      onDelete(link.id);
+      onDelete(currentLink.id);
+    }
+  };
+
+  const handleEditSuccess = (updatedLink: LinkType) => {
+    setCurrentLink(updatedLink);
+    if (onUpdate) {
+      onUpdate(updatedLink);
     }
   };
 
@@ -73,7 +86,7 @@ export function LinkCard({ link, locale, onDelete }: LinkCardProps) {
               >
                 {shortUrl.replace(/^https?:\/\//, '')}
               </a>
-              {link.password && (
+              {currentLink.password && (
                 <Lock className="h-4 w-4 text-muted-foreground shrink-0" />
               )}
               {isExpired && (
@@ -85,8 +98,23 @@ export function LinkCard({ link, locale, onDelete }: LinkCardProps) {
 
             {/* Original URL */}
             <p className="text-sm text-muted-foreground truncate">
-              {link.originalUrl}
+              {currentLink.originalUrl}
             </p>
+
+            {/* Tags */}
+            {currentLink.tags && currentLink.tags.length > 0 && (
+              <div className="flex items-center gap-1 flex-wrap">
+                <Tag className="h-3 w-3 text-muted-foreground" />
+                {currentLink.tags.map((tag) => (
+                  <span
+                    key={tag.id}
+                    className="text-xs bg-secondary px-1.5 py-0.5 rounded"
+                  >
+                    {tag.name}
+                  </span>
+                ))}
+              </div>
+            )}
 
             {/* Stats */}
             <div className="flex items-center gap-4 text-sm text-muted-foreground">
@@ -94,12 +122,18 @@ export function LinkCard({ link, locale, onDelete }: LinkCardProps) {
                 {formatNumber(clickCount, locale)} {t('linkCard.clicks')}
               </span>
               <span>
-                {t('linkCard.created')} {formatDate(link.createdAt, locale)}
+                {t('linkCard.created')} {formatDate(currentLink.createdAt, locale)}
               </span>
-              {link.expiresAt && !isExpired && (
+              {currentLink.folder && (
+                <span className="flex items-center gap-1">
+                  <Folder className="h-3 w-3" />
+                  {currentLink.folder.name}
+                </span>
+              )}
+              {currentLink.expiresAt && !isExpired && (
                 <span className="flex items-center gap-1">
                   <Clock className="h-3 w-3" />
-                  {t('linkCard.expires')} {formatDate(link.expiresAt, locale)}
+                  {t('linkCard.expires')} {formatDate(currentLink.expiresAt, locale)}
                 </span>
               )}
             </div>
@@ -146,6 +180,10 @@ export function LinkCard({ link, locale, onDelete }: LinkCardProps) {
                   </Link>
                 </DropdownMenuItem>
                 <DropdownMenuSeparator />
+                <DropdownMenuItem onClick={() => setEditDialogOpen(true)}>
+                  <Pencil className="me-2 h-4 w-4" />
+                  {t('linkCard.edit')}
+                </DropdownMenuItem>
                 <DropdownMenuItem
                   className="text-destructive"
                   onClick={handleDelete}
@@ -158,6 +196,14 @@ export function LinkCard({ link, locale, onDelete }: LinkCardProps) {
           </div>
         </div>
       </CardContent>
+
+      {/* Edit Dialog */}
+      <LinkEditDialog
+        link={currentLink}
+        open={editDialogOpen}
+        onOpenChange={setEditDialogOpen}
+        onSuccess={handleEditSuccess}
+      />
     </Card>
   );
 }
