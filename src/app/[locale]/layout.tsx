@@ -7,6 +7,7 @@ import { Header } from '@/components/layout/Header';
 import { Footer } from '@/components/layout/Footer';
 import { MobileNav } from '@/components/layout/MobileNav';
 import { Toaster } from '@/components/ui/toaster';
+import { SessionProvider } from '@/components/auth/SessionProvider';
 import '../globals.css';
 
 const inter = Inter({ subsets: ['latin'] });
@@ -34,15 +35,17 @@ export default async function LocaleLayout({
   return (
     <html lang={locale} dir={dir} suppressHydrationWarning>
       <body className={inter.className}>
-        <NextIntlClientProvider messages={messages}>
-          <div className="min-h-screen flex flex-col">
-            <Header />
-            <main className="flex-1 main-content">{children}</main>
-            <Footer />
-            <MobileNav />
-          </div>
-          <Toaster />
-        </NextIntlClientProvider>
+        <SessionProvider>
+          <NextIntlClientProvider messages={messages}>
+            <div className="min-h-screen flex flex-col">
+              <Header />
+              <main className="flex-1 main-content">{children}</main>
+              <Footer />
+              <MobileNav />
+            </div>
+            <Toaster />
+          </NextIntlClientProvider>
+        </SessionProvider>
       </body>
     </html>
   );

@@ -5,7 +5,8 @@ import { Link, usePathname } from '@/i18n/routing';
 import { Button } from '@/components/ui/button';
 import { ThemeToggle } from './ThemeToggle';
 import { LanguageSwitcher } from './LanguageSwitcher';
-import { Link2, LayoutDashboard, Layers, FileCode, Menu, X } from 'lucide-react';
+import { UserMenu } from '@/components/auth/UserMenu';
+import { Link2, LayoutDashboard, Layers, FileCode, Menu, X, CreditCard } from 'lucide-react';
 import { useState } from 'react';
 import { cn } from '@/lib/utils';
 
@@ -18,6 +19,7 @@ export function Header() {
     { href: '/', label: t('nav.home'), icon: Link2 },
     { href: '/dashboard', label: t('nav.dashboard'), icon: LayoutDashboard },
     { href: '/bulk', label: t('nav.bulk'), icon: Layers },
+    { href: '/pricing', label: t('nav.pricing'), icon: CreditCard },
     { href: '/api-docs', label: t('nav.apiDocs'), icon: FileCode },
   ];
 
@@ -51,6 +53,11 @@ export function Header() {
           <div className="hidden sm:flex items-center gap-2">
             <LanguageSwitcher />
             <ThemeToggle />
+            <UserMenu />
+          </div>
+
+          <div className="sm:hidden">
+            <UserMenu />
           </div>
 
           <Button
