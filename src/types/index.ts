@@ -188,3 +188,61 @@ export interface UpdateLinkTargetInput {
   priority?: number;
   isActive?: boolean;
 }
+
+// Workspace types
+export type WorkspaceRole = 'OWNER' | 'ADMIN' | 'MEMBER' | 'VIEWER';
+
+export interface Workspace {
+  id: string;
+  name: string;
+  slug: string;
+  description: string | null;
+  logo: string | null;
+  ownerId: string;
+  owner?: User;
+  role?: WorkspaceRole;
+  membersCount?: number;
+  linksCount?: number;
+  createdAt: Date;
+  updatedAt: Date;
+}
+
+export interface WorkspaceMember {
+  id: string;
+  workspaceId: string;
+  userId: string;
+  user?: User;
+  role: WorkspaceRole;
+  joinedAt: Date;
+}
+
+export interface WorkspaceInvitation {
+  id: string;
+  workspaceId: string;
+  email: string;
+  role: WorkspaceRole;
+  expiresAt: Date;
+  createdAt: Date;
+  workspace?: {
+    id: string;
+    name: string;
+    slug: string;
+  };
+}
+
+export interface CreateWorkspaceInput {
+  name: string;
+  description?: string;
+  logo?: string;
+}
+
+export interface UpdateWorkspaceInput {
+  name?: string;
+  description?: string;
+  logo?: string;
+}
+
+export interface InviteMemberInput {
+  email: string;
+  role?: WorkspaceRole;
+}

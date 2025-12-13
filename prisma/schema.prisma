@@ -27,6 +27,8 @@ model User {
   apiKeys       ApiKey[]
   folders       Folder[]
   customDomains CustomDomain[]
+  ownedWorkspaces    Workspace[]         @relation("WorkspaceOwner")
+  workspaceMemberships WorkspaceMember[]
 
   @@index([email])
 }
@@ -140,16 +142,19 @@ model ApiKey {
 // ==================== FOLDER MODEL ====================
 
 model Folder {
-  id        String   @id @default(cuid())
-  name      String
-  color     String?  // hex color like #FF5733
-  userId    String
-  user      User     @relation(fields: [userId], references: [id], onDelete: Cascade)
-  links     Link[]
-  createdAt DateTime @default(now())
+  id          String     @id @default(cuid())
+  name        String
+  color       String?    // hex color like #FF5733
+  userId      String
+  user        User       @relation(fields: [userId], references: [id], onDelete: Cascade)
+  workspaceId String?
+  workspace   Workspace? @relation(fields: [workspaceId], references: [id], onDelete: Cascade)
+  links       Link[]
+  createdAt   DateTime   @default(now())
 
   @@unique([userId, name])
   @@index([userId])
+  @@index([workspaceId])
 }
 
 // ==================== CUSTOM DOMAIN MODEL ====================
@@ -210,6 +215,10 @@ model Link {
   customDomainId String?
   customDomain   CustomDomain? @relation(fields: [customDomainId], references: [id], onDelete: SetNull)
 
+  // Workspace relation
+  workspaceId String?
+  workspace   Workspace? @relation(fields: [workspaceId], references: [id], onDelete: SetNull)
+
   // UTM parameters
   utmSource   String?
   utmMedium   String?
@@ -227,6 +236,7 @@ model Link {
   @@index([userId])
   @@index([folderId])
   @@index([customDomainId])
+  @@index([workspaceId])
 }
 
 model Click {
@@ -280,4 +290,70 @@ enum TargetType {
   BROWSER    // chrome, safari, firefox, edge
   COUNTRY    // ISO country codes (US, EG, SA, etc.)
   LANGUAGE   // ISO language codes (en, ar, etc.)
+}
+
+// ==================== WORKSPACE MODELS ====================
+
+model Workspace {
+  id          String   @id @default(cuid())
+  name        String
+  slug        String   @unique
+  description String?
+  logo        String?
+
+  ownerId     String
+  owner       User     @relation("WorkspaceOwner", fields: [ownerId], references: [id])
+
+  members     WorkspaceMember[]
+  links       Link[]
+  folders     Folder[]
+  invitations WorkspaceInvitation[]
+
+  createdAt   DateTime @default(now())
+  updatedAt   DateTime @updatedAt
+
+  @@index([ownerId])
+  @@index([slug])
+}
+
+model WorkspaceMember {
+  id          String        @id @default(cuid())
+  workspaceId String
+  workspace   Workspace     @relation(fields: [workspaceId], references: [id], onDelete: Cascade)
+  userId      String
+  user        User          @relation(fields: [userId], references: [id], onDelete: Cascade)
+
+  role        WorkspaceRole @default(MEMBER)
+
+  joinedAt    DateTime      @default(now())
+
+  @@unique([workspaceId, userId])
+  @@index([workspaceId])
+  @@index([userId])
+}
+
+model WorkspaceInvitation {
+  id          String        @id @default(cuid())
+  workspaceId String
+  workspace   Workspace     @relation(fields: [workspaceId], references: [id], onDelete: Cascade)
+
+  email       String
+  role        WorkspaceRole @default(MEMBER)
+  token       String        @unique
+  expiresAt   DateTime
+
+  invitedBy   String        // userId who sent the invitation
+
+  createdAt   DateTime      @default(now())
+
+  @@unique([workspaceId, email])
+  @@index([token])
+  @@index([email])
+}
+
+enum WorkspaceRole {
+  OWNER    // Full access, can delete workspace
+  ADMIN    // Can manage members, settings, all links
+  MEMBER   // Can create/edit own links
+  VIEWER   // Can only view links and analytics
 }
