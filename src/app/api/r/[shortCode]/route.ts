@@ -1,6 +1,7 @@
 import { NextRequest, NextResponse } from 'next/server';
 import { getLinkByCode, isLinkExpired, verifyPassword } from '@/lib/url/shortener';
 import { trackClick } from '@/lib/analytics/tracker';
+import { resolveTargetUrl } from '@/lib/targeting';
 import { headers } from 'next/headers';
 
 interface RouteContext {
@@ -54,7 +55,7 @@ export async function GET(
     }
 
     // Track click
-    const headersList = headers();
+    const headersList = await headers();
     const userAgent = headersList.get('user-agent') || undefined;
     const referrer = headersList.get('referer') || undefined;
     const ip = headersList.get('x-forwarded-for')?.split(',')[0] ||
@@ -68,9 +69,15 @@ export async function GET(
       referrer,
     });
 
+    // Resolve target URL based on device/geo targeting
+    const targetUrl = await resolveTargetUrl(
+      { id: link.id, originalUrl: link.originalUrl },
+      request
+    );
+
     // Return link info for client-side redirect
     return NextResponse.json({
-      originalUrl: link.originalUrl,
+      originalUrl: targetUrl,
     });
   } catch (error) {
     console.error('Redirect error:', error);

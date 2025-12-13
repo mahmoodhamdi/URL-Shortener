@@ -25,8 +25,10 @@ export interface Link {
   tags?: Tag[];
   folder?: Folder;
   customDomain?: CustomDomain;
+  targets?: LinkTarget[];
   _count?: {
     clicks: number;
+    targets?: number;
   };
 }
 
@@ -156,4 +158,33 @@ export interface ApiKey {
   lastUsedAt: Date | null;
   expiresAt: Date | null;
   createdAt: Date;
+}
+
+// Targeting types
+export type TargetType = 'DEVICE' | 'OS' | 'BROWSER' | 'COUNTRY' | 'LANGUAGE';
+
+export interface LinkTarget {
+  id: string;
+  linkId: string;
+  type: TargetType;
+  value: string;
+  targetUrl: string;
+  priority: number;
+  isActive: boolean;
+  createdAt: Date;
+  updatedAt: Date;
+}
+
+export interface CreateLinkTargetInput {
+  type: TargetType;
+  value: string;
+  targetUrl: string;
+  priority?: number;
+  isActive?: boolean;
+}
+
+export interface UpdateLinkTargetInput {
+  targetUrl?: string;
+  priority?: number;
+  isActive?: boolean;
 }
