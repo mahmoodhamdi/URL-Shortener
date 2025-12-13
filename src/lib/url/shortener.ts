@@ -4,6 +4,16 @@ import { normalizeUrl, isValidUrl, isValidAlias } from './validator';
 import bcrypt from 'bcryptjs';
 import type { Link, CreateLinkInput, UpdateLinkInput } from '@/types';
 
+export interface CreateLinkOptions extends CreateLinkInput {
+  userId?: string;
+  folderId?: string;
+  utmSource?: string;
+  utmMedium?: string;
+  utmCampaign?: string;
+  utmTerm?: string;
+  utmContent?: string;
+}
+
 const SHORT_CODE_LENGTH = 7;
 
 export function generateShortCode(): string {
@@ -22,7 +32,7 @@ export async function isShortCodeAvailable(shortCode: string): Promise<boolean> 
   return !existing;
 }
 
-export async function createShortLink(input: CreateLinkInput): Promise<Link> {
+export async function createShortLink(input: CreateLinkOptions): Promise<Link> {
   const normalizedUrl = normalizeUrl(input.url);
 
   if (!isValidUrl(normalizedUrl)) {
@@ -63,6 +73,13 @@ export async function createShortLink(input: CreateLinkInput): Promise<Link> {
       expiresAt: input.expiresAt ? new Date(input.expiresAt) : null,
       title: input.title || null,
       description: input.description || null,
+      userId: input.userId || null,
+      folderId: input.folderId || null,
+      utmSource: input.utmSource || null,
+      utmMedium: input.utmMedium || null,
+      utmCampaign: input.utmCampaign || null,
+      utmTerm: input.utmTerm || null,
+      utmContent: input.utmContent || null,
     },
     include: {
       _count: {
@@ -70,6 +87,18 @@ export async function createShortLink(input: CreateLinkInput): Promise<Link> {
       },
     },
   });
+
+  // Increment usage counter if user is authenticated
+  if (input.userId) {
+    await prisma.subscription.update({
+      where: { userId: input.userId },
+      data: {
+        linksUsedThisMonth: { increment: 1 },
+      },
+    }).catch(() => {
+      // Ignore if no subscription exists (will be created on first access)
+    });
+  }
 
   return link as Link;
 }

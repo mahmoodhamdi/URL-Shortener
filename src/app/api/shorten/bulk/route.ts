@@ -1,6 +1,8 @@
 import { NextRequest, NextResponse } from 'next/server';
 import { createShortLink, getShortUrl } from '@/lib/url/shortener';
 import { bulkUrlsSchema, isValidUrl, normalizeUrl } from '@/lib/url/validator';
+import { auth } from '@/lib/auth';
+import { checkBulkLimit } from '@/lib/limits';
 import { ZodError } from 'zod';
 import type { BulkShortenResult } from '@/types';
 
@@ -10,6 +12,26 @@ export async function POST(request: NextRequest) {
 
     // Validate input
     const { urls } = bulkUrlsSchema.parse(body);
+
+    // Check if user is authenticated
+    const session = await auth();
+    const userId = session?.user?.id;
+
+    // Check bulk limits if user is authenticated
+    if (userId) {
+      const limitCheck = await checkBulkLimit(userId, urls.length);
+      if (!limitCheck.allowed) {
+        return NextResponse.json(
+          {
+            error: limitCheck.message || 'Bulk limit reached',
+            limit: limitCheck.limit,
+            used: limitCheck.used,
+            remaining: limitCheck.remaining,
+          },
+          { status: 429 }
+        );
+      }
+    }
 
     const result: BulkShortenResult = {
       success: [],
@@ -29,7 +51,10 @@ export async function POST(request: NextRequest) {
           continue;
         }
 
-        const link = await createShortLink({ url: normalizedUrl });
+        const link = await createShortLink({
+          url: normalizedUrl,
+          userId,
+        });
         const shortCode = link.customAlias || link.shortCode;
 
         result.success.push({
