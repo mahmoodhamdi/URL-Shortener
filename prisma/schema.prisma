@@ -7,6 +7,183 @@ datasource db {
   url      = env("DATABASE_URL")
 }
 
+// ==================== AUTH MODELS ====================
+
+model User {
+  id            String    @id @default(cuid())
+  name          String?
+  email         String    @unique
+  emailVerified DateTime?
+  image         String?
+  password      String?   // For credentials provider
+  createdAt     DateTime  @default(now())
+  updatedAt     DateTime  @updatedAt
+
+  // Relations
+  accounts      Account[]
+  sessions      Session[]
+  links         Link[]
+  subscription  Subscription?
+  apiKeys       ApiKey[]
+  folders       Folder[]
+  customDomains CustomDomain[]
+
+  @@index([email])
+}
+
+model Account {
+  id                String  @id @default(cuid())
+  userId            String
+  type              String
+  provider          String
+  providerAccountId String
+  refresh_token     String? @db.Text
+  access_token      String? @db.Text
+  expires_at        Int?
+  token_type        String?
+  scope             String?
+  id_token          String? @db.Text
+  session_state     String?
+
+  user User @relation(fields: [userId], references: [id], onDelete: Cascade)
+
+  @@unique([provider, providerAccountId])
+  @@index([userId])
+}
+
+model Session {
+  id           String   @id @default(cuid())
+  sessionToken String   @unique
+  userId       String
+  expires      DateTime
+  user         User     @relation(fields: [userId], references: [id], onDelete: Cascade)
+
+  @@index([userId])
+}
+
+model VerificationToken {
+  identifier String
+  token      String   @unique
+  expires    DateTime
+
+  @@unique([identifier, token])
+}
+
+// ==================== SUBSCRIPTION MODELS ====================
+
+model Subscription {
+  id                   String             @id @default(cuid())
+  userId               String             @unique
+  user                 User               @relation(fields: [userId], references: [id], onDelete: Cascade)
+
+  plan                 Plan               @default(FREE)
+  status               SubscriptionStatus @default(ACTIVE)
+
+  // Stripe fields
+  stripeCustomerId     String?            @unique
+  stripeSubscriptionId String?            @unique
+  stripePriceId        String?
+
+  // Billing period
+  currentPeriodStart   DateTime?
+  currentPeriodEnd     DateTime?
+  cancelAtPeriodEnd    Boolean            @default(false)
+
+  // Usage tracking (reset monthly)
+  linksUsedThisMonth   Int                @default(0)
+  linksResetAt         DateTime           @default(now())
+
+  createdAt            DateTime           @default(now())
+  updatedAt            DateTime           @updatedAt
+
+  @@index([stripeCustomerId])
+}
+
+enum Plan {
+  FREE
+  STARTER
+  PRO
+  BUSINESS
+  ENTERPRISE
+}
+
+enum SubscriptionStatus {
+  ACTIVE
+  CANCELED
+  PAST_DUE
+  TRIALING
+  INCOMPLETE
+}
+
+// ==================== API KEY MODEL ====================
+
+model ApiKey {
+  id          String    @id @default(cuid())
+  userId      String
+  user        User      @relation(fields: [userId], references: [id], onDelete: Cascade)
+
+  name        String
+  key         String    @unique
+  lastUsedAt  DateTime?
+  expiresAt   DateTime?
+
+  // Rate limiting
+  requestsThisHour Int   @default(0)
+  requestsResetAt  DateTime @default(now())
+
+  createdAt   DateTime  @default(now())
+
+  @@index([userId])
+  @@index([key])
+}
+
+// ==================== FOLDER MODEL ====================
+
+model Folder {
+  id        String   @id @default(cuid())
+  name      String
+  color     String?  // hex color like #FF5733
+  userId    String
+  user      User     @relation(fields: [userId], references: [id], onDelete: Cascade)
+  links     Link[]
+  createdAt DateTime @default(now())
+
+  @@unique([userId, name])
+  @@index([userId])
+}
+
+// ==================== CUSTOM DOMAIN MODEL ====================
+
+model CustomDomain {
+  id          String    @id @default(cuid())
+  domain      String    @unique
+  userId      String
+  user        User      @relation(fields: [userId], references: [id], onDelete: Cascade)
+
+  verified    Boolean   @default(false)
+  verifyToken String?   // Token for DNS TXT verification
+  verifiedAt  DateTime?
+
+  sslStatus   SslStatus @default(PENDING)
+
+  createdAt   DateTime  @default(now())
+  updatedAt   DateTime  @updatedAt
+
+  links       Link[]
+
+  @@index([userId])
+  @@index([domain])
+}
+
+enum SslStatus {
+  PENDING
+  PROVISIONING
+  ACTIVE
+  FAILED
+}
+
+// ==================== LINK MODELS ====================
+
 model Link {
   id          String    @id @default(cuid())
   originalUrl String
@@ -21,12 +198,34 @@ model Link {
   createdAt   DateTime  @default(now())
   updatedAt   DateTime  @updatedAt
 
-  clicks Click[]
-  tags   Tag[]
+  // User relation (optional for backward compatibility)
+  userId      String?
+  user        User?     @relation(fields: [userId], references: [id], onDelete: SetNull)
+
+  // Folder relation
+  folderId    String?
+  folder      Folder?   @relation(fields: [folderId], references: [id], onDelete: SetNull)
+
+  // Custom domain relation
+  customDomainId String?
+  customDomain   CustomDomain? @relation(fields: [customDomainId], references: [id], onDelete: SetNull)
+
+  // UTM parameters
+  utmSource   String?
+  utmMedium   String?
+  utmCampaign String?
+  utmTerm     String?
+  utmContent  String?
+
+  clicks      Click[]
+  tags        Tag[]
 
   @@index([shortCode])
   @@index([createdAt])
   @@index([isActive])
+  @@index([userId])
+  @@index([folderId])
+  @@index([customDomainId])
 }
 
 model Click {
