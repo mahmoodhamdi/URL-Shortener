@@ -44,7 +44,7 @@ npm run db:studio              # Open Prisma Studio
 - `src/types/index.ts` - TypeScript type definitions
 
 ### Key Patterns
-- **Internationalization**: Uses `next-intl` with locale routing (`/en/...`, `/ar/...`). Translation files in `src/messages/`. When adding UI text, update both `en.json` and `ar.json`.
+- **Internationalization**: Uses `next-intl` with locale routing (`/en/...`, `/ar/...`). Translation files in `src/messages/`. Routing config in `src/i18n/`. When adding UI text, update both `en.json` and `ar.json`. Use navigation exports from `src/i18n/routing.ts` (`Link`, `redirect`, `usePathname`, `useRouter`) instead of next/navigation.
 - **Path Alias**: Use `@/` to import from `src/` (configured in tsconfig and vitest)
 - **Validation**: Zod schemas in `src/lib/url/validator.ts` for URL and alias validation
 - **Short Code Generation**: Uses `nanoid` (7 chars) in `src/lib/url/shortener.ts`
@@ -63,10 +63,11 @@ npm run db:studio              # Open Prisma Studio
 - `GET /api/links/[id]/stats` - Link statistics
 - `POST /api/qr` - Generate QR code
 - `GET /api/r/[shortCode]` - Redirect handler
+- `GET /api/health` - Health check endpoint
 
 ### Testing Structure
-- Unit tests: `__tests__/unit/` - Test isolated utilities
-- Integration tests: `__tests__/integration/` - Test with database
+- Unit tests: `__tests__/unit/` - Test isolated utilities (`vitest.config.ts`)
+- Integration tests: `__tests__/integration/` - Test with database (`vitest.integration.config.ts`)
 - E2E tests: `__tests__/e2e/` - Playwright browser tests
 
 ## Environment Variables
