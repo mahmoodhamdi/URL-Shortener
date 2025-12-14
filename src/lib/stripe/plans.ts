@@ -17,6 +17,8 @@ export interface PlanConfig {
     bulkShortenLimit: number;
     abTests: number;
     variantsPerTest: number;
+    bioPages: number;
+    linksPerBioPage: number;
   };
   features: string[];
   popular?: boolean;
@@ -38,6 +40,8 @@ export const PLANS: Record<Plan, PlanConfig> = {
       bulkShortenLimit: 10,
       abTests: 0,
       variantsPerTest: 0,
+      bioPages: 1,
+      linksPerBioPage: 5,
     },
     features: [
       'Basic Analytics',
@@ -65,6 +69,8 @@ export const PLANS: Record<Plan, PlanConfig> = {
       bulkShortenLimit: 50,
       abTests: 1,
       variantsPerTest: 2,
+      bioPages: 2,
+      linksPerBioPage: 10,
     },
     features: [
       'Everything in Free',
@@ -95,6 +101,8 @@ export const PLANS: Record<Plan, PlanConfig> = {
       bulkShortenLimit: 100,
       abTests: 5,
       variantsPerTest: 4,
+      bioPages: 5,
+      linksPerBioPage: 20,
     },
     features: [
       'Everything in Starter',
@@ -124,6 +132,8 @@ export const PLANS: Record<Plan, PlanConfig> = {
       bulkShortenLimit: 500,
       abTests: 20,
       variantsPerTest: 6,
+      bioPages: 20,
+      linksPerBioPage: -1, // unlimited
     },
     features: [
       'Everything in Pro',
@@ -153,6 +163,8 @@ export const PLANS: Record<Plan, PlanConfig> = {
       bulkShortenLimit: -1, // unlimited
       abTests: -1, // unlimited
       variantsPerTest: -1, // unlimited
+      bioPages: -1, // unlimited
+      linksPerBioPage: -1, // unlimited
     },
     features: [
       'Everything in Business',

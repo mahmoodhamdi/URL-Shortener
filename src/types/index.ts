@@ -336,3 +336,74 @@ export interface UpdateVariantInput {
   url?: string;
   weight?: number;
 }
+
+// Bio Page types
+export type BioPageTheme = 'DEFAULT' | 'DARK' | 'LIGHT' | 'GRADIENT' | 'MINIMAL' | 'COLORFUL';
+
+export interface BioPage {
+  id: string;
+  userId: string;
+  slug: string;
+  title: string;
+  bio: string | null;
+  avatar: string | null;
+  theme: BioPageTheme;
+  customCss: string | null;
+  socialLinks: Record<string, string> | null;
+  isActive: boolean;
+  views: number;
+  links?: BioLink[];
+  createdAt: Date;
+  updatedAt: Date;
+}
+
+export interface BioLink {
+  id: string;
+  bioPageId: string;
+  title: string;
+  url: string;
+  icon: string | null;
+  thumbnail: string | null;
+  position: number;
+  isActive: boolean;
+  clicks: number;
+  createdAt: Date;
+  updatedAt: Date;
+}
+
+export interface CreateBioPageInput {
+  slug: string;
+  title: string;
+  bio?: string;
+  avatar?: string;
+  theme?: BioPageTheme;
+  socialLinks?: Record<string, string>;
+}
+
+export interface UpdateBioPageInput {
+  slug?: string;
+  title?: string;
+  bio?: string;
+  avatar?: string;
+  theme?: BioPageTheme;
+  customCss?: string;
+  socialLinks?: Record<string, string>;
+  isActive?: boolean;
+}
+
+export interface CreateBioLinkInput {
+  title: string;
+  url: string;
+  icon?: string;
+  thumbnail?: string;
+  position?: number;
+}
+
+export interface UpdateBioLinkInput {
+  title?: string;
+  url?: string;
+  icon?: string;
+  thumbnail?: string;
+  position?: number;
+  isActive?: boolean;
+}

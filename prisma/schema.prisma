@@ -30,6 +30,7 @@ model User {
   ownedWorkspaces    Workspace[]         @relation("WorkspaceOwner")
   workspaceMemberships WorkspaceMember[]
   webhooks           Webhook[]
+  bioPages           BioPage[]
 
   @@index([email])
 }
@@ -440,4 +441,62 @@ model ABVariant {
   updatedAt   DateTime @updatedAt
 
   @@index([testId])
+}
+
+// ==================== LINK-IN-BIO MODELS ====================
+
+model BioPage {
+  id          String        @id @default(cuid())
+  userId      String
+  user        User          @relation(fields: [userId], references: [id], onDelete: Cascade)
+
+  slug        String        @unique   // username or custom slug
+  title       String                  // Display name
+  bio         String?                 // Short bio/description
+  avatar      String?                 // Profile image URL
+
+  theme       BioPageTheme  @default(DEFAULT)
+  customCss   String?       @db.Text  // Pro feature
+
+  socialLinks Json?         // { twitter, instagram, youtube, etc. }
+
+  isActive    Boolean       @default(true)
+  views       Int           @default(0)
+
+  links       BioLink[]
+
+  createdAt   DateTime      @default(now())
+  updatedAt   DateTime      @updatedAt
+
+  @@index([userId])
+  @@index([slug])
+}
+
+model BioLink {
+  id          String   @id @default(cuid())
+  bioPageId   String
+  bioPage     BioPage  @relation(fields: [bioPageId], references: [id], onDelete: Cascade)
+
+  title       String
+  url         String
+  icon        String?      // Icon name or emoji
+  thumbnail   String?      // Image thumbnail
+
+  position    Int          // Order on the page
+  isActive    Boolean      @default(true)
+  clicks      Int          @default(0)
+
+  createdAt   DateTime     @default(now())
+  updatedAt   DateTime     @updatedAt
+
+  @@index([bioPageId])
+}
+
+enum BioPageTheme {
+  DEFAULT
+  DARK
+  LIGHT
+  GRADIENT
+  MINIMAL
+  COLORFUL
 }
