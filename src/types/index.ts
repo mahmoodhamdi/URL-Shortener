@@ -246,3 +246,42 @@ export interface InviteMemberInput {
   email: string;
   role?: WorkspaceRole;
 }
+
+// Webhook types
+export type WebhookEvent = 'link.created' | 'link.updated' | 'link.deleted' | 'link.clicked' | 'link.expired';
+
+export interface Webhook {
+  id: string;
+  name: string;
+  url: string;
+  secret?: string; // Only returned on creation
+  events: WebhookEvent[];
+  isActive: boolean;
+  failCount?: number;
+  lastError?: string | null;
+  createdAt: Date;
+  updatedAt?: Date;
+}
+
+export interface WebhookLog {
+  id: string;
+  webhookId: string;
+  event: string;
+  statusCode?: number | null;
+  success: boolean;
+  duration?: number | null;
+  createdAt: Date;
+}
+
+export interface CreateWebhookInput {
+  name: string;
+  url: string;
+  events: WebhookEvent[];
+}
+
+export interface UpdateWebhookInput {
+  name?: string;
+  url?: string;
+  events?: WebhookEvent[];
+  isActive?: boolean;
+}

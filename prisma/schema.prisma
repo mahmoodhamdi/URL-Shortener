@@ -29,6 +29,7 @@ model User {
   customDomains CustomDomain[]
   ownedWorkspaces    Workspace[]         @relation("WorkspaceOwner")
   workspaceMemberships WorkspaceMember[]
+  webhooks           Webhook[]
 
   @@index([email])
 }
@@ -356,4 +357,47 @@ enum WorkspaceRole {
   ADMIN    // Can manage members, settings, all links
   MEMBER   // Can create/edit own links
   VIEWER   // Can only view links and analytics
+}
+
+// ==================== WEBHOOK MODELS ====================
+
+model Webhook {
+  id          String      @id @default(cuid())
+  userId      String
+  user        User        @relation(fields: [userId], references: [id], onDelete: Cascade)
+
+  name        String      // User-friendly name
+  url         String      // Webhook endpoint URL
+  secret      String      // HMAC secret for signature verification
+  events      String[]    // Events to trigger webhook
+
+  isActive    Boolean     @default(true)
+  failCount   Int         @default(0)   // Consecutive failures
+  lastError   String?     // Last error message
+
+  createdAt   DateTime    @default(now())
+  updatedAt   DateTime    @updatedAt
+
+  logs        WebhookLog[]
+
+  @@index([userId])
+  @@index([isActive])
+}
+
+model WebhookLog {
+  id          String   @id @default(cuid())
+  webhookId   String
+  webhook     Webhook  @relation(fields: [webhookId], references: [id], onDelete: Cascade)
+
+  event       String
+  payload     Json
+  statusCode  Int?
+  response    String?  @db.Text
+  duration    Int?     // Response time in ms
+  success     Boolean
+
+  createdAt   DateTime @default(now())
+
+  @@index([webhookId])
+  @@index([createdAt])
 }
