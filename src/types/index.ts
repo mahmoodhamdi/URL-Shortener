@@ -285,3 +285,54 @@ export interface UpdateWebhookInput {
   events?: WebhookEvent[];
   isActive?: boolean;
 }
+
+// A/B Testing types
+export interface ABTest {
+  id: string;
+  linkId: string;
+  name: string | null;
+  isActive: boolean;
+  startedAt: Date;
+  endedAt: Date | null;
+  variants?: ABVariant[];
+  createdAt: Date;
+  updatedAt: Date;
+}
+
+export interface ABVariant {
+  id: string;
+  testId: string;
+  name: string;
+  url: string;
+  weight: number;
+  clicks: number;
+  conversions: number;
+  createdAt: Date;
+  updatedAt: Date;
+}
+
+export interface CreateABTestInput {
+  name?: string;
+  variants: {
+    name: string;
+    url: string;
+    weight: number;
+  }[];
+}
+
+export interface UpdateABTestInput {
+  name?: string;
+  isActive?: boolean;
+}
+
+export interface AddVariantInput {
+  name: string;
+  url: string;
+  weight: number;
+}
+
+export interface UpdateVariantInput {
+  name?: string;
+  url?: string;
+  weight?: number;
+}

@@ -15,6 +15,8 @@ export interface PlanConfig {
     apiRequestsPerDay: number;
     analyticsRetentionDays: number;
     bulkShortenLimit: number;
+    abTests: number;
+    variantsPerTest: number;
   };
   features: string[];
   popular?: boolean;
@@ -34,6 +36,8 @@ export const PLANS: Record<Plan, PlanConfig> = {
       apiRequestsPerDay: 100,
       analyticsRetentionDays: 30,
       bulkShortenLimit: 10,
+      abTests: 0,
+      variantsPerTest: 0,
     },
     features: [
       'Basic Analytics',
@@ -59,6 +63,8 @@ export const PLANS: Record<Plan, PlanConfig> = {
       apiRequestsPerDay: 1000,
       analyticsRetentionDays: 90,
       bulkShortenLimit: 50,
+      abTests: 1,
+      variantsPerTest: 2,
     },
     features: [
       'Everything in Free',
@@ -87,6 +93,8 @@ export const PLANS: Record<Plan, PlanConfig> = {
       apiRequestsPerDay: 5000,
       analyticsRetentionDays: 180,
       bulkShortenLimit: 100,
+      abTests: 5,
+      variantsPerTest: 4,
     },
     features: [
       'Everything in Starter',
@@ -114,6 +122,8 @@ export const PLANS: Record<Plan, PlanConfig> = {
       apiRequestsPerDay: 25000,
       analyticsRetentionDays: 365,
       bulkShortenLimit: 500,
+      abTests: 20,
+      variantsPerTest: 6,
     },
     features: [
       'Everything in Pro',
@@ -141,6 +151,8 @@ export const PLANS: Record<Plan, PlanConfig> = {
       apiRequestsPerDay: -1, // unlimited
       analyticsRetentionDays: -1, // unlimited
       bulkShortenLimit: -1, // unlimited
+      abTests: -1, // unlimited
+      variantsPerTest: -1, // unlimited
     },
     features: [
       'Everything in Business',

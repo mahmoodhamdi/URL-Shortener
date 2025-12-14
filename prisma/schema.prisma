@@ -230,6 +230,7 @@ model Link {
   clicks      Click[]
   tags        Tag[]
   targets     LinkTarget[]
+  abTest      ABTest?
 
   @@index([shortCode])
   @@index([createdAt])
@@ -400,4 +401,43 @@ model WebhookLog {
 
   @@index([webhookId])
   @@index([createdAt])
+}
+
+// ==================== A/B TESTING MODELS ====================
+
+model ABTest {
+  id        String      @id @default(cuid())
+  linkId    String      @unique
+  link      Link        @relation(fields: [linkId], references: [id], onDelete: Cascade)
+
+  name      String?     // Optional test name
+  isActive  Boolean     @default(true)
+  startedAt DateTime    @default(now())
+  endedAt   DateTime?
+
+  variants  ABVariant[]
+
+  createdAt DateTime    @default(now())
+  updatedAt DateTime    @updatedAt
+
+  @@index([linkId])
+  @@index([isActive])
+}
+
+model ABVariant {
+  id          String   @id @default(cuid())
+  testId      String
+  test        ABTest   @relation(fields: [testId], references: [id], onDelete: Cascade)
+
+  name        String   // "Control", "Variant A", "Variant B"
+  url         String
+  weight      Int      @default(50) // Percentage (1-100)
+
+  clicks      Int      @default(0)
+  conversions Int      @default(0)
+
+  createdAt   DateTime @default(now())
+  updatedAt   DateTime @updatedAt
+
+  @@index([testId])
 }

@@ -2,6 +2,7 @@ import { NextRequest, NextResponse } from 'next/server';
 import { getLinkByCode, isLinkExpired, verifyPassword } from '@/lib/url/shortener';
 import { trackClick } from '@/lib/analytics/tracker';
 import { resolveTargetUrl } from '@/lib/targeting';
+import { selectAndTrackVariant } from '@/lib/ab-testing';
 import { headers } from 'next/headers';
 
 interface RouteContext {
@@ -69,7 +70,21 @@ export async function GET(
       referrer,
     });
 
-    // Resolve target URL based on device/geo targeting
+    // First, check if there's an active A/B test
+    const abTestUrl = await selectAndTrackVariant(
+      link.id,
+      ip || null,
+      userAgent || null
+    );
+
+    // If A/B test is active, use the selected variant URL
+    if (abTestUrl) {
+      return NextResponse.json({
+        originalUrl: abTestUrl,
+      });
+    }
+
+    // Otherwise, resolve target URL based on device/geo targeting
     const targetUrl = await resolveTargetUrl(
       { id: link.id, originalUrl: link.originalUrl },
       request
