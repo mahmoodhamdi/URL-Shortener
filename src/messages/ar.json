@@ -801,5 +801,54 @@
     "step3": "اختر مشغلاً أو إجراءً",
     "step4": "اربط حسابك باستخدام مفتاح API",
     "learnMore": "اعرف المزيد"
+  },
+  "cloaking": {
+    "title": "إخفاء الروابط",
+    "subtitle": "إخفاء عناوين URL الوجهة عن الزوار",
+    "enable": "تفعيل الإخفاء",
+    "disable": "إلغاء الإخفاء",
+    "enabled": "الإخفاء مفعّل",
+    "disabled": "الإخفاء معطّل",
+    "type": "نوع الإخفاء",
+    "selectType": "اختر نوع الإخفاء",
+    "types": {
+      "IFRAME": "إخفاء iFrame",
+      "JAVASCRIPT": "إعادة توجيه JavaScript",
+      "META_REFRESH": "إعادة توجيه Meta Refresh"
+    },
+    "typeDescriptions": {
+      "IFRAME": "يحمّل الوجهة في iFrame، مع إبقاء رابطك المختصر في شريط العناوين",
+      "JAVASCRIPT": "يستخدم JavaScript لإعادة التوجيه، يخفي الوجهة من الفحص البسيط",
+      "META_REFRESH": "يستخدم وسم HTML meta refresh لإعادة التوجيه، الأكثر توافقاً"
+    },
+    "customTitle": "عنوان الصفحة المخصص",
+    "customTitlePlaceholder": "أدخل عنواناً مخصصاً للصفحة المخفية",
+    "customTitleHelp": "العنوان المعروض في تبويب المتصفح عند استخدام الإخفاء",
+    "customFavicon": "رابط الأيقونة المخصصة",
+    "customFaviconPlaceholder": "https://example.com/favicon.ico",
+    "customFaviconHelp": "أيقونة مخصصة لعرضها للصفحة المخفية",
+    "settings": "إعدادات الإخفاء",
+    "status": "الحالة",
+    "active": "نشط",
+    "inactive": "غير نشط",
+    "preview": "معاينة",
+    "cloakedLinks": "الروابط المخفية",
+    "cloakedLinksCount": "{count} من {limit} رابط مخفي مستخدم",
+    "cloakedLinksUnlimited": "{count} روابط مخفية (غير محدود)",
+    "empty": "لا توجد روابط مخفية",
+    "emptyDesc": "فعّل الإخفاء على روابطك لإخفاء عناوين URL الوجهة عن الزوار",
+    "upgradeRequired": "إخفاء الروابط متاح في خطة Starter وما فوق",
+    "limitReached": "تم الوصول لحد الروابط المخفية لخطتك",
+    "warning": "ملاحظة: إخفاء iFrame قد لا يعمل على المواقع التي تحظر التضمين",
+    "howItWorks": "كيف يعمل",
+    "step1": "فعّل الإخفاء على أي رابط",
+    "step2": "اختر طريقة الإخفاء المفضلة لديك",
+    "step3": "يرى الزوار رابطك المختصر بدلاً من الوجهة",
+    "benefits": {
+      "title": "الفوائد",
+      "hideAffiliate": "إخفاء روابط الأفلييت",
+      "brandConsistency": "الحفاظ على اتساق العلامة التجارية",
+      "trackingProtection": "حماية معلمات التتبع"
+    }
   }
 }

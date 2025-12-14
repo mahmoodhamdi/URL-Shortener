@@ -230,6 +230,12 @@ model Link {
   utmTerm     String?
   utmContent  String?
 
+  // Link cloaking
+  cloakingEnabled  Boolean       @default(false)
+  cloakingType     CloakingType?
+  cloakingTitle    String?
+  cloakingFavicon  String?
+
   clicks      Click[]
   tags        Tag[]
   targets     LinkTarget[]
@@ -547,6 +553,14 @@ enum PixelType {
   LINKEDIN        // LinkedIn Insight Tag
   TIKTOK          // TikTok Pixel
   CUSTOM          // Custom script
+}
+
+// ==================== LINK CLOAKING ====================
+
+enum CloakingType {
+  IFRAME       // Load destination in iframe (hides URL in address bar)
+  JAVASCRIPT   // JavaScript redirect with delay
+  META_REFRESH // Meta refresh redirect
 }
 
 // ==================== ZAPIER INTEGRATION MODELS ====================

@@ -3,6 +3,7 @@ import { getLinkByCode, isLinkExpired, verifyPassword } from '@/lib/url/shortene
 import { trackClick } from '@/lib/analytics/tracker';
 import { resolveTargetUrl } from '@/lib/targeting';
 import { selectAndTrackVariant } from '@/lib/ab-testing';
+import { generateCloakedPage, getCloakedPageContentType } from '@/lib/cloaking';
 import { headers } from 'next/headers';
 
 interface RouteContext {
@@ -89,6 +90,22 @@ export async function GET(
       { id: link.id, originalUrl: link.originalUrl },
       request
     );
+
+    // Check if cloaking is enabled
+    if (link.cloakingEnabled && link.cloakingType) {
+      const html = generateCloakedPage(link.cloakingType, {
+        destinationUrl: targetUrl,
+        title: link.cloakingTitle,
+        favicon: link.cloakingFavicon,
+      });
+
+      return new NextResponse(html, {
+        headers: {
+          'Content-Type': getCloakedPageContentType(),
+          'X-Robots-Tag': 'noindex, nofollow',
+        },
+      });
+    }
 
     // Return link info for client-side redirect
     return NextResponse.json({

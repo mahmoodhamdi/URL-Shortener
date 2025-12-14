@@ -801,5 +801,54 @@
     "step3": "Choose a trigger or action",
     "step4": "Connect your account using an API key",
     "learnMore": "Learn More"
+  },
+  "cloaking": {
+    "title": "Link Cloaking",
+    "subtitle": "Hide destination URLs from visitors",
+    "enable": "Enable Cloaking",
+    "disable": "Disable Cloaking",
+    "enabled": "Cloaking Enabled",
+    "disabled": "Cloaking Disabled",
+    "type": "Cloaking Type",
+    "selectType": "Select cloaking type",
+    "types": {
+      "IFRAME": "iFrame Cloaking",
+      "JAVASCRIPT": "JavaScript Redirect",
+      "META_REFRESH": "Meta Refresh Redirect"
+    },
+    "typeDescriptions": {
+      "IFRAME": "Loads destination in an iFrame, keeping your short URL in the address bar",
+      "JAVASCRIPT": "Uses JavaScript to redirect, hiding destination from simple inspection",
+      "META_REFRESH": "Uses HTML meta refresh tag for redirect, most compatible"
+    },
+    "customTitle": "Custom Page Title",
+    "customTitlePlaceholder": "Enter a custom title for the cloaked page",
+    "customTitleHelp": "Title shown in browser tab when using cloaking",
+    "customFavicon": "Custom Favicon URL",
+    "customFaviconPlaceholder": "https://example.com/favicon.ico",
+    "customFaviconHelp": "Custom favicon to display for the cloaked page",
+    "settings": "Cloaking Settings",
+    "status": "Status",
+    "active": "Active",
+    "inactive": "Inactive",
+    "preview": "Preview",
+    "cloakedLinks": "Cloaked Links",
+    "cloakedLinksCount": "{count} of {limit} cloaked links used",
+    "cloakedLinksUnlimited": "{count} cloaked links (unlimited)",
+    "empty": "No cloaked links yet",
+    "emptyDesc": "Enable cloaking on your links to hide destination URLs from visitors",
+    "upgradeRequired": "Link cloaking is available on Starter and above plans",
+    "limitReached": "Cloaked links limit reached for your plan",
+    "warning": "Note: iFrame cloaking may not work on sites that block embedding",
+    "howItWorks": "How It Works",
+    "step1": "Enable cloaking on any link",
+    "step2": "Choose your preferred cloaking method",
+    "step3": "Visitors see your short URL instead of the destination",
+    "benefits": {
+      "title": "Benefits",
+      "hideAffiliate": "Hide affiliate links",
+      "brandConsistency": "Maintain brand consistency",
+      "trackingProtection": "Protect tracking parameters"
+    }
   }
 }
