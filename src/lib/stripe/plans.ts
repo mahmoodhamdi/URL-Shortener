@@ -21,6 +21,8 @@ export interface PlanConfig {
     linksPerBioPage: number;
     retargetingPixels: number;
     linksWithPixels: number;
+    zapierSubscriptions: number;
+    zapierEventsPerDay: number;
   };
   features: string[];
   popular?: boolean;
@@ -46,6 +48,8 @@ export const PLANS: Record<Plan, PlanConfig> = {
       linksPerBioPage: 5,
       retargetingPixels: 0,
       linksWithPixels: 0,
+      zapierSubscriptions: 0,
+      zapierEventsPerDay: 0,
     },
     features: [
       'Basic Analytics',
@@ -77,6 +81,8 @@ export const PLANS: Record<Plan, PlanConfig> = {
       linksPerBioPage: 10,
       retargetingPixels: 1,
       linksWithPixels: 10,
+      zapierSubscriptions: 2,
+      zapierEventsPerDay: 100,
     },
     features: [
       'Everything in Free',
@@ -88,6 +94,7 @@ export const PLANS: Record<Plan, PlanConfig> = {
       'UTM Builder',
       'Tags & Folders',
       '1 Retargeting Pixel',
+      '2 Zapier Integrations',
     ],
   },
   PRO: {
@@ -112,6 +119,8 @@ export const PLANS: Record<Plan, PlanConfig> = {
       linksPerBioPage: 20,
       retargetingPixels: 5,
       linksWithPixels: 50,
+      zapierSubscriptions: 10,
+      zapierEventsPerDay: 1000,
     },
     features: [
       'Everything in Starter',
@@ -123,6 +132,7 @@ export const PLANS: Record<Plan, PlanConfig> = {
       'Priority Support',
       'Webhooks',
       '5 Retargeting Pixels',
+      '10 Zapier Integrations',
     ],
   },
   BUSINESS: {
@@ -146,6 +156,8 @@ export const PLANS: Record<Plan, PlanConfig> = {
       linksPerBioPage: -1, // unlimited
       retargetingPixels: 20,
       linksWithPixels: -1, // unlimited
+      zapierSubscriptions: 50,
+      zapierEventsPerDay: 10000,
     },
     features: [
       'Everything in Pro',
@@ -157,6 +169,7 @@ export const PLANS: Record<Plan, PlanConfig> = {
       'SSO (SAML)',
       'Dedicated Support',
       '20 Retargeting Pixels',
+      '50 Zapier Integrations',
     ],
   },
   ENTERPRISE: {
@@ -180,6 +193,8 @@ export const PLANS: Record<Plan, PlanConfig> = {
       linksPerBioPage: -1, // unlimited
       retargetingPixels: -1, // unlimited
       linksWithPixels: -1, // unlimited
+      zapierSubscriptions: -1, // unlimited
+      zapierEventsPerDay: -1, // unlimited
     },
     features: [
       'Everything in Business',
@@ -191,6 +206,7 @@ export const PLANS: Record<Plan, PlanConfig> = {
       'SLA',
       'Dedicated Account Manager',
       'Unlimited Retargeting Pixels',
+      'Unlimited Zapier Integrations',
     ],
   },
 };

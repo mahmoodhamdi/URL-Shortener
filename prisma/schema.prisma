@@ -30,8 +30,9 @@ model User {
   ownedWorkspaces    Workspace[]         @relation("WorkspaceOwner")
   workspaceMemberships WorkspaceMember[]
   webhooks           Webhook[]
-  bioPages           BioPage[]
-  retargetingPixels  RetargetingPixel[]
+  bioPages             BioPage[]
+  retargetingPixels    RetargetingPixel[]
+  zapierSubscriptions  ZapierSubscription[]
 
   @@index([email])
 }
@@ -546,4 +547,32 @@ enum PixelType {
   LINKEDIN        // LinkedIn Insight Tag
   TIKTOK          // TikTok Pixel
   CUSTOM          // Custom script
+}
+
+// ==================== ZAPIER INTEGRATION MODELS ====================
+
+model ZapierSubscription {
+  id          String   @id @default(cuid())
+  userId      String
+  user        User     @relation(fields: [userId], references: [id], onDelete: Cascade)
+
+  hookUrl     String   // Zapier webhook URL
+  event       ZapierEvent
+  isActive    Boolean  @default(true)
+
+  createdAt   DateTime @default(now())
+  updatedAt   DateTime @updatedAt
+
+  @@index([userId])
+  @@index([event])
+  @@unique([userId, hookUrl, event])
+}
+
+enum ZapierEvent {
+  LINK_CREATED
+  LINK_CLICKED
+  LINK_EXPIRED
+  LINK_DELETED
+  BIO_PAGE_CREATED
+  BIO_PAGE_UPDATED
 }

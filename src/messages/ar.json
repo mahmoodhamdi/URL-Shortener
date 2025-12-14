@@ -735,5 +735,71 @@
       "tiktokFormat": "معرف بكسل تيك توك يجب أن يكون 15-30 حرفاً أو رقماً",
       "customFormat": "السكربت المخصص يجب أن يكون على الأقل 10 أحرف"
     }
+  },
+  "zapier": {
+    "title": "تكامل Zapier",
+    "subtitle": "اربط مختصر الروابط الخاص بك مع أكثر من 5,000 تطبيق عبر Zapier",
+    "subscriptions": "الاشتراكات",
+    "subscribe": "الاشتراك في الأحداث",
+    "unsubscribe": "إلغاء الاشتراك",
+    "hookUrl": "رابط Webhook",
+    "hookUrlPlaceholder": "https://hooks.zapier.com/...",
+    "hookUrlHelp": "أدخل رابط Webhook المقدم من Zapier",
+    "event": "الحدث",
+    "selectEvent": "اختر حدثاً",
+    "events": {
+      "LINK_CREATED": "تم إنشاء رابط",
+      "LINK_CLICKED": "تم النقر على رابط",
+      "LINK_EXPIRED": "انتهى صلاحية الرابط",
+      "LINK_DELETED": "تم حذف الرابط",
+      "BIO_PAGE_CREATED": "تم إنشاء صفحة Bio",
+      "BIO_PAGE_UPDATED": "تم تحديث صفحة Bio"
+    },
+    "eventDescriptions": {
+      "LINK_CREATED": "يتم التفعيل عند إنشاء رابط مختصر جديد",
+      "LINK_CLICKED": "يتم التفعيل عند النقر على رابط",
+      "LINK_EXPIRED": "يتم التفعيل عند انتهاء صلاحية الرابط",
+      "LINK_DELETED": "يتم التفعيل عند حذف رابط",
+      "BIO_PAGE_CREATED": "يتم التفعيل عند إنشاء صفحة Bio جديدة",
+      "BIO_PAGE_UPDATED": "يتم التفعيل عند تحديث صفحة Bio"
+    },
+    "status": "الحالة",
+    "active": "نشط",
+    "inactive": "غير نشط",
+    "createdAt": "تاريخ الإنشاء",
+    "lastTriggered": "آخر تفعيل",
+    "delete": "حذف الاشتراك",
+    "deleteConfirm": "هل أنت متأكد من حذف هذا الاشتراك في Zapier؟",
+    "empty": "لا توجد اشتراكات Zapier",
+    "emptyDesc": "اربط مختصر الروابط مع Zapier لأتمتة سير العمل",
+    "upgradeRequired": "تكامل Zapier متاح في خطة Starter وما فوق",
+    "limitReached": "تم الوصول لحد الاشتراكات لخطتك",
+    "invalidHookUrl": "رابط Webhook غير صالح. يجب أن يكون رابط HTTPS صالح.",
+    "duplicateSubscription": "يوجد اشتراك بالفعل لهذا الحدث ورابط Webhook",
+    "zapierIntegration": "تكامل Zapier",
+    "connectWith": "اتصل بأكثر من 5,000 تطبيق",
+    "availableActions": "الإجراءات المتاحة",
+    "actions": {
+      "createLink": "إنشاء رابط مختصر",
+      "createLinkDesc": "إنشاء رابط مختصر جديد",
+      "updateLink": "تحديث الرابط",
+      "updateLinkDesc": "تحديث إعدادات رابط موجود",
+      "deleteLink": "حذف الرابط",
+      "deleteLinkDesc": "حذف رابط مختصر"
+    },
+    "availableTriggers": "المشغلات المتاحة",
+    "availableSearches": "عمليات البحث المتاحة",
+    "searches": {
+      "findLink": "البحث عن رابط",
+      "findLinkDesc": "البحث عن رابط بالكود المختصر أو الرابط",
+      "findBioPage": "البحث عن صفحة Bio",
+      "findBioPageDesc": "البحث عن صفحة Bio بالمعرف أو العنوان"
+    },
+    "setupGuide": "دليل الإعداد",
+    "step1": "أنشئ Zap جديد في Zapier",
+    "step2": "ابحث عن 'URL Shortener' في قائمة التطبيقات",
+    "step3": "اختر مشغلاً أو إجراءً",
+    "step4": "اربط حسابك باستخدام مفتاح API",
+    "learnMore": "اعرف المزيد"
   }
 }
