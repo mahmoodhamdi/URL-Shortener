@@ -6,6 +6,9 @@ import { checkBulkLimit } from '@/lib/limits';
 import { ZodError } from 'zod';
 import type { BulkShortenResult } from '@/types';
 
+// Batch size for parallel processing
+const BATCH_SIZE = 10;
+
 export async function POST(request: NextRequest) {
   try {
     const body = await request.json();
@@ -38,36 +41,53 @@ export async function POST(request: NextRequest) {
       failed: [],
     };
 
-    // Process each URL
+    // Pre-validate all URLs first
+    const validUrls: { original: string; normalized: string }[] = [];
     for (const url of urls) {
-      try {
-        const normalizedUrl = normalizeUrl(url);
-
-        if (!isValidUrl(normalizedUrl)) {
-          result.failed.push({
-            originalUrl: url,
-            error: 'Invalid URL format',
-          });
-          continue;
-        }
-
-        const link = await createShortLink({
-          url: normalizedUrl,
-          userId,
-        });
-        const shortCode = link.customAlias || link.shortCode;
-
-        result.success.push({
-          originalUrl: link.originalUrl,
-          shortUrl: getShortUrl(shortCode),
-          shortCode,
-        });
-      } catch (error) {
+      const normalizedUrl = normalizeUrl(url);
+      if (!isValidUrl(normalizedUrl)) {
         result.failed.push({
           originalUrl: url,
-          error: error instanceof Error ? error.message : 'Unknown error',
+          error: 'Invalid URL format',
         });
+      } else {
+        validUrls.push({ original: url, normalized: normalizedUrl });
       }
+    }
+
+    // Process valid URLs in batches for better performance
+    for (let i = 0; i < validUrls.length; i += BATCH_SIZE) {
+      const batch = validUrls.slice(i, i + BATCH_SIZE);
+
+      // Process batch in parallel
+      const batchResults = await Promise.allSettled(
+        batch.map(async ({ original, normalized }) => {
+          const link = await createShortLink({
+            url: normalized,
+            userId,
+          });
+          const shortCode = link.customAlias || link.shortCode;
+          return {
+            originalUrl: link.originalUrl,
+            shortUrl: getShortUrl(shortCode),
+            shortCode,
+          };
+        })
+      );
+
+      // Collect results
+      batchResults.forEach((settledResult, index) => {
+        if (settledResult.status === 'fulfilled') {
+          result.success.push(settledResult.value);
+        } else {
+          result.failed.push({
+            originalUrl: batch[index].original,
+            error: settledResult.reason instanceof Error
+              ? settledResult.reason.message
+              : 'Unknown error',
+          });
+        }
+      });
     }
 
     return NextResponse.json(result, { status: 200 });

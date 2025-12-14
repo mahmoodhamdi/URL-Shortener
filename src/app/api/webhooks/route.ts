@@ -1,6 +1,6 @@
 import { NextResponse } from 'next/server';
-import { getServerSession } from 'next-auth';
-import { authOptions } from '@/lib/auth';
+import { auth } from '@/lib/auth';
+
 import {
   createWebhook,
   getUserWebhooks,
@@ -9,6 +9,7 @@ import {
   ALL_WEBHOOK_EVENTS,
 } from '@/lib/webhooks';
 import { validateUrl } from '@/lib/url/validator';
+import { validateWebhookUrl } from '@/lib/security/ssrf';
 import type { WebhookEvent } from '@/lib/webhooks/events';
 
 /**
@@ -17,7 +18,7 @@ import type { WebhookEvent } from '@/lib/webhooks/events';
  */
 export async function GET() {
   try {
-    const session = await getServerSession(authOptions);
+    const session = await auth();
     if (!session?.user?.id) {
       return NextResponse.json({ error: 'Unauthorized' }, { status: 401 });
     }
@@ -40,7 +41,7 @@ export async function GET() {
  */
 export async function POST(request: Request) {
   try {
-    const session = await getServerSession(authOptions);
+    const session = await auth();
     if (!session?.user?.id) {
       return NextResponse.json({ error: 'Unauthorized' }, { status: 401 });
     }
@@ -96,6 +97,15 @@ export async function POST(request: Request) {
       );
     }
 
+    // SSRF protection - validate URL doesn't point to internal resources
+    const ssrfValidation = validateWebhookUrl(url);
+    if (!ssrfValidation.safe) {
+      return NextResponse.json(
+        { error: ssrfValidation.reason || 'Webhook URL is not allowed' },
+        { status: 400 }
+      );
+    }
+
     // Validate events
     if (!events || !Array.isArray(events) || events.length === 0) {
       return NextResponse.json(
@@ -107,8 +117,9 @@ export async function POST(request: Request) {
     const validatedEvents: WebhookEvent[] = [];
     for (const event of events) {
       if (!isValidWebhookEvent(event)) {
+        // Don't reveal valid events to prevent enumeration
         return NextResponse.json(
-          { error: `Invalid event: ${event}. Valid events: ${ALL_WEBHOOK_EVENTS.join(', ')}` },
+          { error: 'Invalid event type specified' },
           { status: 400 }
         );
       }

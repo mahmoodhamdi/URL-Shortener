@@ -237,6 +237,10 @@ model Link {
   cloakingTitle    String?
   cloakingFavicon  String?
 
+  // Deep linking (app links)
+  deepLinkEnabled  Boolean       @default(false)
+  deepLinkConfig   Json?         // iOS/Android app schemes, store URLs, fallback
+
   clicks      Click[]
   tags        Tag[]
   targets     LinkTarget[]
@@ -268,6 +272,7 @@ model Click {
 
   @@index([linkId])
   @@index([clickedAt])
+  @@index([linkId, clickedAt]) // Composite index for analytics queries
 }
 
 model Tag {

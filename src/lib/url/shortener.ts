@@ -3,6 +3,7 @@ import { prisma } from '@/lib/db/prisma';
 import { normalizeUrl, isValidUrl, isValidAlias } from './validator';
 import bcrypt from 'bcryptjs';
 import type { Link, CreateLinkInput, UpdateLinkInput } from '@/types';
+import { getPlanLimits } from '@/lib/stripe/plans';
 
 export interface CreateLinkOptions extends CreateLinkInput {
   userId?: string;
@@ -15,6 +16,7 @@ export interface CreateLinkOptions extends CreateLinkInput {
 }
 
 const SHORT_CODE_LENGTH = 7;
+const MAX_SHORT_CODE_RETRIES = 10;
 
 export function generateShortCode(): string {
   return nanoid(SHORT_CODE_LENGTH);
@@ -39,9 +41,7 @@ export async function createShortLink(input: CreateLinkOptions): Promise<Link> {
     throw new Error('Invalid URL format');
   }
 
-  let shortCode = generateShortCode();
-
-  // If custom alias provided, validate and use it
+  // If custom alias provided, validate it
   if (input.customAlias) {
     if (!isValidAlias(input.customAlias)) {
       throw new Error('Invalid alias format');
@@ -53,9 +53,15 @@ export async function createShortLink(input: CreateLinkOptions): Promise<Link> {
     }
   }
 
-  // Ensure shortCode is unique
+  // Generate unique short code with retry logic
+  let shortCode = generateShortCode();
+  let retries = 0;
   while (!(await isShortCodeAvailable(shortCode))) {
+    if (retries >= MAX_SHORT_CODE_RETRIES) {
+      throw new Error('Failed to generate unique short code. Please try again.');
+    }
     shortCode = generateShortCode();
+    retries++;
   }
 
   // Hash password if provided
@@ -64,6 +70,64 @@ export async function createShortLink(input: CreateLinkOptions): Promise<Link> {
     hashedPassword = await bcrypt.hash(input.password, 10);
   }
 
+  // Use transaction to prevent race conditions in limit checking
+  if (input.userId) {
+    return await prisma.$transaction(async (tx) => {
+      // Lock and check subscription limits
+      const subscription = await tx.subscription.findUnique({
+        where: { userId: input.userId },
+      });
+
+      if (subscription) {
+        const limits = getPlanLimits(subscription.plan);
+        const linkLimit = limits.linksPerMonth;
+
+        // Check if limit would be exceeded (skip for unlimited plans)
+        if (linkLimit !== -1 && subscription.linksUsedThisMonth >= linkLimit) {
+          throw new Error(`Link limit reached (${linkLimit}). Upgrade your plan to create more links.`);
+        }
+
+        // Increment counter BEFORE creating link (atomic)
+        await tx.subscription.update({
+          where: { userId: input.userId },
+          data: {
+            linksUsedThisMonth: { increment: 1 },
+          },
+        });
+      }
+
+      // Create the link
+      const link = await tx.link.create({
+        data: {
+          originalUrl: normalizedUrl,
+          shortCode,
+          customAlias: input.customAlias || null,
+          password: hashedPassword,
+          expiresAt: input.expiresAt ? new Date(input.expiresAt) : null,
+          title: input.title || null,
+          description: input.description || null,
+          userId: input.userId || null,
+          folderId: input.folderId || null,
+          utmSource: input.utmSource || null,
+          utmMedium: input.utmMedium || null,
+          utmCampaign: input.utmCampaign || null,
+          utmTerm: input.utmTerm || null,
+          utmContent: input.utmContent || null,
+        },
+        include: {
+          _count: {
+            select: { clicks: true },
+          },
+        },
+      });
+
+      return link as Link;
+    }, {
+      isolationLevel: 'Serializable', // Prevent concurrent modifications
+    });
+  }
+
+  // For anonymous users (no userId), create without transaction
   const link = await prisma.link.create({
     data: {
       originalUrl: normalizedUrl,
@@ -73,7 +137,7 @@ export async function createShortLink(input: CreateLinkOptions): Promise<Link> {
       expiresAt: input.expiresAt ? new Date(input.expiresAt) : null,
       title: input.title || null,
       description: input.description || null,
-      userId: input.userId || null,
+      userId: null,
       folderId: input.folderId || null,
       utmSource: input.utmSource || null,
       utmMedium: input.utmMedium || null,
@@ -87,18 +151,6 @@ export async function createShortLink(input: CreateLinkOptions): Promise<Link> {
       },
     },
   });
-
-  // Increment usage counter if user is authenticated
-  if (input.userId) {
-    await prisma.subscription.update({
-      where: { userId: input.userId },
-      data: {
-        linksUsedThisMonth: { increment: 1 },
-      },
-    }).catch(() => {
-      // Ignore if no subscription exists (will be created on first access)
-    });
-  }
 
   return link as Link;
 }

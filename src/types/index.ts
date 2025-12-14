@@ -1,3 +1,5 @@
+export type CloakingType = 'IFRAME' | 'JAVASCRIPT' | 'META_REFRESH';
+
 export interface Link {
   id: string;
   originalUrl: string;
@@ -14,12 +16,21 @@ export interface Link {
   userId: string | null;
   folderId: string | null;
   customDomainId: string | null;
+  workspaceId: string | null;
   // UTM parameters
   utmSource: string | null;
   utmMedium: string | null;
   utmCampaign: string | null;
   utmTerm: string | null;
   utmContent: string | null;
+  // Link cloaking
+  cloakingEnabled: boolean;
+  cloakingType: CloakingType | null;
+  cloakingTitle: string | null;
+  cloakingFavicon: string | null;
+  // Deep linking
+  deepLinkEnabled: boolean;
+  deepLinkConfig: Record<string, unknown> | null;
   // Relations
   clicks?: Click[];
   tags?: Tag[];

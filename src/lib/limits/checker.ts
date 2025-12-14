@@ -127,9 +127,7 @@ export async function checkClickTrackingLimit(userId: string): Promise<LimitChec
   }
 
   // Count total clicks this month for user's links
-  const startOfMonth = new Date();
-  startOfMonth.setDate(1);
-  startOfMonth.setHours(0, 0, 0, 0);
+  const startOfMonth = getStartOfMonthUTC();
 
   const clicksCount = await prisma.click.count({
     where: {
@@ -236,10 +234,16 @@ export async function checkApiRateLimit(userId: string): Promise<LimitCheckResul
   };
 }
 
+/**
+ * Get start of current month in UTC
+ */
+function getStartOfMonthUTC(): Date {
+  const now = new Date();
+  return new Date(Date.UTC(now.getUTCFullYear(), now.getUTCMonth(), 1, 0, 0, 0, 0));
+}
+
 async function countLinksThisMonth(userId: string): Promise<number> {
-  const startOfMonth = new Date();
-  startOfMonth.setDate(1);
-  startOfMonth.setHours(0, 0, 0, 0);
+  const startOfMonth = getStartOfMonthUTC();
 
   return await prisma.link.count({
     where: {
@@ -259,10 +263,8 @@ export async function getUsageSummary(userId: string) {
   const plan = subscription?.plan || 'FREE';
   const limits = getPlanLimits(plan);
 
-  // Get current usage
-  const startOfMonth = new Date();
-  startOfMonth.setDate(1);
-  startOfMonth.setHours(0, 0, 0, 0);
+  // Get current usage (using UTC for consistency)
+  const startOfMonth = getStartOfMonthUTC();
 
   const [linksThisMonth, totalClicks, domainCount] = await Promise.all([
     prisma.link.count({

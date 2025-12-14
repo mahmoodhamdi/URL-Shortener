@@ -10,3 +10,6 @@ export const {
 
 // Helper to get session in server components
 export { auth as getServerSession };
+
+// Export auth config for routes that need it
+export { authConfig as authOptions };

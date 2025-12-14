@@ -4,7 +4,7 @@ This file provides guidance to Claude Code (claude.ai/code) when working with co
 
 ## Project Overview
 
-A production-ready URL shortener built with Next.js 14 (App Router), TypeScript (strict mode), and PostgreSQL. Features bilingual support (English/Arabic with RTL), dark/light themes, and a complete REST API.
+A production-ready URL shortener built with Next.js 14 (App Router), TypeScript (strict mode), and PostgreSQL. Features bilingual support (English/Arabic with RTL), dark/light themes, multi-tenant workspaces, subscription-based plans, and a complete REST API.
 
 ## Common Commands
 
@@ -36,34 +36,74 @@ npm run db:studio              # Open Prisma Studio
 ### Directory Structure
 - `src/app/[locale]/` - Locale-based pages (Next.js App Router with next-intl)
 - `src/app/api/` - REST API routes
-- `src/lib/url/` - Core URL shortening logic (validator, shortener, qr)
-- `src/lib/analytics/` - Click tracking and device detection
-- `src/lib/db/prisma.ts` - Database client singleton
+- `src/lib/` - Core business logic modules (see Library Modules below)
 - `src/components/` - React components (ui/, url/, stats/, layout/)
 - `src/messages/` - i18n translations (en.json, ar.json)
 - `src/types/index.ts` - TypeScript type definitions
 
+### Library Modules (`src/lib/`)
+| Module | Purpose |
+|--------|---------|
+| `url/` | URL shortening, validation (Zod), QR generation, UTM params |
+| `auth/` | NextAuth.js v5 config with Google, GitHub, Credentials providers |
+| `analytics/` | Click tracking and device detection (ua-parser-js) |
+| `stripe/` | Stripe subscriptions, checkout, webhooks |
+| `limits/` | Plan-based feature limit checking |
+| `rate-limit/` | API rate limiting per user/plan |
+| `targeting/` | Device/geo/browser-based URL targeting |
+| `webhooks/` | Webhook CRUD, HMAC signatures, event dispatching |
+| `workspace/` | Multi-tenant workspace permissions, invitations |
+| `ab-testing/` | A/B test variant selection and statistics |
+| `bio-page/` | Link-in-bio page themes and management |
+| `retargeting/` | Facebook, Google Analytics, TikTok pixel integration |
+| `cloaking/` | Link cloaking (iframe, JS redirect, meta refresh) |
+| `deeplink/` | Mobile app deep linking with fallbacks |
+| `zapier/` | Zapier trigger/action event dispatching |
+| `extension/` | Browser extension token management |
+| `domains/` | Custom domain verification and SSL |
+| `security/` | SSRF protection for URL validation |
+
 ### Key Patterns
-- **Internationalization**: Uses `next-intl` with locale routing (`/en/...`, `/ar/...`). Translation files in `src/messages/`. Routing config in `src/i18n/`. When adding UI text, update both `en.json` and `ar.json`. Use navigation exports from `src/i18n/routing.ts` (`Link`, `redirect`, `usePathname`, `useRouter`) instead of next/navigation.
+- **Internationalization**: Uses `next-intl` with locale routing (`/en/...`, `/ar/...`). Translation files in `src/messages/`. When adding UI text, update both `en.json` and `ar.json`. Use navigation exports from `src/i18n/routing.ts` (`Link`, `redirect`, `usePathname`, `useRouter`) instead of next/navigation.
 - **Path Alias**: Use `@/` to import from `src/` (configured in tsconfig and vitest)
+- **Authentication**: NextAuth.js v5 with JWT strategy. Get session via `auth()` from `@/lib/auth`. User ID available in `session.user.id`.
+- **Plan Limits**: Feature availability is gated by subscription plan (FREE, STARTER, PRO, BUSINESS, ENTERPRISE). Each module has a `*_LIMITS` constant (e.g., `WEBHOOK_LIMITS`, `TARGETING_LIMITS`). Use `checkLinkLimit()`, `checkWebhookLimits()`, etc. before creating resources.
 - **Validation**: Zod schemas in `src/lib/url/validator.ts` for URL and alias validation
 - **Short Code Generation**: Uses `nanoid` (7 chars) in `src/lib/url/shortener.ts`
 - **Password Protection**: bcryptjs for hashing link passwords
 
 ### Database Schema (Prisma)
-- `Link` - Main model with shortCode, customAlias, password, expiresAt
-- `Click` - Analytics: ip, country, device, browser, os, referrer
-- `Tag` - For link categorization
+Key models (see `prisma/schema.prisma` for full schema):
+- `User`, `Account`, `Session` - NextAuth.js authentication
+- `Subscription` - Stripe subscription with plan, usage tracking
+- `Link` - Core model with shortCode, targeting, cloaking, deep linking
+- `Click` - Analytics with IP, country, device, browser, referrer
+- `LinkTarget` - Device/geo/browser targeting rules
+- `ABTest`, `ABVariant` - A/B testing configuration
+- `Workspace`, `WorkspaceMember`, `WorkspaceInvitation` - Multi-tenant teams
+- `Webhook`, `WebhookLog` - Webhook subscriptions and delivery logs
+- `RetargetingPixel`, `LinkPixel` - Tracking pixel assignments
+- `BioPage`, `BioLink` - Link-in-bio pages
+- `ZapierSubscription` - Zapier webhook subscriptions
+- `ExtensionToken` - Browser extension authentication
 
 ### API Routes
+Core:
 - `POST /api/shorten` - Create short URL
 - `POST /api/shorten/bulk` - Bulk shorten (max 100)
-- `GET /api/links` - List all links (supports search, filter, sort)
 - `GET/PUT/DELETE /api/links/[id]` - Single link operations
 - `GET /api/links/[id]/stats` - Link statistics
-- `POST /api/qr` - Generate QR code
-- `GET /api/r/[shortCode]` - Redirect handler
-- `GET /api/health` - Health check endpoint
+- `GET /api/r/[shortCode]` - Redirect handler with targeting
+
+Advanced Features:
+- `/api/links/[id]/targets` - Link targeting rules
+- `/api/links/[id]/ab-test` - A/B test configuration
+- `/api/links/[id]/pixels` - Retargeting pixel assignment
+- `/api/workspaces/` - Workspace CRUD, members, invitations
+- `/api/webhooks/` - Webhook CRUD, logs, testing
+- `/api/bio/` - Bio page management
+- `/api/zapier/` - Zapier triggers and actions
+- `/api/extension/` - Browser extension endpoints
 
 ### Testing Structure
 - Unit tests: `__tests__/unit/` - Test isolated utilities (`vitest.config.ts`)
@@ -74,6 +114,15 @@ npm run db:studio              # Open Prisma Studio
 
 Required:
 - `DATABASE_URL` - PostgreSQL connection string
+- `AUTH_SECRET` - NextAuth.js secret
+
+OAuth (optional):
+- `GOOGLE_CLIENT_ID`, `GOOGLE_CLIENT_SECRET`
+- `GITHUB_CLIENT_ID`, `GITHUB_CLIENT_SECRET`
+
+Stripe (optional):
+- `STRIPE_SECRET_KEY`, `STRIPE_WEBHOOK_SECRET`
+- `NEXT_PUBLIC_STRIPE_PUBLISHABLE_KEY`
 
 Optional:
 - `NEXT_PUBLIC_APP_URL` - Base URL (default: http://localhost:3000)

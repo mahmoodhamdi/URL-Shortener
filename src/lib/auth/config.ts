@@ -20,13 +20,15 @@ export const authConfig: NextAuthConfig = {
     Google({
       clientId: process.env.GOOGLE_CLIENT_ID!,
       clientSecret: process.env.GOOGLE_CLIENT_SECRET!,
-      allowDangerousEmailAccountLinking: true,
+      // SECURITY: Disabled to prevent account takeover attacks
+      allowDangerousEmailAccountLinking: false,
     }),
     // GitHub OAuth
     GitHub({
       clientId: process.env.GITHUB_CLIENT_ID!,
       clientSecret: process.env.GITHUB_CLIENT_SECRET!,
-      allowDangerousEmailAccountLinking: true,
+      // SECURITY: Disabled to prevent account takeover attacks
+      allowDangerousEmailAccountLinking: false,
     }),
     // Email/Password credentials
     Credentials({

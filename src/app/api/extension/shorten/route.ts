@@ -1,7 +1,7 @@
 import { NextRequest, NextResponse } from 'next/server';
 import { validateExtensionToken } from '@/lib/extension';
-import { validateUrl, validateAlias } from '@/lib/url/validator';
-import { createShortUrl } from '@/lib/url/shortener';
+import { validateUrl, isValidAlias, normalizeUrl } from '@/lib/url/validator';
+import { createShortLink, getShortUrl } from '@/lib/url/shortener';
 import { buildUtmUrl } from '@/lib/url/utm';
 import { prisma } from '@/lib/db/prisma';
 import { checkLinkLimit } from '@/lib/limits/checker';
@@ -64,10 +64,9 @@ export async function POST(request: NextRequest) {
 
     // Validate custom alias if provided
     if (customAlias) {
-      const aliasValidation = validateAlias(customAlias);
-      if (!aliasValidation.isValid) {
+      if (!isValidAlias(customAlias)) {
         return NextResponse.json(
-          { error: aliasValidation.error || 'Invalid alias' },
+          { error: 'Invalid alias format. Use 3-50 characters: letters, numbers, and hyphens only.' },
           { status: 400 }
         );
       }
@@ -86,17 +85,17 @@ export async function POST(request: NextRequest) {
     }
 
     // Build URL with UTM parameters if provided
-    let finalUrl = urlValidation.normalizedUrl!;
+    let finalUrl = normalizeUrl(url);
     if (utm) {
       finalUrl = buildUtmUrl(finalUrl, utm);
     }
 
-    // Create the short URL
-    const link = await createShortUrl({
-      originalUrl: finalUrl,
+    // Create the short URL (transaction handles usage increment)
+    const link = await createShortLink({
+      url: finalUrl,
       customAlias,
       password,
-      expiresAt: expiresAt ? new Date(expiresAt) : undefined,
+      expiresAt: expiresAt ? new Date(expiresAt).toISOString() : undefined,
       userId,
       utmSource: utm?.source,
       utmMedium: utm?.medium,
@@ -105,17 +104,8 @@ export async function POST(request: NextRequest) {
       utmContent: utm?.content,
     });
 
-    // Update usage count
-    await prisma.subscription.updateMany({
-      where: { userId },
-      data: {
-        linksUsedThisMonth: { increment: 1 },
-      },
-    });
-
     // Get the full short URL
-    const baseUrl = process.env.NEXT_PUBLIC_APP_URL || 'http://localhost:3000';
-    const shortUrl = `${baseUrl}/${link.customAlias || link.shortCode}`;
+    const shortUrl = getShortUrl(link.customAlias || link.shortCode);
 
     return NextResponse.json({
       id: link.id,

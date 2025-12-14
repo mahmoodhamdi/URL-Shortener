@@ -1,6 +1,5 @@
 import { NextRequest, NextResponse } from 'next/server';
-import { getServerSession } from 'next-auth';
-import { authOptions } from '@/lib/auth/config';
+import { auth } from '@/lib/auth';
 import { prisma } from '@/lib/db/prisma';
 import {
   canCreateExtensionToken,
@@ -15,7 +14,7 @@ import {
  */
 export async function GET() {
   try {
-    const session = await getServerSession(authOptions);
+    const session = await auth();
 
     if (!session?.user?.id) {
       return NextResponse.json({ error: 'Unauthorized' }, { status: 401 });
@@ -35,7 +34,7 @@ export async function GET() {
     ]);
 
     // Mask tokens for security (only show first 8 chars)
-    const maskedTokens = tokens.map((token) => ({
+    const maskedTokens = tokens.map((token: { token: string; [key: string]: unknown }) => ({
       ...token,
       token: `${token.token.substring(0, 12)}...`,
       fullToken: undefined, // Remove full token from response
@@ -60,7 +59,7 @@ export async function GET() {
  */
 export async function POST(request: NextRequest) {
   try {
-    const session = await getServerSession(authOptions);
+    const session = await auth();
 
     if (!session?.user?.id) {
       return NextResponse.json({ error: 'Unauthorized' }, { status: 401 });

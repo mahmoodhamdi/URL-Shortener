@@ -5,19 +5,18 @@
 
 import { prisma } from '@/lib/db/prisma';
 import type { Plan } from '@prisma/client';
+import type { PixelType, PixelConfig } from './pixels';
 import {
-  PixelType,
   validatePixelId,
   generatePixelScript,
   generateAllPixelScripts,
   getPixelTypeName,
   getPixelTypeIcon,
-  PixelConfig,
 } from './pixels';
 
 // Re-export pixel utilities
+export type { PixelType, PixelConfig };
 export {
-  PixelType,
   validatePixelId,
   generatePixelScript,
   generateAllPixelScripts,

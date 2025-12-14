@@ -1,6 +1,13 @@
 import { z } from 'zod';
 
-export const urlSchema = z.string().url('Invalid URL format').min(1, 'URL is required');
+// Maximum URL length (2048 is standard browser limit)
+export const MAX_URL_LENGTH = 2048;
+
+export const urlSchema = z
+  .string()
+  .url('Invalid URL format')
+  .min(1, 'URL is required')
+  .max(MAX_URL_LENGTH, `URL must be less than ${MAX_URL_LENGTH} characters`);
 
 export const aliasSchema = z
   .string()
@@ -60,4 +67,38 @@ export function normalizeUrl(url: string): string {
   }
 
   return normalized;
+}
+
+export interface UrlValidationResult {
+  isValid: boolean;
+  error?: string;
+}
+
+export function validateUrl(url: string): UrlValidationResult {
+  try {
+    urlSchema.parse(url);
+    return { isValid: true };
+  } catch (error) {
+    if (error instanceof z.ZodError) {
+      return { isValid: false, error: error.errors[0].message };
+    }
+    return { isValid: false, error: 'Invalid URL' };
+  }
+}
+
+export interface AliasValidationResult {
+  isValid: boolean;
+  error?: string;
+}
+
+export function validateAlias(alias: string): AliasValidationResult {
+  try {
+    aliasSchema.parse(alias);
+    return { isValid: true };
+  } catch (error) {
+    if (error instanceof z.ZodError) {
+      return { isValid: false, error: error.errors[0].message };
+    }
+    return { isValid: false, error: 'Invalid alias' };
+  }
 }

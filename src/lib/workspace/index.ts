@@ -9,6 +9,50 @@ import { hasPermission, type WorkspaceRole, type Permission } from './permission
 
 export * from './permissions';
 
+// Reserved slugs that cannot be used for workspaces
+const RESERVED_SLUGS = new Set([
+  'api',
+  'auth',
+  'admin',
+  'app',
+  'dashboard',
+  'login',
+  'logout',
+  'register',
+  'signup',
+  'signin',
+  'settings',
+  'profile',
+  'account',
+  'billing',
+  'pricing',
+  'docs',
+  'help',
+  'support',
+  'status',
+  'health',
+  'static',
+  'assets',
+  'public',
+  'private',
+  'internal',
+  'system',
+  'root',
+  'null',
+  'undefined',
+  'www',
+  'mail',
+  'ftp',
+  'smtp',
+]);
+
+/**
+ * Check if a slug is reserved
+ */
+export function isReservedSlug(slug: string): boolean {
+  return RESERVED_SLUGS.has(slug.toLowerCase().replace(/-\w+$/, ''));
+}
+
 // Plan limits for workspaces
 export const WORKSPACE_LIMITS: Record<string, { workspaces: number; membersPerWorkspace: number }> = {
   FREE: { workspaces: 0, membersPerWorkspace: 0 },
@@ -22,11 +66,16 @@ export const WORKSPACE_LIMITS: Record<string, { workspaces: number; membersPerWo
  * Generate a unique slug for a workspace
  */
 export function generateSlug(name: string): string {
-  const baseSlug = name
+  let baseSlug = name
     .toLowerCase()
     .replace(/[^a-z0-9]+/g, '-')
     .replace(/^-|-$/g, '')
     .slice(0, 30);
+
+  // Ensure base slug isn't reserved
+  if (RESERVED_SLUGS.has(baseSlug)) {
+    baseSlug = `ws-${baseSlug}`;
+  }
 
   return `${baseSlug}-${nanoid(6)}`;
 }
@@ -43,6 +92,14 @@ export async function createWorkspace(
     slug?: string;
   }
 ) {
+  // If custom slug provided, validate it
+  if (data.slug) {
+    const normalizedSlug = data.slug.toLowerCase();
+    if (isReservedSlug(normalizedSlug)) {
+      throw new Error('This workspace slug is reserved. Please choose a different name.');
+    }
+  }
+
   const slug = data.slug || generateSlug(data.name);
 
   const workspace = await prisma.workspace.create({
