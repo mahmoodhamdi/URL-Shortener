@@ -1,0 +1,186 @@
+{
+  "extension_name": {
+    "message": "مختصر الروابط",
+    "description": "اسم الإضافة"
+  },
+  "extension_description": {
+    "message": "اختصر الروابط بسرعة مع أسماء مخصصة ورموز QR وتتبع التحليلات",
+    "description": "وصف الإضافة"
+  },
+  "popup_title": {
+    "message": "مختصر الروابط",
+    "description": "عنوان النافذة المنبثقة"
+  },
+  "current_url": {
+    "message": "الرابط الحالي",
+    "description": "تسمية الرابط الحالي للصفحة"
+  },
+  "custom_alias": {
+    "message": "اسم مخصص (اختياري)",
+    "description": "تسمية حقل الاسم المخصص"
+  },
+  "alias_placeholder": {
+    "message": "أدخل اسم مخصص...",
+    "description": "نص توضيحي لحقل الاسم المخصص"
+  },
+  "shorten_button": {
+    "message": "اختصار الرابط",
+    "description": "زر اختصار الرابط"
+  },
+  "shortening": {
+    "message": "جاري الاختصار...",
+    "description": "حالة التحميل لزر الاختصار"
+  },
+  "shortened_url": {
+    "message": "الرابط المختصر",
+    "description": "تسمية نتيجة الرابط المختصر"
+  },
+  "copy": {
+    "message": "نسخ",
+    "description": "نص زر النسخ"
+  },
+  "copied": {
+    "message": "تم النسخ!",
+    "description": "تأكيد النسخ"
+  },
+  "qr_code": {
+    "message": "رمز QR",
+    "description": "نص زر رمز QR"
+  },
+  "recent_links": {
+    "message": "الروابط الأخيرة",
+    "description": "عنوان قسم الروابط الأخيرة"
+  },
+  "no_recent_links": {
+    "message": "لا توجد روابط حديثة",
+    "description": "حالة فارغة للروابط الأخيرة"
+  },
+  "clicks": {
+    "message": "نقرات",
+    "description": "تسمية عدد النقرات"
+  },
+  "login": {
+    "message": "تسجيل الدخول",
+    "description": "نص زر تسجيل الدخول"
+  },
+  "logout": {
+    "message": "تسجيل الخروج",
+    "description": "نص زر تسجيل الخروج"
+  },
+  "settings": {
+    "message": "الإعدادات",
+    "description": "زر/عنوان صفحة الإعدادات"
+  },
+  "logged_in_as": {
+    "message": "مسجل الدخول كـ",
+    "description": "تسمية توضح المستخدم الحالي"
+  },
+  "login_required": {
+    "message": "يرجى تسجيل الدخول لاستخدام الإضافة",
+    "description": "رسالة تسجيل الدخول مطلوب"
+  },
+  "login_instructions": {
+    "message": "أدخل رمز الإضافة لربط حسابك",
+    "description": "تعليمات تسجيل الدخول"
+  },
+  "token_placeholder": {
+    "message": "أدخل رمز الإضافة...",
+    "description": "نص توضيحي لحقل الرمز"
+  },
+  "connect": {
+    "message": "ربط",
+    "description": "نص زر الربط"
+  },
+  "get_token": {
+    "message": "الحصول على الرمز",
+    "description": "رابط للحصول على الرمز من التطبيق"
+  },
+  "invalid_token": {
+    "message": "رمز غير صالح أو منتهي الصلاحية",
+    "description": "خطأ للرمز غير الصالح"
+  },
+  "error_shortening": {
+    "message": "فشل في اختصار الرابط",
+    "description": "رسالة خطأ لفشل الاختصار"
+  },
+  "error_loading": {
+    "message": "فشل في تحميل البيانات",
+    "description": "رسالة خطأ لفشل التحميل"
+  },
+  "open_original": {
+    "message": "فتح الرابط الأصلي",
+    "description": "تلميح لفتح الرابط الأصلي"
+  },
+  "open_short": {
+    "message": "فتح الرابط المختصر",
+    "description": "تلميح لفتح الرابط المختصر"
+  },
+  "view_stats": {
+    "message": "عرض الإحصائيات",
+    "description": "تلميح لعرض إحصائيات الرابط"
+  },
+  "expires": {
+    "message": "ينتهي في",
+    "description": "تسمية تاريخ الانتهاء"
+  },
+  "password_protected": {
+    "message": "محمي بكلمة مرور",
+    "description": "تسمية للروابط المحمية بكلمة مرور"
+  },
+  "options_title": {
+    "message": "إعدادات الإضافة",
+    "description": "عنوان صفحة الخيارات"
+  },
+  "auto_copy": {
+    "message": "نسخ تلقائي للرابط المختصر",
+    "description": "إعداد النسخ التلقائي"
+  },
+  "auto_copy_description": {
+    "message": "نسخ الرابط المختصر تلقائياً إلى الحافظة بعد الإنشاء",
+    "description": "وصف إعداد النسخ التلقائي"
+  },
+  "dark_mode": {
+    "message": "الوضع الداكن",
+    "description": "إعداد الوضع الداكن"
+  },
+  "dark_mode_description": {
+    "message": "استخدام السمة الداكنة للإضافة",
+    "description": "وصف إعداد الوضع الداكن"
+  },
+  "api_endpoint": {
+    "message": "نقطة نهاية API",
+    "description": "إعداد نقطة نهاية API"
+  },
+  "api_endpoint_description": {
+    "message": "عنوان URL لـ API مختصر الروابط (اتركه فارغاً للافتراضي)",
+    "description": "وصف إعداد نقطة نهاية API"
+  },
+  "save_settings": {
+    "message": "حفظ الإعدادات",
+    "description": "زر حفظ الإعدادات"
+  },
+  "settings_saved": {
+    "message": "تم حفظ الإعدادات!",
+    "description": "تأكيد حفظ الإعدادات"
+  },
+  "context_menu_shorten": {
+    "message": "اختصار هذا الرابط",
+    "description": "عنصر قائمة السياق لاختصار الروابط"
+  },
+  "context_menu_shorten_page": {
+    "message": "اختصار هذه الصفحة",
+    "description": "عنصر قائمة السياق لاختصار الصفحة الحالية"
+  },
+  "usage": {
+    "message": "الاستخدام",
+    "description": "تسمية إحصائيات الاستخدام"
+  },
+  "links_used": {
+    "message": "روابط مستخدمة هذا الشهر",
+    "description": "تسمية عدد الروابط المستخدمة"
+  },
+  "upgrade_plan": {
+    "message": "ترقية الخطة",
+    "description": "زر ترقية الخطة"
+  }
+}

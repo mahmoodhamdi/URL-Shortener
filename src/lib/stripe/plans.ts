@@ -24,6 +24,7 @@ export interface PlanConfig {
     zapierSubscriptions: number;
     zapierEventsPerDay: number;
     cloakedLinks: number;
+    extensionTokens: number;
   };
   features: string[];
   popular?: boolean;
@@ -52,6 +53,7 @@ export const PLANS: Record<Plan, PlanConfig> = {
       zapierSubscriptions: 0,
       zapierEventsPerDay: 0,
       cloakedLinks: 0,
+      extensionTokens: 1,
     },
     features: [
       'Basic Analytics',
@@ -60,6 +62,7 @@ export const PLANS: Record<Plan, PlanConfig> = {
       'Password Protection',
       'Link Expiration',
       '30-day Analytics History',
+      '1 Browser Extension',
     ],
   },
   STARTER: {
@@ -86,6 +89,7 @@ export const PLANS: Record<Plan, PlanConfig> = {
       zapierSubscriptions: 2,
       zapierEventsPerDay: 100,
       cloakedLinks: 10,
+      extensionTokens: 3,
     },
     features: [
       'Everything in Free',
@@ -99,6 +103,7 @@ export const PLANS: Record<Plan, PlanConfig> = {
       '1 Retargeting Pixel',
       '2 Zapier Integrations',
       '10 Cloaked Links',
+      '3 Browser Extensions',
     ],
   },
   PRO: {
@@ -126,6 +131,7 @@ export const PLANS: Record<Plan, PlanConfig> = {
       zapierSubscriptions: 10,
       zapierEventsPerDay: 1000,
       cloakedLinks: 50,
+      extensionTokens: 10,
     },
     features: [
       'Everything in Starter',
@@ -139,6 +145,7 @@ export const PLANS: Record<Plan, PlanConfig> = {
       '5 Retargeting Pixels',
       '10 Zapier Integrations',
       '50 Cloaked Links',
+      '10 Browser Extensions',
     ],
   },
   BUSINESS: {
@@ -165,6 +172,7 @@ export const PLANS: Record<Plan, PlanConfig> = {
       zapierSubscriptions: 50,
       zapierEventsPerDay: 10000,
       cloakedLinks: -1, // Unlimited
+      extensionTokens: -1, // Unlimited
     },
     features: [
       'Everything in Pro',
@@ -178,6 +186,7 @@ export const PLANS: Record<Plan, PlanConfig> = {
       '20 Retargeting Pixels',
       '50 Zapier Integrations',
       'Unlimited Cloaked Links',
+      'Unlimited Browser Extensions',
     ],
   },
   ENTERPRISE: {
@@ -204,6 +213,7 @@ export const PLANS: Record<Plan, PlanConfig> = {
       zapierSubscriptions: -1, // unlimited
       zapierEventsPerDay: -1, // unlimited
       cloakedLinks: -1, // unlimited
+      extensionTokens: -1, // unlimited
     },
     features: [
       'Everything in Business',
@@ -217,6 +227,7 @@ export const PLANS: Record<Plan, PlanConfig> = {
       'Unlimited Retargeting Pixels',
       'Unlimited Zapier Integrations',
       'Unlimited Cloaked Links',
+      'Unlimited Browser Extensions',
     ],
   },
 };

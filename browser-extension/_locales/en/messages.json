@@ -1,0 +1,186 @@
+{
+  "extension_name": {
+    "message": "URL Shortener",
+    "description": "The extension name"
+  },
+  "extension_description": {
+    "message": "Quickly shorten URLs with custom aliases, QR codes, and analytics tracking",
+    "description": "The extension description"
+  },
+  "popup_title": {
+    "message": "URL Shortener",
+    "description": "Popup header title"
+  },
+  "current_url": {
+    "message": "Current URL",
+    "description": "Label for current page URL"
+  },
+  "custom_alias": {
+    "message": "Custom Alias (optional)",
+    "description": "Label for custom alias input"
+  },
+  "alias_placeholder": {
+    "message": "Enter custom alias...",
+    "description": "Placeholder for custom alias input"
+  },
+  "shorten_button": {
+    "message": "Shorten URL",
+    "description": "Button to shorten URL"
+  },
+  "shortening": {
+    "message": "Shortening...",
+    "description": "Loading state for shorten button"
+  },
+  "shortened_url": {
+    "message": "Shortened URL",
+    "description": "Label for shortened URL result"
+  },
+  "copy": {
+    "message": "Copy",
+    "description": "Copy button text"
+  },
+  "copied": {
+    "message": "Copied!",
+    "description": "Copied confirmation"
+  },
+  "qr_code": {
+    "message": "QR Code",
+    "description": "QR code button text"
+  },
+  "recent_links": {
+    "message": "Recent Links",
+    "description": "Section header for recent links"
+  },
+  "no_recent_links": {
+    "message": "No recent links",
+    "description": "Empty state for recent links"
+  },
+  "clicks": {
+    "message": "clicks",
+    "description": "Clicks count label"
+  },
+  "login": {
+    "message": "Login",
+    "description": "Login button text"
+  },
+  "logout": {
+    "message": "Logout",
+    "description": "Logout button text"
+  },
+  "settings": {
+    "message": "Settings",
+    "description": "Settings button/page title"
+  },
+  "logged_in_as": {
+    "message": "Logged in as",
+    "description": "Label showing current user"
+  },
+  "login_required": {
+    "message": "Please login to use the extension",
+    "description": "Login required message"
+  },
+  "login_instructions": {
+    "message": "Enter your extension token to connect your account",
+    "description": "Login instructions"
+  },
+  "token_placeholder": {
+    "message": "Enter extension token...",
+    "description": "Token input placeholder"
+  },
+  "connect": {
+    "message": "Connect",
+    "description": "Connect button text"
+  },
+  "get_token": {
+    "message": "Get Token",
+    "description": "Link to get token from web app"
+  },
+  "invalid_token": {
+    "message": "Invalid or expired token",
+    "description": "Error for invalid token"
+  },
+  "error_shortening": {
+    "message": "Failed to shorten URL",
+    "description": "Error message for shortening failure"
+  },
+  "error_loading": {
+    "message": "Failed to load data",
+    "description": "Error message for loading failure"
+  },
+  "open_original": {
+    "message": "Open original URL",
+    "description": "Tooltip for opening original URL"
+  },
+  "open_short": {
+    "message": "Open short URL",
+    "description": "Tooltip for opening short URL"
+  },
+  "view_stats": {
+    "message": "View statistics",
+    "description": "Tooltip for viewing link stats"
+  },
+  "expires": {
+    "message": "Expires",
+    "description": "Label for expiration date"
+  },
+  "password_protected": {
+    "message": "Password protected",
+    "description": "Label for password-protected links"
+  },
+  "options_title": {
+    "message": "Extension Settings",
+    "description": "Options page title"
+  },
+  "auto_copy": {
+    "message": "Auto-copy shortened URL",
+    "description": "Setting for auto-copy"
+  },
+  "auto_copy_description": {
+    "message": "Automatically copy the shortened URL to clipboard after creation",
+    "description": "Description for auto-copy setting"
+  },
+  "dark_mode": {
+    "message": "Dark mode",
+    "description": "Setting for dark mode"
+  },
+  "dark_mode_description": {
+    "message": "Use dark theme for the extension",
+    "description": "Description for dark mode setting"
+  },
+  "api_endpoint": {
+    "message": "API Endpoint",
+    "description": "Setting for API endpoint"
+  },
+  "api_endpoint_description": {
+    "message": "The URL of the URL Shortener API (leave empty for default)",
+    "description": "Description for API endpoint setting"
+  },
+  "save_settings": {
+    "message": "Save Settings",
+    "description": "Save settings button"
+  },
+  "settings_saved": {
+    "message": "Settings saved!",
+    "description": "Settings saved confirmation"
+  },
+  "context_menu_shorten": {
+    "message": "Shorten this link",
+    "description": "Context menu item for shortening links"
+  },
+  "context_menu_shorten_page": {
+    "message": "Shorten this page",
+    "description": "Context menu item for shortening current page"
+  },
+  "usage": {
+    "message": "Usage",
+    "description": "Label for usage stats"
+  },
+  "links_used": {
+    "message": "links used this month",
+    "description": "Label for links used count"
+  },
+  "upgrade_plan": {
+    "message": "Upgrade Plan",
+    "description": "Upgrade plan button"
+  }
+}

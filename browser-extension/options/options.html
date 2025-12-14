@@ -1,0 +1,74 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <title>Extension Settings</title>
+  <link rel="stylesheet" href="options.css">
+</head>
+<body>
+  <div class="container">
+    <header class="header">
+      <svg class="logo" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2">
+        <path d="M10 13a5 5 0 0 0 7.54.54l3-3a5 5 0 0 0-7.07-7.07l-1.72 1.71" />
+        <path d="M14 11a5 5 0 0 0-7.54-.54l-3 3a5 5 0 0 0 7.07 7.07l1.71-1.71" />
+      </svg>
+      <h1 data-i18n="options_title">Extension Settings</h1>
+    </header>
+
+    <main class="settings">
+      <!-- Auto Copy Setting -->
+      <div class="setting-item">
+        <div class="setting-info">
+          <label class="setting-label" for="autoCopy" data-i18n="auto_copy">Auto-copy shortened URL</label>
+          <p class="setting-description" data-i18n="auto_copy_description">Automatically copy the shortened URL to clipboard after creation</p>
+        </div>
+        <label class="toggle">
+          <input type="checkbox" id="autoCopy">
+          <span class="toggle-slider"></span>
+        </label>
+      </div>
+
+      <!-- Dark Mode Setting -->
+      <div class="setting-item">
+        <div class="setting-info">
+          <label class="setting-label" for="darkMode" data-i18n="dark_mode">Dark mode</label>
+          <p class="setting-description" data-i18n="dark_mode_description">Use dark theme for the extension</p>
+        </div>
+        <label class="toggle">
+          <input type="checkbox" id="darkMode">
+          <span class="toggle-slider"></span>
+        </label>
+      </div>
+
+      <!-- API Endpoint Setting -->
+      <div class="setting-item">
+        <div class="setting-info">
+          <label class="setting-label" for="apiEndpoint" data-i18n="api_endpoint">API Endpoint</label>
+          <p class="setting-description" data-i18n="api_endpoint_description">The URL of the URL Shortener API (leave empty for default)</p>
+        </div>
+        <input type="text" id="apiEndpoint" placeholder="http://localhost:3000">
+      </div>
+
+      <!-- Token Management -->
+      <div class="setting-item">
+        <div class="setting-info">
+          <label class="setting-label">Extension Token</label>
+          <p class="setting-description">Manage your extension authentication token</p>
+        </div>
+        <div class="token-actions">
+          <span id="tokenStatus" class="token-status">Not connected</span>
+          <button id="disconnectBtn" class="btn btn-danger hidden" data-i18n="logout">Disconnect</button>
+        </div>
+      </div>
+    </main>
+
+    <footer class="footer">
+      <button id="saveBtn" class="btn btn-primary" data-i18n="save_settings">Save Settings</button>
+      <p id="saveMessage" class="save-message hidden" data-i18n="settings_saved">Settings saved!</p>
+    </footer>
+  </div>
+
+  <script src="options.js"></script>
+</body>
+</html>

@@ -33,6 +33,7 @@ model User {
   bioPages             BioPage[]
   retargetingPixels    RetargetingPixel[]
   zapierSubscriptions  ZapierSubscription[]
+  extensionTokens      ExtensionToken[]
 
   @@index([email])
 }
@@ -589,4 +590,25 @@ enum ZapierEvent {
   LINK_DELETED
   BIO_PAGE_CREATED
   BIO_PAGE_UPDATED
+}
+
+// ==================== BROWSER EXTENSION MODELS ====================
+
+model ExtensionToken {
+  id          String    @id @default(cuid())
+  userId      String
+  user        User      @relation(fields: [userId], references: [id], onDelete: Cascade)
+
+  token       String    @unique    // The actual token used for API auth
+  name        String    @default("Browser Extension")
+  deviceInfo  String?              // Browser/device info
+
+  lastUsedAt  DateTime?
+  expiresAt   DateTime?            // Optional expiration
+
+  createdAt   DateTime  @default(now())
+  updatedAt   DateTime  @updatedAt
+
+  @@index([userId])
+  @@index([token])
 }
