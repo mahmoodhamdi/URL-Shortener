@@ -19,6 +19,8 @@ export interface PlanConfig {
     variantsPerTest: number;
     bioPages: number;
     linksPerBioPage: number;
+    retargetingPixels: number;
+    linksWithPixels: number;
   };
   features: string[];
   popular?: boolean;
@@ -42,6 +44,8 @@ export const PLANS: Record<Plan, PlanConfig> = {
       variantsPerTest: 0,
       bioPages: 1,
       linksPerBioPage: 5,
+      retargetingPixels: 0,
+      linksWithPixels: 0,
     },
     features: [
       'Basic Analytics',
@@ -71,6 +75,8 @@ export const PLANS: Record<Plan, PlanConfig> = {
       variantsPerTest: 2,
       bioPages: 2,
       linksPerBioPage: 10,
+      retargetingPixels: 1,
+      linksWithPixels: 10,
     },
     features: [
       'Everything in Free',
@@ -81,6 +87,7 @@ export const PLANS: Record<Plan, PlanConfig> = {
       '90-day Analytics History',
       'UTM Builder',
       'Tags & Folders',
+      '1 Retargeting Pixel',
     ],
   },
   PRO: {
@@ -103,6 +110,8 @@ export const PLANS: Record<Plan, PlanConfig> = {
       variantsPerTest: 4,
       bioPages: 5,
       linksPerBioPage: 20,
+      retargetingPixels: 5,
+      linksWithPixels: 50,
     },
     features: [
       'Everything in Starter',
@@ -113,6 +122,7 @@ export const PLANS: Record<Plan, PlanConfig> = {
       '180-day Analytics History',
       'Priority Support',
       'Webhooks',
+      '5 Retargeting Pixels',
     ],
   },
   BUSINESS: {
@@ -134,6 +144,8 @@ export const PLANS: Record<Plan, PlanConfig> = {
       variantsPerTest: 6,
       bioPages: 20,
       linksPerBioPage: -1, // unlimited
+      retargetingPixels: 20,
+      linksWithPixels: -1, // unlimited
     },
     features: [
       'Everything in Pro',
@@ -144,6 +156,7 @@ export const PLANS: Record<Plan, PlanConfig> = {
       'Custom Branding',
       'SSO (SAML)',
       'Dedicated Support',
+      '20 Retargeting Pixels',
     ],
   },
   ENTERPRISE: {
@@ -165,6 +178,8 @@ export const PLANS: Record<Plan, PlanConfig> = {
       variantsPerTest: -1, // unlimited
       bioPages: -1, // unlimited
       linksPerBioPage: -1, // unlimited
+      retargetingPixels: -1, // unlimited
+      linksWithPixels: -1, // unlimited
     },
     features: [
       'Everything in Business',
@@ -175,6 +190,7 @@ export const PLANS: Record<Plan, PlanConfig> = {
       'Custom Integrations',
       'SLA',
       'Dedicated Account Manager',
+      'Unlimited Retargeting Pixels',
     ],
   },
 };

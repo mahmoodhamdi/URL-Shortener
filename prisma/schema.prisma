@@ -31,6 +31,7 @@ model User {
   workspaceMemberships WorkspaceMember[]
   webhooks           Webhook[]
   bioPages           BioPage[]
+  retargetingPixels  RetargetingPixel[]
 
   @@index([email])
 }
@@ -232,6 +233,7 @@ model Link {
   tags        Tag[]
   targets     LinkTarget[]
   abTest      ABTest?
+  pixels      LinkPixel[]
 
   @@index([shortCode])
   @@index([createdAt])
@@ -499,4 +501,49 @@ enum BioPageTheme {
   GRADIENT
   MINIMAL
   COLORFUL
+}
+
+// ==================== RETARGETING PIXELS MODELS ====================
+
+model RetargetingPixel {
+  id          String    @id @default(cuid())
+  userId      String
+  user        User      @relation(fields: [userId], references: [id], onDelete: Cascade)
+
+  name        String
+  type        PixelType
+  pixelId     String    // Platform-specific ID (e.g., FB pixel ID, GA4 measurement ID)
+
+  isActive    Boolean   @default(true)
+  links       LinkPixel[]
+
+  createdAt   DateTime  @default(now())
+  updatedAt   DateTime  @updatedAt
+
+  @@index([userId])
+  @@index([type])
+}
+
+model LinkPixel {
+  id          String           @id @default(cuid())
+  linkId      String
+  link        Link             @relation(fields: [linkId], references: [id], onDelete: Cascade)
+  pixelId     String
+  pixel       RetargetingPixel @relation(fields: [pixelId], references: [id], onDelete: Cascade)
+
+  createdAt   DateTime         @default(now())
+
+  @@unique([linkId, pixelId])
+  @@index([linkId])
+  @@index([pixelId])
+}
+
+enum PixelType {
+  FACEBOOK        // Meta Pixel
+  GOOGLE_ANALYTICS // GA4
+  GOOGLE_ADS      // Google Ads conversion tracking
+  TWITTER         // X Pixel
+  LINKEDIN        // LinkedIn Insight Tag
+  TIKTOK          // TikTok Pixel
+  CUSTOM          // Custom script
 }

@@ -677,5 +677,63 @@
     "linkLimitReached": "Link limit reached for this bio page",
     "slugTaken": "This username is already taken",
     "slugInvalid": "Invalid username format. Use 3-30 letters, numbers, hyphens, or underscores"
+  },
+  "retargeting": {
+    "title": "Retargeting Pixels",
+    "subtitle": "Add tracking pixels to your links for retargeting campaigns",
+    "create": "Add Pixel",
+    "createNew": "New Retargeting Pixel",
+    "name": "Pixel Name",
+    "namePlaceholder": "My Facebook Pixel",
+    "type": "Platform",
+    "pixelId": "Pixel ID",
+    "pixelIdPlaceholder": "Enter your pixel ID",
+    "types": {
+      "FACEBOOK": "Meta (Facebook) Pixel",
+      "GOOGLE_ANALYTICS": "Google Analytics 4",
+      "GOOGLE_ADS": "Google Ads",
+      "TWITTER": "X (Twitter) Pixel",
+      "LINKEDIN": "LinkedIn Insight Tag",
+      "TIKTOK": "TikTok Pixel",
+      "CUSTOM": "Custom Script"
+    },
+    "pixelIdHelp": {
+      "FACEBOOK": "Enter your 15-16 digit Facebook Pixel ID",
+      "GOOGLE_ANALYTICS": "Enter your GA4 Measurement ID (G-XXXXXXXXXX)",
+      "GOOGLE_ADS": "Enter your Google Ads Conversion ID (AW-XXXXXXXXXXX)",
+      "TWITTER": "Enter your Twitter Pixel ID",
+      "LINKEDIN": "Enter your LinkedIn Partner ID",
+      "TIKTOK": "Enter your TikTok Pixel ID",
+      "CUSTOM": "Enter your custom tracking script"
+    },
+    "status": "Status",
+    "active": "Active",
+    "inactive": "Inactive",
+    "attachedLinks": "Attached to {count} links",
+    "edit": "Edit Pixel",
+    "delete": "Delete Pixel",
+    "deleteConfirm": "Are you sure you want to delete this pixel? It will be removed from all attached links.",
+    "addToLink": "Add Pixel to Link",
+    "removeFromLink": "Remove Pixel from Link",
+    "selectPixel": "Select a pixel to add",
+    "linkPixels": "Pixels on this link",
+    "noPixels": "No pixels attached",
+    "addPixel": "Add a retargeting pixel",
+    "pixelFired": "Pixel will fire when users click this link",
+    "empty": "No retargeting pixels yet",
+    "emptyDesc": "Add retargeting pixels to track visitors and build audiences for your marketing campaigns",
+    "upgradeRequired": "Retargeting pixels are available on Starter and above plans",
+    "limitReached": "Pixel limit reached for your plan",
+    "linkLimitReached": "Link pixel limit reached for your plan",
+    "invalidPixelId": "Invalid pixel ID format",
+    "validation": {
+      "facebookFormat": "Facebook Pixel ID must be a 15-16 digit number",
+      "gaFormat": "Google Analytics ID must be in format G-XXXXXXXXXX",
+      "googleAdsFormat": "Google Ads ID must be in format AW-XXXXXXXXXXX",
+      "twitterFormat": "Twitter Pixel ID must be 5-10 alphanumeric characters",
+      "linkedinFormat": "LinkedIn Partner ID must be a 6-7 digit number",
+      "tiktokFormat": "TikTok Pixel ID must be 15-30 alphanumeric characters",
+      "customFormat": "Custom script must be at least 10 characters"
+    }
   }
 }
