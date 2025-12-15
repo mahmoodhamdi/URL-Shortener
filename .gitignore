@@ -49,3 +49,6 @@ next-env.d.ts
 
 # screenshots (keep for README but ignore during dev)
 # /screenshots/
+
+# credentials (DO NOT COMMIT)
+docs/deployment/CREDENTIALS.local.md

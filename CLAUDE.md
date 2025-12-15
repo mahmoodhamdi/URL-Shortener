@@ -23,6 +23,9 @@ npm run test:coverage          # Coverage report
 # Run single test file
 npx vitest run path/to/test.test.ts --config vitest.config.ts
 
+# Run single integration test file (uses 30s timeout)
+npx vitest run path/to/test.test.ts --config vitest.integration.config.ts
+
 # Database (Prisma + PostgreSQL)
 npm run db:generate            # Generate Prisma client
 npm run db:push                # Push schema to database
