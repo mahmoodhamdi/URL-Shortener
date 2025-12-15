@@ -54,6 +54,62 @@ describe('Deep Link Templates', () => {
       });
     });
 
+    describe('SSRF protection', () => {
+      it('should reject localhost fallback URL', () => {
+        const result = validateDeepLinkConfig({ fallbackUrl: 'http://localhost/page' });
+        expect(result.valid).toBe(false);
+        expect(result.error).toContain('not safe');
+      });
+
+      it('should reject 127.0.0.1 fallback URL', () => {
+        const result = validateDeepLinkConfig({ fallbackUrl: 'http://127.0.0.1/page' });
+        expect(result.valid).toBe(false);
+        expect(result.error).toContain('not safe');
+      });
+
+      it('should reject private IP fallback URLs', () => {
+        expect(validateDeepLinkConfig({ fallbackUrl: 'http://192.168.1.1/page' }).valid).toBe(false);
+        expect(validateDeepLinkConfig({ fallbackUrl: 'http://10.0.0.1/page' }).valid).toBe(false);
+        expect(validateDeepLinkConfig({ fallbackUrl: 'http://172.16.0.1/page' }).valid).toBe(false);
+      });
+
+      it('should reject cloud metadata endpoint URLs', () => {
+        const result = validateDeepLinkConfig({ fallbackUrl: 'http://169.254.169.254/latest/meta-data/' });
+        expect(result.valid).toBe(false);
+        expect(result.error).toContain('not safe');
+      });
+
+      it('should reject internal hostnames', () => {
+        expect(validateDeepLinkConfig({ fallbackUrl: 'http://internal/page' }).valid).toBe(false);
+        expect(validateDeepLinkConfig({ fallbackUrl: 'http://intranet/page' }).valid).toBe(false);
+        expect(validateDeepLinkConfig({ fallbackUrl: 'http://server.local/page' }).valid).toBe(false);
+      });
+
+      it('should reject file:// protocol', () => {
+        const result = validateDeepLinkConfig({ fallbackUrl: 'file:///etc/passwd' });
+        expect(result.valid).toBe(false);
+        expect(result.error).toContain('not safe');
+      });
+
+      it('should reject URLs with credentials', () => {
+        const result = validateDeepLinkConfig({ fallbackUrl: 'http://user:pass@example.com/page' });
+        expect(result.valid).toBe(false);
+        expect(result.error).toContain('not safe');
+      });
+
+      it('should reject non-standard ports', () => {
+        const result = validateDeepLinkConfig({ fallbackUrl: 'http://example.com:22/page' });
+        expect(result.valid).toBe(false);
+        expect(result.error).toContain('not safe');
+      });
+
+      it('should allow public URLs', () => {
+        expect(validateDeepLinkConfig({ fallbackUrl: 'https://example.com' }).valid).toBe(true);
+        expect(validateDeepLinkConfig({ fallbackUrl: 'https://api.stripe.com/webhook' }).valid).toBe(true);
+        expect(validateDeepLinkConfig({ fallbackUrl: 'http://example.com:8080/page' }).valid).toBe(true);
+      });
+    });
+
     describe('iOS config validation', () => {
       it('should accept valid iOS config', () => {
         const result = validateDeepLinkConfig({

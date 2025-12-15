@@ -3,6 +3,7 @@
  */
 
 import { escapeHtml } from '@/lib/cloaking/templates';
+import { validateUrlForSSRF } from '@/lib/security/ssrf';
 
 export interface DeepLinkConfig {
   ios?: {
@@ -48,6 +49,12 @@ export function validateDeepLinkConfig(config: unknown): {
     new URL(cfg.fallbackUrl as string);
   } catch {
     return { valid: false, error: 'Fallback URL is not a valid URL' };
+  }
+
+  // Validate fallback URL against SSRF attacks
+  const ssrfCheck = validateUrlForSSRF(cfg.fallbackUrl as string);
+  if (!ssrfCheck.safe) {
+    return { valid: false, error: `Fallback URL is not safe: ${ssrfCheck.reason}` };
   }
 
   // Validate iOS config if present
