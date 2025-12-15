@@ -155,8 +155,9 @@ test.describe('Error Handling Scenarios', () => {
       await page.waitForLoadState('networkidle');
 
       // Fill with invalid data
-      const emailInput = page.locator('input[type="email"], input#email');
-      const passwordInput = page.locator('input[type="password"], input#password');
+      const emailInput = page.locator('input#email');
+      // Use first() to select only the password field, not confirmPassword
+      const passwordInput = page.locator('input#password').first();
 
       if (await emailInput.count() > 0) {
         await emailInput.fill('invalid-email');

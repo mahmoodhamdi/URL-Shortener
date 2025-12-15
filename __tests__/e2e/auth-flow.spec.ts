@@ -63,9 +63,8 @@ test.describe('Authentication Flow', () => {
 
     test('should have link to registration page', async ({ page }) => {
       const registerLink = page.locator('a[href*="register"], a[href*="signup"]');
-      if (await registerLink.count() > 0) {
-        await expect(registerLink.first()).toBeVisible();
-      }
+      // Link exists in DOM (may not be visible on small screens)
+      expect(await registerLink.count()).toBeGreaterThan(0);
     });
 
     test('should have social login options', async ({ page }) => {
@@ -105,14 +104,14 @@ test.describe('Authentication Flow', () => {
 
     test('should have link to login page', async ({ page }) => {
       const loginLink = page.locator('a[href*="signin"], a[href*="login"]');
-      if (await loginLink.count() > 0) {
-        await expect(loginLink.first()).toBeVisible();
-      }
+      // Link exists in DOM (may not be visible on small screens)
+      expect(await loginLink.count()).toBeGreaterThan(0);
     });
 
     test('should validate password requirements', async ({ page }) => {
-      const emailInput = page.locator('input[type="email"], input#email');
-      const passwordInput = page.locator('input[type="password"], input#password');
+      const emailInput = page.locator('input#email');
+      // Use first() to select only the password field, not confirmPassword
+      const passwordInput = page.locator('input#password').first();
 
       if (await emailInput.count() > 0) {
         await emailInput.fill('test@example.com');
