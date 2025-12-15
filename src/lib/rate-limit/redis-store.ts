@@ -86,7 +86,7 @@ export class RedisStore implements RateLimitStore {
     try {
       // Dynamic import to avoid requiring ioredis if not used
       // Using Function constructor to bypass TypeScript static analysis for optional dependency
-      // eslint-disable-next-line @typescript-eslint/no-implied-eval, no-new-func
+      // eslint-disable-next-line no-new-func
       const dynamicImport = new Function('moduleName', 'return import(moduleName)');
       const ioredisModule = await dynamicImport('ioredis');
       const Redis = ioredisModule.default;
