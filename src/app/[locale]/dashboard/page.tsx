@@ -1,6 +1,6 @@
 'use client';
 
-import { useState, useEffect } from 'react';
+import { useState, useEffect, useCallback } from 'react';
 import { useTranslations } from 'next-intl';
 import { Input } from '@/components/ui/input';
 import { Button } from '@/components/ui/button';
@@ -25,7 +25,7 @@ export default function DashboardPage() {
   const [sort, setSort] = useState<SortOption>('date');
   const [filter, setFilter] = useState<FilterOption>('all');
 
-  const fetchLinks = async () => {
+  const fetchLinks = useCallback(async () => {
     setLoading(true);
     try {
       const params = new URLSearchParams();
@@ -41,11 +41,11 @@ export default function DashboardPage() {
     } finally {
       setLoading(false);
     }
-  };
+  }, [search, sort, filter]);
 
   useEffect(() => {
     fetchLinks();
-  }, [sort, filter]);
+  }, [fetchLinks]);
 
   const handleSearch = (e: React.FormEvent) => {
     e.preventDefault();

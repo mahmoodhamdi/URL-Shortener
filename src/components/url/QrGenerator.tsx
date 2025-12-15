@@ -76,6 +76,7 @@ export function QrGenerator({ url, size = 256 }: QrGeneratorProps) {
     <div className="flex flex-col items-center gap-4">
       <div className="p-4 bg-white rounded-lg">
         {qrDataUrl && (
+          // eslint-disable-next-line @next/next/no-img-element -- Using data URL for QR code
           <img
             src={qrDataUrl}
             alt="QR Code"

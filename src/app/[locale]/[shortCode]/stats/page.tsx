@@ -1,6 +1,6 @@
 'use client';
 
-import { useEffect, useState } from 'react';
+import { useEffect, useState, useCallback } from 'react';
 import { useTranslations, useLocale } from 'next-intl';
 import { Button } from '@/components/ui/button';
 import {
@@ -34,7 +34,7 @@ export default function StatsPage({ params }: PageProps) {
   const [period, setPeriod] = useState<TimePeriod>('all');
   const [error, setError] = useState<string | null>(null);
 
-  const fetchStats = async () => {
+  const fetchStats = useCallback(async () => {
     setLoading(true);
     try {
       // First get the link ID from the shortCode
@@ -65,11 +65,11 @@ export default function StatsPage({ params }: PageProps) {
     } finally {
       setLoading(false);
     }
-  };
+  }, [params.shortCode, period, t]);
 
   useEffect(() => {
     fetchStats();
-  }, [params.shortCode, period]);
+  }, [fetchStats]);
 
   const handleExportCSV = () => {
     if (!stats) return;

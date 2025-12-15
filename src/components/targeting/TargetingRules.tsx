@@ -1,6 +1,6 @@
 'use client';
 
-import { useState, useEffect } from 'react';
+import { useState, useEffect, useCallback } from 'react';
 import { useTranslations } from 'next-intl';
 import { Button } from '@/components/ui/button';
 import { Input } from '@/components/ui/input';
@@ -57,14 +57,7 @@ export function TargetingRules({ linkId, disabled, onTargetsChange }: TargetingR
     priority: 0,
   });
 
-  // Fetch targets when component mounts or linkId changes
-  useEffect(() => {
-    if (linkId) {
-      fetchTargets();
-    }
-  }, [linkId]);
-
-  const fetchTargets = async () => {
+  const fetchTargets = useCallback(async () => {
     setIsLoading(true);
     setError(null);
     try {
@@ -82,7 +75,14 @@ export function TargetingRules({ linkId, disabled, onTargetsChange }: TargetingR
     } finally {
       setIsLoading(false);
     }
-  };
+  }, [linkId, onTargetsChange]);
+
+  // Fetch targets when component mounts or linkId changes
+  useEffect(() => {
+    if (linkId) {
+      fetchTargets();
+    }
+  }, [linkId, fetchTargets]);
 
   const handleAddTarget = async () => {
     if (!newTarget.value || !newTarget.targetUrl) {
