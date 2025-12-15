@@ -8,8 +8,10 @@ import { prisma } from '@/lib/db/prisma';
 import { getPlanLimits } from '@/lib/stripe/plans';
 import { Plan } from '@/types';
 import { BioPageTheme } from './themes';
+import { sanitizeCssString } from './css-sanitizer';
 
 export * from './themes';
+export * from './css-sanitizer';
 
 export interface CreateBioPageInput {
   slug: string;
@@ -208,6 +210,11 @@ export async function getUserBioPages(userId: string) {
  * Updates a bio page.
  */
 export async function updateBioPage(id: string, input: UpdateBioPageInput) {
+  // Sanitize custom CSS to prevent CSS injection attacks
+  const sanitizedCss = input.customCss !== undefined
+    ? sanitizeCssString(input.customCss)
+    : undefined;
+
   return prisma.bioPage.update({
     where: { id },
     data: {
@@ -215,7 +222,7 @@ export async function updateBioPage(id: string, input: UpdateBioPageInput) {
       bio: input.bio,
       avatar: input.avatar,
       theme: input.theme,
-      customCss: input.customCss,
+      customCss: sanitizedCss,
       socialLinks: input.socialLinks,
       isActive: input.isActive,
     },
