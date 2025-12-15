@@ -84,6 +84,7 @@ export function usePushNotifications(options: UsePushNotificationsOptions = {}) 
     if (autoInitialize && state.isSupported && Notification.permission === 'granted') {
       enableNotifications();
     }
+    // eslint-disable-next-line react-hooks/exhaustive-deps
   }, [autoInitialize, state.isSupported]);
 
   /**

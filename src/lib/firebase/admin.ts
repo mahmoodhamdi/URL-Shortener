@@ -68,7 +68,6 @@ function getCredential(): admin.credential.Credential | null {
   // Method 1: Service account file path
   if (process.env.FIREBASE_SERVICE_ACCOUNT_PATH) {
     try {
-      // eslint-disable-next-line @typescript-eslint/no-require-imports
       const serviceAccount = require(process.env.FIREBASE_SERVICE_ACCOUNT_PATH);
       return admin.credential.cert(serviceAccount);
     } catch (error) {
