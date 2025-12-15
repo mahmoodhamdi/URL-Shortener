@@ -1,0 +1,1401 @@
+openapi: 3.1.0
+info:
+  title: URL Shortener API
+  description: |
+    A comprehensive REST API for URL shortening with advanced features including:
+    - Link management and analytics
+    - Custom domains and SSL
+    - A/B testing and targeting
+    - Workspaces and team collaboration
+    - Webhooks and integrations
+    - Bio pages (link-in-bio)
+    - Browser extension support
+
+    ## Authentication
+    Most endpoints require authentication via NextAuth.js session or API key.
+
+    ## Rate Limiting
+    Rate limits are applied per user/plan:
+    - Anonymous: 60 requests/minute
+    - Free: 100 requests/day
+    - Starter: 1,000 requests/day
+    - Pro: 10,000 requests/day
+    - Business: 50,000 requests/day
+    - Enterprise: Unlimited
+
+    Rate limit headers are included in responses:
+    - `X-RateLimit-Limit`: Maximum requests allowed
+    - `X-RateLimit-Remaining`: Requests remaining
+    - `X-RateLimit-Reset`: Unix timestamp when limit resets
+  version: 1.0.0
+  contact:
+    email: support@urlshortener.com
+  license:
+    name: MIT
+    url: https://opensource.org/licenses/MIT
+
+servers:
+  - url: http://localhost:3000/api
+    description: Development server
+  - url: https://yourdomain.com/api
+    description: Production server
+
+tags:
+  - name: URL Shortening
+    description: Core URL shortening operations
+  - name: Links
+    description: Link management and statistics
+  - name: Domains
+    description: Custom domain management
+  - name: A/B Testing
+    description: A/B test configuration and statistics
+  - name: Targeting
+    description: Device, geo, and browser targeting
+  - name: Workspaces
+    description: Team workspace collaboration
+  - name: Webhooks
+    description: Webhook subscriptions and events
+  - name: Bio Pages
+    description: Link-in-bio page management
+  - name: Retargeting
+    description: Tracking pixel management
+  - name: Extension
+    description: Browser extension endpoints
+  - name: Zapier
+    description: Zapier integration endpoints
+  - name: Subscription
+    description: Plan and subscription management
+
+paths:
+  /shorten:
+    post:
+      tags:
+        - URL Shortening
+      summary: Create a short URL
+      description: Shortens a URL and returns the short link
+      operationId: shortenUrl
+      requestBody:
+        required: true
+        content:
+          application/json:
+            schema:
+              $ref: '#/components/schemas/ShortenRequest'
+      responses:
+        '200':
+          description: Successfully shortened URL
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/ShortenResponse'
+        '400':
+          $ref: '#/components/responses/BadRequest'
+        '401':
+          $ref: '#/components/responses/Unauthorized'
+        '429':
+          $ref: '#/components/responses/RateLimited'
+
+  /shorten/bulk:
+    post:
+      tags:
+        - URL Shortening
+      summary: Bulk shorten URLs
+      description: Shortens multiple URLs at once (max 100)
+      operationId: bulkShortenUrls
+      requestBody:
+        required: true
+        content:
+          application/json:
+            schema:
+              $ref: '#/components/schemas/BulkShortenRequest'
+      responses:
+        '200':
+          description: Successfully shortened URLs
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/BulkShortenResponse'
+        '400':
+          $ref: '#/components/responses/BadRequest'
+        '401':
+          $ref: '#/components/responses/Unauthorized'
+        '429':
+          $ref: '#/components/responses/RateLimited'
+
+  /links:
+    get:
+      tags:
+        - Links
+      summary: List user's links
+      description: Returns paginated list of user's short links
+      operationId: listLinks
+      parameters:
+        - name: page
+          in: query
+          schema:
+            type: integer
+            default: 1
+        - name: limit
+          in: query
+          schema:
+            type: integer
+            default: 20
+            maximum: 100
+        - name: search
+          in: query
+          schema:
+            type: string
+        - name: folderId
+          in: query
+          schema:
+            type: string
+        - name: sort
+          in: query
+          schema:
+            type: string
+            enum: [createdAt, clicks, expiresAt]
+      responses:
+        '200':
+          description: List of links
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/LinksListResponse'
+        '401':
+          $ref: '#/components/responses/Unauthorized'
+
+  /links/{id}:
+    get:
+      tags:
+        - Links
+      summary: Get link details
+      operationId: getLink
+      parameters:
+        - $ref: '#/components/parameters/LinkId'
+      responses:
+        '200':
+          description: Link details
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/Link'
+        '404':
+          $ref: '#/components/responses/NotFound'
+    put:
+      tags:
+        - Links
+      summary: Update a link
+      operationId: updateLink
+      parameters:
+        - $ref: '#/components/parameters/LinkId'
+      requestBody:
+        required: true
+        content:
+          application/json:
+            schema:
+              $ref: '#/components/schemas/UpdateLinkRequest'
+      responses:
+        '200':
+          description: Updated link
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/Link'
+        '404':
+          $ref: '#/components/responses/NotFound'
+    delete:
+      tags:
+        - Links
+      summary: Delete a link
+      operationId: deleteLink
+      parameters:
+        - $ref: '#/components/parameters/LinkId'
+      responses:
+        '200':
+          description: Link deleted
+        '404':
+          $ref: '#/components/responses/NotFound'
+
+  /links/{id}/stats:
+    get:
+      tags:
+        - Links
+      summary: Get link statistics
+      operationId: getLinkStats
+      parameters:
+        - $ref: '#/components/parameters/LinkId'
+        - name: period
+          in: query
+          schema:
+            type: string
+            enum: [24h, 7d, 30d, 90d, all]
+            default: 7d
+      responses:
+        '200':
+          description: Link statistics
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/LinkStats'
+        '404':
+          $ref: '#/components/responses/NotFound'
+
+  /links/{id}/targets:
+    get:
+      tags:
+        - Targeting
+      summary: List link targets
+      operationId: listLinkTargets
+      parameters:
+        - $ref: '#/components/parameters/LinkId'
+      responses:
+        '200':
+          description: List of targeting rules
+          content:
+            application/json:
+              schema:
+                type: array
+                items:
+                  $ref: '#/components/schemas/LinkTarget'
+    post:
+      tags:
+        - Targeting
+      summary: Add targeting rule
+      operationId: addLinkTarget
+      parameters:
+        - $ref: '#/components/parameters/LinkId'
+      requestBody:
+        required: true
+        content:
+          application/json:
+            schema:
+              $ref: '#/components/schemas/CreateTargetRequest'
+      responses:
+        '201':
+          description: Targeting rule created
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/LinkTarget'
+
+  /links/{id}/ab-test:
+    get:
+      tags:
+        - A/B Testing
+      summary: Get A/B test configuration
+      operationId: getABTest
+      parameters:
+        - $ref: '#/components/parameters/LinkId'
+      responses:
+        '200':
+          description: A/B test configuration
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/ABTest'
+        '404':
+          $ref: '#/components/responses/NotFound'
+    post:
+      tags:
+        - A/B Testing
+      summary: Create A/B test
+      operationId: createABTest
+      parameters:
+        - $ref: '#/components/parameters/LinkId'
+      requestBody:
+        required: true
+        content:
+          application/json:
+            schema:
+              $ref: '#/components/schemas/CreateABTestRequest'
+      responses:
+        '201':
+          description: A/B test created
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/ABTest'
+
+  /domains:
+    get:
+      tags:
+        - Domains
+      summary: List custom domains
+      operationId: listDomains
+      responses:
+        '200':
+          description: List of custom domains
+          content:
+            application/json:
+              schema:
+                type: array
+                items:
+                  $ref: '#/components/schemas/Domain'
+    post:
+      tags:
+        - Domains
+      summary: Add custom domain
+      operationId: addDomain
+      requestBody:
+        required: true
+        content:
+          application/json:
+            schema:
+              $ref: '#/components/schemas/CreateDomainRequest'
+      responses:
+        '201':
+          description: Domain added
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/Domain'
+
+  /domains/{id}/verify:
+    post:
+      tags:
+        - Domains
+      summary: Verify domain ownership
+      operationId: verifyDomain
+      parameters:
+        - name: id
+          in: path
+          required: true
+          schema:
+            type: string
+      responses:
+        '200':
+          description: Verification status
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/DomainVerification'
+
+  /workspaces:
+    get:
+      tags:
+        - Workspaces
+      summary: List workspaces
+      operationId: listWorkspaces
+      responses:
+        '200':
+          description: List of workspaces
+          content:
+            application/json:
+              schema:
+                type: array
+                items:
+                  $ref: '#/components/schemas/Workspace'
+    post:
+      tags:
+        - Workspaces
+      summary: Create workspace
+      operationId: createWorkspace
+      requestBody:
+        required: true
+        content:
+          application/json:
+            schema:
+              $ref: '#/components/schemas/CreateWorkspaceRequest'
+      responses:
+        '201':
+          description: Workspace created
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/Workspace'
+
+  /workspaces/{id}/members:
+    get:
+      tags:
+        - Workspaces
+      summary: List workspace members
+      operationId: listWorkspaceMembers
+      parameters:
+        - name: id
+          in: path
+          required: true
+          schema:
+            type: string
+      responses:
+        '200':
+          description: List of members
+          content:
+            application/json:
+              schema:
+                type: array
+                items:
+                  $ref: '#/components/schemas/WorkspaceMember'
+
+  /workspaces/{id}/invitations:
+    post:
+      tags:
+        - Workspaces
+      summary: Invite member to workspace
+      operationId: inviteToWorkspace
+      parameters:
+        - name: id
+          in: path
+          required: true
+          schema:
+            type: string
+      requestBody:
+        required: true
+        content:
+          application/json:
+            schema:
+              $ref: '#/components/schemas/InviteRequest'
+      responses:
+        '201':
+          description: Invitation sent
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/Invitation'
+
+  /webhooks:
+    get:
+      tags:
+        - Webhooks
+      summary: List webhooks
+      operationId: listWebhooks
+      responses:
+        '200':
+          description: List of webhooks
+          content:
+            application/json:
+              schema:
+                type: array
+                items:
+                  $ref: '#/components/schemas/Webhook'
+    post:
+      tags:
+        - Webhooks
+      summary: Create webhook
+      operationId: createWebhook
+      requestBody:
+        required: true
+        content:
+          application/json:
+            schema:
+              $ref: '#/components/schemas/CreateWebhookRequest'
+      responses:
+        '201':
+          description: Webhook created
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/Webhook'
+
+  /webhooks/{id}/test:
+    post:
+      tags:
+        - Webhooks
+      summary: Test webhook
+      operationId: testWebhook
+      parameters:
+        - name: id
+          in: path
+          required: true
+          schema:
+            type: string
+      responses:
+        '200':
+          description: Test webhook sent
+          content:
+            application/json:
+              schema:
+                type: object
+                properties:
+                  success:
+                    type: boolean
+                  statusCode:
+                    type: integer
+
+  /bio:
+    get:
+      tags:
+        - Bio Pages
+      summary: List bio pages
+      operationId: listBioPages
+      responses:
+        '200':
+          description: List of bio pages
+          content:
+            application/json:
+              schema:
+                type: array
+                items:
+                  $ref: '#/components/schemas/BioPage'
+    post:
+      tags:
+        - Bio Pages
+      summary: Create bio page
+      operationId: createBioPage
+      requestBody:
+        required: true
+        content:
+          application/json:
+            schema:
+              $ref: '#/components/schemas/CreateBioPageRequest'
+      responses:
+        '201':
+          description: Bio page created
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/BioPage'
+
+  /pixels:
+    get:
+      tags:
+        - Retargeting
+      summary: List retargeting pixels
+      operationId: listPixels
+      responses:
+        '200':
+          description: List of pixels
+          content:
+            application/json:
+              schema:
+                type: array
+                items:
+                  $ref: '#/components/schemas/Pixel'
+    post:
+      tags:
+        - Retargeting
+      summary: Create retargeting pixel
+      operationId: createPixel
+      requestBody:
+        required: true
+        content:
+          application/json:
+            schema:
+              $ref: '#/components/schemas/CreatePixelRequest'
+      responses:
+        '201':
+          description: Pixel created
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/Pixel'
+
+  /r/{shortCode}:
+    get:
+      tags:
+        - URL Shortening
+      summary: Redirect to original URL
+      description: Handles short URL redirects with analytics tracking
+      operationId: redirect
+      parameters:
+        - name: shortCode
+          in: path
+          required: true
+          schema:
+            type: string
+      responses:
+        '302':
+          description: Redirect to original URL
+        '404':
+          description: Short URL not found
+
+  /qr:
+    get:
+      tags:
+        - URL Shortening
+      summary: Generate QR code
+      operationId: generateQR
+      parameters:
+        - name: url
+          in: query
+          required: true
+          schema:
+            type: string
+        - name: size
+          in: query
+          schema:
+            type: integer
+            default: 200
+        - name: format
+          in: query
+          schema:
+            type: string
+            enum: [png, svg]
+            default: png
+      responses:
+        '200':
+          description: QR code image
+          content:
+            image/png:
+              schema:
+                type: string
+                format: binary
+            image/svg+xml:
+              schema:
+                type: string
+
+  /health:
+    get:
+      tags:
+        - System
+      summary: Health check
+      operationId: healthCheck
+      responses:
+        '200':
+          description: Service is healthy
+          content:
+            application/json:
+              schema:
+                type: object
+                properties:
+                  status:
+                    type: string
+                    enum: [ok]
+                  timestamp:
+                    type: string
+                    format: date-time
+
+  /subscription:
+    get:
+      tags:
+        - Subscription
+      summary: Get subscription status
+      operationId: getSubscription
+      responses:
+        '200':
+          description: Subscription details
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/Subscription'
+
+  /usage:
+    get:
+      tags:
+        - Subscription
+      summary: Get usage statistics
+      operationId: getUsage
+      responses:
+        '200':
+          description: Usage statistics
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/Usage'
+
+  /extension/shorten:
+    post:
+      tags:
+        - Extension
+      summary: Shorten URL from browser extension
+      operationId: extensionShorten
+      security:
+        - extensionToken: []
+      requestBody:
+        required: true
+        content:
+          application/json:
+            schema:
+              $ref: '#/components/schemas/ShortenRequest'
+      responses:
+        '200':
+          description: Successfully shortened URL
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/ShortenResponse'
+
+  /extension/tokens:
+    get:
+      tags:
+        - Extension
+      summary: List extension tokens
+      operationId: listExtensionTokens
+      responses:
+        '200':
+          description: List of tokens
+          content:
+            application/json:
+              schema:
+                type: array
+                items:
+                  $ref: '#/components/schemas/ExtensionToken'
+    post:
+      tags:
+        - Extension
+      summary: Create extension token
+      operationId: createExtensionToken
+      requestBody:
+        required: true
+        content:
+          application/json:
+            schema:
+              type: object
+              properties:
+                name:
+                  type: string
+              required:
+                - name
+      responses:
+        '201':
+          description: Token created
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/ExtensionToken'
+
+components:
+  securitySchemes:
+    session:
+      type: apiKey
+      in: cookie
+      name: next-auth.session-token
+      description: NextAuth.js session cookie
+    extensionToken:
+      type: http
+      scheme: bearer
+      description: Browser extension authentication token
+
+  parameters:
+    LinkId:
+      name: id
+      in: path
+      required: true
+      description: Link ID
+      schema:
+        type: string
+
+  responses:
+    BadRequest:
+      description: Bad request - invalid input
+      content:
+        application/json:
+          schema:
+            $ref: '#/components/schemas/Error'
+    Unauthorized:
+      description: Authentication required
+      content:
+        application/json:
+          schema:
+            $ref: '#/components/schemas/Error'
+    NotFound:
+      description: Resource not found
+      content:
+        application/json:
+          schema:
+            $ref: '#/components/schemas/Error'
+    RateLimited:
+      description: Rate limit exceeded
+      headers:
+        X-RateLimit-Limit:
+          schema:
+            type: integer
+        X-RateLimit-Remaining:
+          schema:
+            type: integer
+        X-RateLimit-Reset:
+          schema:
+            type: integer
+        Retry-After:
+          schema:
+            type: integer
+      content:
+        application/json:
+          schema:
+            $ref: '#/components/schemas/Error'
+
+  schemas:
+    Error:
+      type: object
+      properties:
+        error:
+          type: string
+        message:
+          type: string
+        code:
+          type: string
+      required:
+        - error
+
+    ShortenRequest:
+      type: object
+      properties:
+        url:
+          type: string
+          format: uri
+          description: The URL to shorten
+        alias:
+          type: string
+          description: Custom alias (optional)
+        expiresAt:
+          type: string
+          format: date-time
+          description: Expiration date (optional)
+        password:
+          type: string
+          description: Password protection (optional)
+        folderId:
+          type: string
+          description: Folder ID (optional)
+        customDomainId:
+          type: string
+          description: Custom domain ID (optional)
+        utm:
+          $ref: '#/components/schemas/UTMParams'
+      required:
+        - url
+
+    UTMParams:
+      type: object
+      properties:
+        source:
+          type: string
+        medium:
+          type: string
+        campaign:
+          type: string
+        term:
+          type: string
+        content:
+          type: string
+
+    ShortenResponse:
+      type: object
+      properties:
+        id:
+          type: string
+        shortUrl:
+          type: string
+        shortCode:
+          type: string
+        originalUrl:
+          type: string
+        createdAt:
+          type: string
+          format: date-time
+        qrCode:
+          type: string
+          description: Base64 QR code (optional)
+
+    BulkShortenRequest:
+      type: object
+      properties:
+        urls:
+          type: array
+          items:
+            type: string
+            format: uri
+          maxItems: 100
+      required:
+        - urls
+
+    BulkShortenResponse:
+      type: object
+      properties:
+        results:
+          type: array
+          items:
+            type: object
+            properties:
+              originalUrl:
+                type: string
+              shortUrl:
+                type: string
+              error:
+                type: string
+
+    Link:
+      type: object
+      properties:
+        id:
+          type: string
+        shortCode:
+          type: string
+        originalUrl:
+          type: string
+        shortUrl:
+          type: string
+        clicks:
+          type: integer
+        createdAt:
+          type: string
+          format: date-time
+        expiresAt:
+          type: string
+          format: date-time
+        isPasswordProtected:
+          type: boolean
+        folderId:
+          type: string
+        customDomainId:
+          type: string
+        cloakingEnabled:
+          type: boolean
+        cloakingType:
+          type: string
+          enum: [iframe, js, meta]
+        deepLinkEnabled:
+          type: boolean
+
+    UpdateLinkRequest:
+      type: object
+      properties:
+        originalUrl:
+          type: string
+          format: uri
+        expiresAt:
+          type: string
+          format: date-time
+        password:
+          type: string
+        folderId:
+          type: string
+        cloakingEnabled:
+          type: boolean
+        cloakingType:
+          type: string
+          enum: [iframe, js, meta]
+        deepLinkEnabled:
+          type: boolean
+
+    LinksListResponse:
+      type: object
+      properties:
+        links:
+          type: array
+          items:
+            $ref: '#/components/schemas/Link'
+        total:
+          type: integer
+        page:
+          type: integer
+        limit:
+          type: integer
+        totalPages:
+          type: integer
+
+    LinkStats:
+      type: object
+      properties:
+        totalClicks:
+          type: integer
+        uniqueClicks:
+          type: integer
+        clicksByDate:
+          type: array
+          items:
+            type: object
+            properties:
+              date:
+                type: string
+              clicks:
+                type: integer
+        clicksByCountry:
+          type: array
+          items:
+            type: object
+            properties:
+              country:
+                type: string
+              clicks:
+                type: integer
+        clicksByDevice:
+          type: array
+          items:
+            type: object
+            properties:
+              device:
+                type: string
+              clicks:
+                type: integer
+        clicksByBrowser:
+          type: array
+          items:
+            type: object
+            properties:
+              browser:
+                type: string
+              clicks:
+                type: integer
+        referrers:
+          type: array
+          items:
+            type: object
+            properties:
+              referrer:
+                type: string
+              clicks:
+                type: integer
+
+    LinkTarget:
+      type: object
+      properties:
+        id:
+          type: string
+        linkId:
+          type: string
+        type:
+          type: string
+          enum: [device, browser, os, country, language]
+        value:
+          type: string
+        url:
+          type: string
+          format: uri
+        priority:
+          type: integer
+
+    CreateTargetRequest:
+      type: object
+      properties:
+        type:
+          type: string
+          enum: [device, browser, os, country, language]
+        value:
+          type: string
+        url:
+          type: string
+          format: uri
+        priority:
+          type: integer
+      required:
+        - type
+        - value
+        - url
+
+    ABTest:
+      type: object
+      properties:
+        id:
+          type: string
+        linkId:
+          type: string
+        status:
+          type: string
+          enum: [draft, running, paused, completed]
+        variants:
+          type: array
+          items:
+            $ref: '#/components/schemas/ABVariant'
+        createdAt:
+          type: string
+          format: date-time
+
+    ABVariant:
+      type: object
+      properties:
+        id:
+          type: string
+        name:
+          type: string
+        url:
+          type: string
+          format: uri
+        weight:
+          type: integer
+        clicks:
+          type: integer
+        conversions:
+          type: integer
+
+    CreateABTestRequest:
+      type: object
+      properties:
+        variants:
+          type: array
+          items:
+            type: object
+            properties:
+              name:
+                type: string
+              url:
+                type: string
+                format: uri
+              weight:
+                type: integer
+          minItems: 2
+      required:
+        - variants
+
+    Domain:
+      type: object
+      properties:
+        id:
+          type: string
+        domain:
+          type: string
+        verified:
+          type: boolean
+        sslStatus:
+          type: string
+          enum: [pending, active, failed]
+        createdAt:
+          type: string
+          format: date-time
+
+    CreateDomainRequest:
+      type: object
+      properties:
+        domain:
+          type: string
+      required:
+        - domain
+
+    DomainVerification:
+      type: object
+      properties:
+        verified:
+          type: boolean
+        dnsRecords:
+          type: array
+          items:
+            type: object
+            properties:
+              type:
+                type: string
+              name:
+                type: string
+              value:
+                type: string
+              status:
+                type: string
+                enum: [pending, verified, failed]
+
+    Workspace:
+      type: object
+      properties:
+        id:
+          type: string
+        name:
+          type: string
+        slug:
+          type: string
+        ownerId:
+          type: string
+        memberCount:
+          type: integer
+        createdAt:
+          type: string
+          format: date-time
+
+    CreateWorkspaceRequest:
+      type: object
+      properties:
+        name:
+          type: string
+      required:
+        - name
+
+    WorkspaceMember:
+      type: object
+      properties:
+        id:
+          type: string
+        userId:
+          type: string
+        email:
+          type: string
+        name:
+          type: string
+        role:
+          type: string
+          enum: [owner, admin, member, viewer]
+        joinedAt:
+          type: string
+          format: date-time
+
+    InviteRequest:
+      type: object
+      properties:
+        email:
+          type: string
+          format: email
+        role:
+          type: string
+          enum: [admin, member, viewer]
+      required:
+        - email
+        - role
+
+    Invitation:
+      type: object
+      properties:
+        id:
+          type: string
+        email:
+          type: string
+        role:
+          type: string
+        status:
+          type: string
+          enum: [pending, accepted, declined, expired]
+        expiresAt:
+          type: string
+          format: date-time
+
+    Webhook:
+      type: object
+      properties:
+        id:
+          type: string
+        url:
+          type: string
+          format: uri
+        events:
+          type: array
+          items:
+            type: string
+            enum:
+              - link.created
+              - link.updated
+              - link.deleted
+              - link.clicked
+              - bio.created
+              - bio.updated
+        secret:
+          type: string
+        active:
+          type: boolean
+        createdAt:
+          type: string
+          format: date-time
+
+    CreateWebhookRequest:
+      type: object
+      properties:
+        url:
+          type: string
+          format: uri
+        events:
+          type: array
+          items:
+            type: string
+      required:
+        - url
+        - events
+
+    BioPage:
+      type: object
+      properties:
+        id:
+          type: string
+        slug:
+          type: string
+        title:
+          type: string
+        description:
+          type: string
+        theme:
+          type: string
+        links:
+          type: array
+          items:
+            $ref: '#/components/schemas/BioLink'
+        createdAt:
+          type: string
+          format: date-time
+
+    BioLink:
+      type: object
+      properties:
+        id:
+          type: string
+        title:
+          type: string
+        url:
+          type: string
+        icon:
+          type: string
+        order:
+          type: integer
+
+    CreateBioPageRequest:
+      type: object
+      properties:
+        slug:
+          type: string
+        title:
+          type: string
+        theme:
+          type: string
+      required:
+        - slug
+        - title
+
+    Pixel:
+      type: object
+      properties:
+        id:
+          type: string
+        name:
+          type: string
+        type:
+          type: string
+          enum: [facebook, google_analytics, tiktok, custom]
+        pixelId:
+          type: string
+        createdAt:
+          type: string
+          format: date-time
+
+    CreatePixelRequest:
+      type: object
+      properties:
+        name:
+          type: string
+        type:
+          type: string
+          enum: [facebook, google_analytics, tiktok, custom]
+        pixelId:
+          type: string
+      required:
+        - name
+        - type
+        - pixelId
+
+    Subscription:
+      type: object
+      properties:
+        plan:
+          type: string
+          enum: [FREE, STARTER, PRO, BUSINESS, ENTERPRISE]
+        status:
+          type: string
+          enum: [active, canceled, past_due, trialing]
+        currentPeriodEnd:
+          type: string
+          format: date-time
+        cancelAtPeriodEnd:
+          type: boolean
+
+    Usage:
+      type: object
+      properties:
+        linksCreated:
+          type: integer
+        linksLimit:
+          type: integer
+        clicksTracked:
+          type: integer
+        apiRequests:
+          type: integer
+        apiRequestsLimit:
+          type: integer
+
+    ExtensionToken:
+      type: object
+      properties:
+        id:
+          type: string
+        name:
+          type: string
+        token:
+          type: string
+          description: Only returned on creation
+        lastUsed:
+          type: string
+          format: date-time
+        createdAt:
+          type: string
+          format: date-time
+
+security:
+  - session: []

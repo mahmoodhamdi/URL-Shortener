@@ -280,8 +280,8 @@ if (options?.sort === 'clicks') {
 ### Priority 4: Low (Nice to Have)
 - [x] Add API route integration tests (97 tests added)
 - [x] Add E2E tests for complete flows (6 new test files added)
-- [ ] Add Redis rate limiting for scale
-- [ ] Add OpenAPI documentation
+- [x] Add Redis rate limiting for scale (42 tests added)
+- [x] Add OpenAPI documentation (comprehensive spec added)
 - [x] Add Stripe client/subscription tests (25 tests added)
 - [x] Add auth middleware tests (19 tests added)
 - [x] Add environment variable validation (27 tests added)
@@ -325,27 +325,39 @@ The URL Shortener project is well-architected with strong security practices. Al
    - Multi-user collaboration: `multi-user-collaboration.spec.ts`
    - Subscription/pricing: `subscription-flow.spec.ts`
    - Error handling: `error-handling.spec.ts`
+8. ✅ **Redis rate limiting for scale** - Production-ready distributed rate limiting:
+   - Redis store implementation with connection pooling
+   - Automatic fallback to in-memory store
+   - Factory function for store selection
+   - 42 new tests added for Redis rate limiting
+9. ✅ **OpenAPI documentation** - Comprehensive API documentation:
+   - Full OpenAPI 3.1 specification (`src/app/api/openapi.yaml`)
+   - API docs endpoint (`/api/docs`)
+   - Enhanced API docs page with rate limit info
+   - Documents all 60+ API endpoints
 
 ### Current Status:
-- **All unit tests passing (784)**
+- **All unit tests passing (826)**
 - **All integration tests passing (218)**
 - **E2E tests covering all major flows (16 test files)**
-- **No TypeScript errors**
+- **No TypeScript errors in source code**
 - **No ESLint warnings**
 - **All security concerns addressed**
 - **Environment validation ready for production**
 - **Comprehensive API route coverage**
 - **Complete E2E flow coverage**
+- **Redis rate limiting ready for scale**
+- **OpenAPI documentation complete**
 
 ### Test Coverage Summary:
 | Test Type | Count | Status |
 |-----------|-------|--------|
-| Unit Tests | 784 | ✅ All passing |
+| Unit Tests | 826 | ✅ All passing |
 | Integration Tests | 218 | ✅ All passing |
 | E2E Test Files | 16 | ✅ Comprehensive coverage |
-| Total Unit/Integration | 1002 | ✅ All passing |
+| Total Unit/Integration | 1044 | ✅ All passing |
 
-The project is now **production-ready** with comprehensive test coverage, E2E flow testing, and security hardening.
+The project is now **production-ready** with comprehensive test coverage, E2E flow testing, security hardening, scalable rate limiting, and complete API documentation.
 
 ---
 

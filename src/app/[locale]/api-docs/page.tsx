@@ -1,7 +1,10 @@
 import { useTranslations } from 'next-intl';
 import { unstable_setRequestLocale } from 'next-intl/server';
-import { Card, CardContent, CardHeader, CardTitle } from '@/components/ui/card';
+import { Card, CardContent, CardHeader, CardTitle, CardDescription } from '@/components/ui/card';
 import { Tabs, TabsContent, TabsList, TabsTrigger } from '@/components/ui/tabs';
+import { Button } from '@/components/ui/button';
+import { FileText, Download, ExternalLink } from 'lucide-react';
+import Link from 'next/link';
 import type { Locale } from '@/i18n/config';
 
 interface PageProps {
@@ -104,14 +107,63 @@ export default function ApiDocsPage({ params: { locale } }: PageProps) {
           <p className="text-muted-foreground">{t('apiDocs.subtitle')}</p>
         </div>
 
-        <Card className="mb-8">
+        <div className="grid gap-6 md:grid-cols-2 mb-8">
+          <Card>
+            <CardHeader>
+              <CardTitle>{t('apiDocs.baseUrl')}</CardTitle>
+            </CardHeader>
+            <CardContent>
+              <code className="text-sm bg-muted p-2 rounded block">
+                {typeof window !== 'undefined' ? window.location.origin : 'https://your-domain.com'}
+              </code>
+            </CardContent>
+          </Card>
+
+          <Card>
+            <CardHeader>
+              <CardTitle className="flex items-center gap-2">
+                <FileText className="h-5 w-5" />
+                OpenAPI Specification
+              </CardTitle>
+              <CardDescription>
+                Download the full API specification for use with Swagger, Postman, or other tools
+              </CardDescription>
+            </CardHeader>
+            <CardContent className="flex gap-2">
+              <Button asChild variant="outline" size="sm">
+                <Link href="/api/docs" target="_blank">
+                  <ExternalLink className="h-4 w-4 mr-2" />
+                  View YAML
+                </Link>
+              </Button>
+              <Button asChild variant="outline" size="sm">
+                <a href="/api/docs" download="openapi.yaml">
+                  <Download className="h-4 w-4 mr-2" />
+                  Download
+                </a>
+              </Button>
+            </CardContent>
+          </Card>
+        </div>
+
+        <Card className="mb-8 bg-gradient-to-r from-blue-50 to-indigo-50 dark:from-blue-950 dark:to-indigo-950 border-blue-200 dark:border-blue-800">
           <CardHeader>
-            <CardTitle>{t('apiDocs.baseUrl')}</CardTitle>
+            <CardTitle className="text-blue-700 dark:text-blue-300">Rate Limiting</CardTitle>
           </CardHeader>
-          <CardContent>
-            <code className="text-sm bg-muted p-2 rounded block">
-              {typeof window !== 'undefined' ? window.location.origin : 'https://your-domain.com'}
-            </code>
+          <CardContent className="text-sm space-y-2">
+            <p>Rate limits vary by subscription plan:</p>
+            <ul className="list-disc list-inside space-y-1 text-muted-foreground">
+              <li><span className="font-medium">Free:</span> 100 requests/day</li>
+              <li><span className="font-medium">Starter:</span> 1,000 requests/day</li>
+              <li><span className="font-medium">Pro:</span> 10,000 requests/day</li>
+              <li><span className="font-medium">Business:</span> 50,000 requests/day</li>
+              <li><span className="font-medium">Enterprise:</span> Unlimited</li>
+            </ul>
+            <p className="text-xs mt-4 text-muted-foreground">
+              Rate limit headers: <code className="bg-muted px-1 rounded">X-RateLimit-Limit</code>,
+              <code className="bg-muted px-1 rounded">X-RateLimit-Remaining</code>,
+              <code className="bg-muted px-1 rounded">X-RateLimit-Reset</code>
+            </p>
           </CardContent>
         </Card>
 
