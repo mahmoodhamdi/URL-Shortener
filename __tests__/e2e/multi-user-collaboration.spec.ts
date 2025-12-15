@@ -226,9 +226,11 @@ test.describe('Multi-User Collaboration', () => {
       await page.goto('/en/workspaces');
       await page.waitForLoadState('networkidle');
 
-      // Navigate to workspace settings
+      // Navigate to workspace settings (only if settings button exists)
       const settingsBtn = page.locator('button:has-text("Settings"), a:has-text("Settings")');
-      if (await settingsBtn.count() > 0) {
+      const settingsBtnCount = await settingsBtn.count();
+
+      if (settingsBtnCount > 0) {
         await settingsBtn.first().click();
         await page.waitForTimeout(1000);
 

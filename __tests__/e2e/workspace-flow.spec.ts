@@ -189,9 +189,11 @@ test.describe('Workspace Collaboration Flow', () => {
       await page.goto('/en/workspaces');
       await page.waitForLoadState('networkidle');
 
-      // Navigate to workspace settings
+      // Navigate to workspace settings (only if settings button exists)
       const settingsBtn = page.locator('button:has-text("Settings"), a:has-text("Settings"), [data-testid="workspace-settings"]');
-      if (await settingsBtn.count() > 0) {
+      const settingsBtnCount = await settingsBtn.count();
+
+      if (settingsBtnCount > 0) {
         await settingsBtn.first().click();
         await page.waitForTimeout(1000);
 
@@ -200,9 +202,9 @@ test.describe('Workspace Collaboration Flow', () => {
         if (await leaveBtn.count() > 0) {
           await expect(leaveBtn.first()).toBeVisible();
         }
-
-        await page.screenshot({ path: 'screenshots/workspace-08-settings.png' });
       }
+
+      await page.screenshot({ path: 'screenshots/workspace-08-settings.png' });
     });
   });
 });
