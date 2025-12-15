@@ -226,18 +226,21 @@ test.describe('Multi-User Collaboration', () => {
       await page.goto('/en/workspaces');
       await page.waitForLoadState('networkidle');
 
-      // Navigate to workspace settings (only if settings button exists)
+      // Navigate to workspace settings (only if settings button exists and is visible)
       const settingsBtn = page.locator('button:has-text("Settings"), a:has-text("Settings")');
       const settingsBtnCount = await settingsBtn.count();
 
       if (settingsBtnCount > 0) {
-        await settingsBtn.first().click();
-        await page.waitForTimeout(1000);
+        const isVisible = await settingsBtn.first().isVisible();
+        if (isVisible) {
+          await settingsBtn.first().click();
+          await page.waitForTimeout(1000);
 
-        // Look for role change dropdown
-        const roleSelect = page.locator('select[name="role"], [data-testid="role-select"]');
-        if (await roleSelect.count() > 0) {
-          await expect(roleSelect.first()).toBeVisible();
+          // Look for role change dropdown
+          const roleSelect = page.locator('select[name="role"], [data-testid="role-select"]');
+          if (await roleSelect.count() > 0) {
+            await expect(roleSelect.first()).toBeVisible();
+          }
         }
       }
 

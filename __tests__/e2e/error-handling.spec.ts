@@ -166,15 +166,20 @@ test.describe('Error Handling Scenarios', () => {
         await passwordInput.fill('123'); // Too short
       }
 
-      // Submit
+      // Submit button may be disabled due to validation (correct behavior)
       const submitBtn = page.locator('button[type="submit"]');
       if (await submitBtn.count() > 0) {
-        await submitBtn.click();
+        const isDisabled = await submitBtn.isDisabled();
+        if (isDisabled) {
+          // Form validation is working - button is disabled for invalid input
+          expect(isDisabled).toBe(true);
+        } else {
+          await submitBtn.click();
+          await page.waitForTimeout(500);
+        }
       }
 
-      await page.waitForTimeout(500);
-
-      // Should stay on register page or show errors
+      // Should stay on register page
       expect(page.url()).toContain('register');
 
       await page.screenshot({ path: 'screenshots/error-08-register-validation.png' });

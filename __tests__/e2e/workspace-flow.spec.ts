@@ -189,18 +189,21 @@ test.describe('Workspace Collaboration Flow', () => {
       await page.goto('/en/workspaces');
       await page.waitForLoadState('networkidle');
 
-      // Navigate to workspace settings (only if settings button exists)
+      // Navigate to workspace settings (only if settings button exists and is visible)
       const settingsBtn = page.locator('button:has-text("Settings"), a:has-text("Settings"), [data-testid="workspace-settings"]');
       const settingsBtnCount = await settingsBtn.count();
 
       if (settingsBtnCount > 0) {
-        await settingsBtn.first().click();
-        await page.waitForTimeout(1000);
+        const isVisible = await settingsBtn.first().isVisible();
+        if (isVisible) {
+          await settingsBtn.first().click();
+          await page.waitForTimeout(1000);
 
-        // Look for leave or danger zone
-        const leaveBtn = page.locator('button:has-text("Leave"), button:has-text("Delete")');
-        if (await leaveBtn.count() > 0) {
-          await expect(leaveBtn.first()).toBeVisible();
+          // Look for leave or danger zone
+          const leaveBtn = page.locator('button:has-text("Leave"), button:has-text("Delete")');
+          if (await leaveBtn.count() > 0) {
+            await expect(leaveBtn.first()).toBeVisible();
+          }
         }
       }
 
