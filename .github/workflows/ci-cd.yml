@@ -106,6 +106,10 @@ jobs:
 
       - name: Build application
         run: npm run build
+        env:
+          GITHUB_CLIENT_ID: ${{ secrets.GH_CLIENT_ID }}
+          GITHUB_CLIENT_SECRET: ${{ secrets.GH_CLIENT_SECRET }}
+          AUTH_SECRET: ${{ secrets.AUTH_SECRET }}
 
   # E2E Tests
   e2e:

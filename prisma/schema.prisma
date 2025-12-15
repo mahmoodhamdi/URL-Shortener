@@ -34,6 +34,8 @@ model User {
   retargetingPixels    RetargetingPixel[]
   zapierSubscriptions  ZapierSubscription[]
   extensionTokens      ExtensionToken[]
+  fcmTokens            FCMToken[]
+  notificationPreferences Json?           // FCM notification preferences
 
   @@index([email])
 }
@@ -616,4 +618,29 @@ model ExtensionToken {
 
   @@index([userId])
   @@index([token])
+}
+
+// ==================== FCM / PUSH NOTIFICATIONS ====================
+
+model FCMToken {
+  id          String    @id @default(cuid())
+  userId      String
+  user        User      @relation(fields: [userId], references: [id], onDelete: Cascade)
+
+  token       String    @unique    // FCM device token
+  deviceType  DeviceType @default(WEB)
+  deviceName  String?              // User-friendly device name
+
+  lastUsedAt  DateTime  @default(now())
+  createdAt   DateTime  @default(now())
+  updatedAt   DateTime  @updatedAt
+
+  @@index([userId])
+  @@index([token])
+}
+
+enum DeviceType {
+  WEB
+  ANDROID
+  IOS
 }

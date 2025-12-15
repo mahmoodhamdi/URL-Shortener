@@ -5,6 +5,7 @@ import Google from 'next-auth/providers/google';
 import GitHub from 'next-auth/providers/github';
 import bcrypt from 'bcryptjs';
 import { prisma } from '@/lib/db/prisma';
+import { syncFirebaseUser } from '@/lib/firebase/auth';
 
 export const authConfig: NextAuthConfig = {
   adapter: PrismaAdapter(prisma),
@@ -120,6 +121,21 @@ export const authConfig: NextAuthConfig = {
           status: 'ACTIVE',
         },
       });
+
+      // Sync user with Firebase for FCM and other Firebase services
+      if (user.email) {
+        try {
+          await syncFirebaseUser(
+            user.id!,
+            user.email,
+            user.name || undefined,
+            user.image || undefined
+          );
+        } catch (error) {
+          // Log but don't fail - Firebase is optional
+          console.warn('[Auth] Failed to sync user with Firebase:', error);
+        }
+      }
     },
   },
 };
