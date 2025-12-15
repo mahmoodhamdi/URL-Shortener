@@ -3,6 +3,7 @@
  */
 
 import { describe, it, expect, vi, beforeEach } from 'vitest';
+import { DeviceType } from '@prisma/client';
 
 // Mock prisma - define inside factory to avoid hoisting issues
 vi.mock('@/lib/db/prisma', () => ({
@@ -60,7 +61,7 @@ describe('FCM Token Management', () => {
         id: 'token-id-1',
         userId: 'user-123',
         token: 'fcm-token-abc',
-        deviceType: 'web',
+        deviceType: DeviceType.WEB,
         deviceName: 'Chrome',
         createdAt: new Date(),
         lastUsedAt: new Date(),
@@ -70,14 +71,14 @@ describe('FCM Token Management', () => {
       vi.mocked(prisma.fCMToken.create).mockResolvedValue(mockToken as never);
       vi.mocked(prisma.user.findUnique).mockResolvedValue({ notificationPreferences: null } as never);
 
-      const result = await registerFCMToken('user-123', 'fcm-token-abc', 'web', 'Chrome');
+      const result = await registerFCMToken('user-123', 'fcm-token-abc', DeviceType.WEB, 'Chrome');
 
       expect(result).toEqual(mockToken);
       expect(prisma.fCMToken.create).toHaveBeenCalledWith({
         data: {
           userId: 'user-123',
           token: 'fcm-token-abc',
-          deviceType: 'web',
+          deviceType: DeviceType.WEB,
           deviceName: 'Chrome',
         },
       });
@@ -88,7 +89,7 @@ describe('FCM Token Management', () => {
         id: 'token-id-1',
         userId: 'old-user',
         token: 'fcm-token-abc',
-        deviceType: 'web',
+        deviceType: DeviceType.WEB,
       };
 
       const updatedToken = {
@@ -100,7 +101,7 @@ describe('FCM Token Management', () => {
       vi.mocked(prisma.fCMToken.findUnique).mockResolvedValue(existingToken as never);
       vi.mocked(prisma.fCMToken.update).mockResolvedValue(updatedToken as never);
 
-      const result = await registerFCMToken('user-123', 'fcm-token-abc', 'web', 'Chrome');
+      const result = await registerFCMToken('user-123', 'fcm-token-abc', DeviceType.WEB, 'Chrome');
 
       expect(result).toEqual(updatedToken);
       expect(prisma.fCMToken.update).toHaveBeenCalled();
@@ -169,7 +170,7 @@ describe('FCM Token Management', () => {
           id: 'id-1',
           userId: 'user-123',
           token: 'token-1',
-          deviceType: 'web',
+          deviceType: DeviceType.WEB,
           deviceName: 'Chrome',
           createdAt: new Date(),
           lastUsedAt: new Date(),

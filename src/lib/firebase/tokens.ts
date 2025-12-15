@@ -6,7 +6,11 @@
  */
 
 import { prisma } from '@/lib/db/prisma';
+import { DeviceType } from '@prisma/client';
 import { subscribeToTopic, unsubscribeFromTopic, FCM_TOPICS, FCMTopic } from './fcm';
+
+// Re-export DeviceType for convenience
+export { DeviceType };
 
 /**
  * FCM Token with metadata
@@ -15,7 +19,7 @@ export interface FCMToken {
   id: string;
   userId: string;
   token: string;
-  deviceType: 'web' | 'android' | 'ios';
+  deviceType: DeviceType;
   deviceName?: string;
   createdAt: Date;
   lastUsedAt: Date;
@@ -46,7 +50,7 @@ const DEFAULT_PREFERENCES: NotificationPreferences = {
 export async function registerFCMToken(
   userId: string,
   token: string,
-  deviceType: 'web' | 'android' | 'ios' = 'web',
+  deviceType: DeviceType = DeviceType.WEB,
   deviceName?: string
 ): Promise<FCMToken | null> {
   try {

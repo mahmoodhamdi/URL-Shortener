@@ -11,13 +11,24 @@
 import { NextRequest, NextResponse } from 'next/server';
 import { auth } from '@/lib/auth';
 import { registerFCMToken, removeFCMToken } from '@/lib/firebase/tokens';
+import { DeviceType } from '@prisma/client';
 import { z } from 'zod';
 
 const registerSchema = z.object({
   token: z.string().min(1, 'Token is required'),
-  deviceType: z.enum(['web', 'android', 'ios']).default('web'),
+  deviceType: z.enum(['web', 'android', 'ios', 'WEB', 'ANDROID', 'IOS']).default('web'),
   deviceName: z.string().optional(),
 });
+
+// Map lowercase device types to Prisma enum
+const deviceTypeMap: Record<string, DeviceType> = {
+  web: DeviceType.WEB,
+  android: DeviceType.ANDROID,
+  ios: DeviceType.IOS,
+  WEB: DeviceType.WEB,
+  ANDROID: DeviceType.ANDROID,
+  IOS: DeviceType.IOS,
+};
 
 const removeSchema = z.object({
   token: z.string().min(1, 'Token is required'),
@@ -44,8 +55,9 @@ export async function POST(request: NextRequest) {
     }
 
     const { token, deviceType, deviceName } = validation.data;
+    const mappedDeviceType = deviceTypeMap[deviceType] || DeviceType.WEB;
 
-    const result = await registerFCMToken(session.user.id, token, deviceType, deviceName);
+    const result = await registerFCMToken(session.user.id, token, mappedDeviceType, deviceName);
 
     if (!result) {
       return NextResponse.json(
