@@ -63,9 +63,9 @@ The mock Link object is missing required properties from the `Link` type.
 
 | # | File | Line | Error | Status |
 |---|------|------|-------|--------|
-| 1 | `__tests__/unit/components/LinkEditDialog.test.tsx` | 12 | Missing Link type properties | 🔴 Open |
-| 2 | `__tests__/unit/rate-limit/limiter.test.ts` | 19 | Cannot find name 'afterEach' | 🔴 Open |
-| 3 | `__tests__/unit/rate-limit/limiter.test.ts` | 203 | Cannot find name 'afterEach' | 🔴 Open |
+| 1 | `__tests__/unit/components/LinkEditDialog.test.tsx` | 12 | Missing Link type properties | ✅ Fixed |
+| 2 | `__tests__/unit/rate-limit/limiter.test.ts` | 19 | Cannot find name 'afterEach' | ✅ Fixed |
+| 3 | `__tests__/unit/rate-limit/limiter.test.ts` | 203 | Cannot find name 'afterEach' | ✅ Fixed |
 
 ---
 
@@ -73,11 +73,11 @@ The mock Link object is missing required properties from the `Link` type.
 
 | # | File | Line | Warning | Status |
 |---|------|------|---------|--------|
-| 1 | `src/app/[locale]/dashboard/page.tsx` | 48 | Missing useEffect dependency: 'fetchLinks' | 🟡 Open |
-| 2 | `src/app/[locale]/[shortCode]/stats/page.tsx` | 72 | Missing useEffect dependency: 'fetchStats' | 🟡 Open |
-| 3 | `src/components/auth/UserMenu.tsx` | 49 | Using `<img>` instead of next/image | 🟡 Open |
-| 4 | `src/components/targeting/TargetingRules.tsx` | 65 | Missing useEffect dependency: 'fetchTargets' | 🟡 Open |
-| 5 | `src/components/url/QrGenerator.tsx` | 79 | Using `<img>` instead of next/image | 🟡 Open |
+| 1 | `src/app/[locale]/dashboard/page.tsx` | 48 | Missing useEffect dependency: 'fetchLinks' | ✅ Fixed |
+| 2 | `src/app/[locale]/[shortCode]/stats/page.tsx` | 72 | Missing useEffect dependency: 'fetchStats' | ✅ Fixed |
+| 3 | `src/components/auth/UserMenu.tsx` | 49 | Using `<img>` instead of next/image | ✅ Fixed |
+| 4 | `src/components/targeting/TargetingRules.tsx` | 65 | Missing useEffect dependency: 'fetchTargets' | ✅ Fixed |
+| 5 | `src/components/url/QrGenerator.tsx` | 79 | Using `<img>` instead of next/image | ✅ Fixed (ESLint exception) |
 
 ---
 
@@ -224,15 +224,15 @@ if (options?.sort === 'clicks') {
 ## Issue Resolution Checklist
 
 ### Priority 1: Critical (Must Fix)
-- [ ] Fix TypeScript error in LinkEditDialog.test.tsx (missing Link properties)
-- [ ] Fix TypeScript error in limiter.test.ts (missing afterEach import)
+- [x] Fix TypeScript error in LinkEditDialog.test.tsx (missing Link properties)
+- [x] Fix TypeScript error in limiter.test.ts (missing afterEach import)
 
 ### Priority 2: High (Should Fix)
-- [ ] Fix useEffect dependency warnings in dashboard page
-- [ ] Fix useEffect dependency warnings in stats page
-- [ ] Fix useEffect dependency warnings in TargetingRules
-- [ ] Replace `<img>` with `<Image>` in UserMenu
-- [ ] Replace `<img>` with `<Image>` in QrGenerator
+- [x] Fix useEffect dependency warnings in dashboard page
+- [x] Fix useEffect dependency warnings in stats page
+- [x] Fix useEffect dependency warnings in TargetingRules
+- [x] Replace `<img>` with `<Image>` in UserMenu
+- [x] Replace `<img>` with `<Image>` in QrGenerator (ESLint exception added)
 
 ### Priority 3: Medium (Recommended)
 - [ ] Add SSRF validation tests
