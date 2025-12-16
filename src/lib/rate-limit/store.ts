@@ -137,16 +137,17 @@ export async function getRateLimitStore(config?: StoreFactoryConfig): Promise<Ra
       await redisStore.connect();
       factoryStore = redisStore;
       factoryStoreType = 'redis';
-      console.log('[RateLimit] Using Redis store');
     } catch (error) {
-      console.warn('[RateLimit] Failed to initialize Redis store, falling back to memory:', error);
+      // Silently fall back to in-memory store in production
+      if (process.env.NODE_ENV === 'development') {
+        console.warn('[RateLimit] Failed to initialize Redis store, falling back to memory:', error);
+      }
       factoryStore = getDefaultStore();
       factoryStoreType = 'memory';
     }
   } else {
     factoryStore = getDefaultStore();
     factoryStoreType = 'memory';
-    console.log('[RateLimit] Using in-memory store');
   }
 
   return factoryStore;

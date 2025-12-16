@@ -64,20 +64,18 @@ export async function POST(request: NextRequest) {
       }
 
       case 'invoice.payment_failed': {
-        // Payment failed, may need to notify user
-        console.log('Payment failed for invoice:', event.data.object.id);
+        // Payment failed - the subscription handler will update status
+        // User notification could be added here if needed
         break;
       }
 
       case 'checkout.session.completed': {
-        // Checkout completed, subscription should be created
-        const session = event.data.object as Stripe.Checkout.Session;
-        console.log('Checkout completed:', session.id);
+        // Checkout completed - subscription is created via subscription.created event
         break;
       }
 
       default:
-        console.log(`Unhandled event type: ${event.type}`);
+        // Unhandled event types are ignored
     }
 
     return NextResponse.json({ received: true });

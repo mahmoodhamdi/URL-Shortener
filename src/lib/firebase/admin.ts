@@ -57,7 +57,6 @@ export function getFirebaseAdmin(): admin.app.App {
   admin.initializeApp(options);
   initialized = true;
 
-  console.log('[Firebase] Admin SDK initialized successfully');
   return admin.app();
 }
 

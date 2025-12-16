@@ -104,7 +104,6 @@ export async function requestFCMToken(): Promise<string | null> {
     // Request notification permission
     const permission = await Notification.requestPermission();
     if (permission !== 'granted') {
-      console.log('[Firebase Client] Notification permission denied');
       return null;
     }
 
