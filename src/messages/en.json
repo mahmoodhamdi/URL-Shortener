@@ -21,7 +21,10 @@
     "language": "Language",
     "english": "English",
     "arabic": "العربية",
-    "or": "or"
+    "or": "or",
+    "switchToLight": "Switch to light mode",
+    "switchToDark": "Switch to dark mode",
+    "changeLanguage": "Change language"
   },
   "nav": {
     "home": "Home",
@@ -96,8 +99,10 @@
     "delete": "Delete",
     "stats": "Stats",
     "qr": "QR Code",
-    "copy": "Copy",
-    "preview": "Preview"
+    "copy": "Copy link",
+    "copied": "Link copied",
+    "preview": "Preview",
+    "moreActions": "More actions"
   },
   "stats": {
     "title": "Link Statistics",

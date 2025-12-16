@@ -21,7 +21,10 @@
     "language": "اللغة",
     "english": "English",
     "arabic": "العربية",
-    "or": "أو"
+    "or": "أو",
+    "switchToLight": "التبديل إلى الوضع الفاتح",
+    "switchToDark": "التبديل إلى الوضع الداكن",
+    "changeLanguage": "تغيير اللغة"
   },
   "nav": {
     "home": "الرئيسية",
@@ -96,8 +99,10 @@
     "delete": "حذف",
     "stats": "إحصائيات",
     "qr": "رمز QR",
-    "copy": "نسخ",
-    "preview": "معاينة"
+    "copy": "نسخ الرابط",
+    "copied": "تم نسخ الرابط",
+    "preview": "معاينة",
+    "moreActions": "المزيد من الإجراءات"
   },
   "stats": {
     "title": "إحصائيات الرابط",

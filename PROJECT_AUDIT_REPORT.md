@@ -388,10 +388,10 @@ These are suggestions, not missing features:
 
 ### Low Priority
 
-- [ ] **L1: Add ARIA labels to icon buttons**
-  - Files: Components with icon-only buttons
-  - Action: Add `aria-label` attributes
-  - Test: Run accessibility audit
+- [x] **L1: Add ARIA labels to icon buttons** ✅ FIXED
+  - Files: LinkCard, ThemeToggle, LanguageSwitcher
+  - Added aria-label to: copy button, more actions button, theme toggle, language switcher
+  - Added EN/AR translations for accessibility labels
 
 - [ ] **L2: Add memoization to expensive components**
   - Files: Dashboard, Stats components

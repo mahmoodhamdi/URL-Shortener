@@ -146,6 +146,7 @@ export function LinkCard({ link, locale, onDelete, onUpdate }: LinkCardProps) {
               size="icon"
               onClick={handleCopy}
               className="shrink-0"
+              aria-label={copied ? t('linkCard.copied') : t('linkCard.copy')}
             >
               {copied ? (
                 <Check className="h-4 w-4 text-green-500" />
@@ -156,7 +157,7 @@ export function LinkCard({ link, locale, onDelete, onUpdate }: LinkCardProps) {
 
             <DropdownMenu>
               <DropdownMenuTrigger asChild>
-                <Button variant="ghost" size="icon">
+                <Button variant="ghost" size="icon" aria-label={t('linkCard.moreActions')}>
                   <MoreVertical className="h-4 w-4" />
                 </Button>
               </DropdownMenuTrigger>
