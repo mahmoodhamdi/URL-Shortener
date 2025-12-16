@@ -136,10 +136,10 @@ docker-compose -f docker/docker-compose.prod.yml up -d
 ## Testing
 
 ```bash
-# Unit tests (826 tests)
+# Unit tests (890 tests)
 npm run test:unit
 
-# Integration tests (218 tests)
+# Integration tests (295 tests)
 npm run test:integration
 
 # E2E tests (16 test files)
