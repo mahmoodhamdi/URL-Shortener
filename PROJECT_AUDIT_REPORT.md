@@ -393,10 +393,10 @@ These are suggestions, not missing features:
   - Added aria-label to: copy button, more actions button, theme toggle, language switcher
   - Added EN/AR translations for accessibility labels
 
-- [ ] **L2: Add memoization to expensive components**
-  - Files: Dashboard, Stats components
-  - Action: Wrap with `React.memo()`, use `useMemo()` for calculations
-  - Test: Profile re-renders in React DevTools
+- [x] **L2: Add memoization to expensive components** ✅ FIXED
+  - Dashboard: Memoized stats calculations (totalLinks, totalClicks, activeLinks, expiredLinks)
+  - StatsOverview: Memoized cards array to prevent recalculation
+  - Used useMemo with proper dependency arrays
 
 - [ ] **L3: Move hardcoded error messages to i18n**
   - Action: Extract error messages to translation files

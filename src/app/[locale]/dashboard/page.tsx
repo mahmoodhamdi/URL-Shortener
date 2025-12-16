@@ -1,6 +1,6 @@
 'use client';
 
-import { useState, useEffect, useCallback } from 'react';
+import { useState, useEffect, useCallback, useMemo } from 'react';
 import { useTranslations } from 'next-intl';
 import { Input } from '@/components/ui/input';
 import { Button } from '@/components/ui/button';
@@ -62,24 +62,27 @@ function DashboardContent() {
     }
   };
 
-  // Calculate stats
-  const totalLinks = links.length;
-  const totalClicks = links.reduce((sum, link) => sum + (link._count?.clicks || 0), 0);
-  const activeLinks = links.filter((link) => {
-    if (!link.isActive) return false;
-    if (link.expiresAt && new Date(link.expiresAt) < new Date()) return false;
-    return true;
-  }).length;
-  const expiredLinks = links.filter((link) => {
-    return link.expiresAt && new Date(link.expiresAt) < new Date();
-  }).length;
+  // Calculate stats - memoized to prevent recalculation on every render
+  const { totalLinks, totalClicks, activeLinks, expiredLinks } = useMemo(() => {
+    const total = links.length;
+    const clicks = links.reduce((sum, link) => sum + (link._count?.clicks || 0), 0);
+    const active = links.filter((link) => {
+      if (!link.isActive) return false;
+      if (link.expiresAt && new Date(link.expiresAt) < new Date()) return false;
+      return true;
+    }).length;
+    const expired = links.filter((link) => {
+      return link.expiresAt && new Date(link.expiresAt) < new Date();
+    }).length;
+    return { totalLinks: total, totalClicks: clicks, activeLinks: active, expiredLinks: expired };
+  }, [links]);
 
-  const stats = [
+  const stats = useMemo(() => [
     { label: t('dashboard.totalLinks'), value: totalLinks, icon: Link2 },
     { label: t('dashboard.totalClicks'), value: totalClicks, icon: MousePointerClick },
     { label: t('dashboard.activeLinks'), value: activeLinks, icon: CheckCircle },
     { label: t('dashboard.expiredLinks'), value: expiredLinks, icon: XCircle },
-  ];
+  ], [t, totalLinks, totalClicks, activeLinks, expiredLinks]);
 
   return (
     <div className="container py-8">

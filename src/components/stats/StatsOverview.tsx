@@ -1,5 +1,6 @@
 'use client';
 
+import { useMemo } from 'react';
 import { useTranslations } from 'next-intl';
 import { Card, CardContent, CardHeader, CardTitle } from '@/components/ui/card';
 import { MousePointerClick, Users, Clock, Calendar } from 'lucide-react';
@@ -16,7 +17,8 @@ interface StatsOverviewProps {
 function StatsOverviewContent({ link, stats, locale }: StatsOverviewProps) {
   const t = useTranslations();
 
-  const cards = [
+  // Memoize cards to prevent recalculation on every render
+  const cards = useMemo(() => [
     {
       title: t('stats.totalClicks'),
       value: formatNumber(stats.totalClicks, locale),
@@ -37,7 +39,7 @@ function StatsOverviewContent({ link, stats, locale }: StatsOverviewProps) {
       value: formatDate(link.createdAt, locale),
       icon: Calendar,
     },
-  ];
+  ], [t, stats.totalClicks, stats.uniqueVisitors, stats.lastClick, link.createdAt, locale]);
 
   return (
     <div className="grid grid-cols-2 md:grid-cols-4 gap-4">
