@@ -278,7 +278,7 @@ No critical issues found.
 | 2 | Missing error boundaries in components | `src/components/` | ✅ Fixed |
 | 3 | QR generation endpoint lacks rate limiting | `src/app/api/qr/route.ts` | ✅ Fixed |
 | 4 | Some API routes don't return consistent error format | Various | ✅ Fixed |
-| 5 | Missing Content-Security-Policy headers | Global | Pending |
+| 5 | Missing Content-Security-Policy headers | Global | ✅ Fixed |
 
 ### Low Priority Issues (5)
 
@@ -375,10 +375,16 @@ These are suggestions, not missing features:
   - Applied to main API routes: shorten, bulk, qr, links, workspaces, webhooks
   - Added 34 unit tests in `__tests__/unit/api/errors.test.ts`
 
-- [ ] **M5: Add Content-Security-Policy headers**
-  - File: `next.config.js` or `middleware.ts`
-  - Action: Add CSP headers for XSS protection
-  - Test: Verify headers in response
+- [x] **M5: Add Content-Security-Policy headers** ✅ FIXED
+  - File: `next.config.js`
+  - Added comprehensive security headers:
+    - Content-Security-Policy (XSS protection)
+    - X-Content-Type-Options: nosniff
+    - X-Frame-Options: SAMEORIGIN
+    - X-XSS-Protection: 1; mode=block
+    - Referrer-Policy: strict-origin-when-cross-origin
+    - Permissions-Policy (camera, microphone, geolocation disabled)
+  - CSP allows: Stripe, Google Analytics, Facebook Pixel, TikTok Analytics, Firebase
 
 ### Low Priority
 
