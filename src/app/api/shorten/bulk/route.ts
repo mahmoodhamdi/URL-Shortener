@@ -3,6 +3,8 @@ import { createShortLink, getShortUrl } from '@/lib/url/shortener';
 import { bulkUrlsSchema, isValidUrl, normalizeUrl } from '@/lib/url/validator';
 import { auth } from '@/lib/auth';
 import { checkBulkLimit } from '@/lib/limits';
+import { checkRateLimit, getClientIp, getRateLimitHeaders, RATE_LIMIT_PRESETS } from '@/lib/rate-limit';
+import { ApiError, handleZodError } from '@/lib/api/errors';
 import { ZodError } from 'zod';
 import type { BulkShortenResult } from '@/types';
 
@@ -11,27 +13,46 @@ const BATCH_SIZE = 10;
 
 export async function POST(request: NextRequest) {
   try {
+    // Check if user is authenticated
+    const session = await auth();
+    const userId = session?.user?.id;
+
+    // Apply rate limiting
+    const identifier = userId || getClientIp(request.headers);
+    const rateLimitResult = await checkRateLimit(identifier, RATE_LIMIT_PRESETS.api.bulk);
+
+    if (!rateLimitResult.allowed) {
+      const response = ApiError.rateLimitExceeded(
+        'Too many requests. Please try again later.',
+        {
+          limit: rateLimitResult.limit,
+          remaining: rateLimitResult.remaining,
+          resetAt: rateLimitResult.resetAt,
+        }
+      );
+      const headers = getRateLimitHeaders(rateLimitResult);
+      Object.entries(headers).forEach(([key, value]) => {
+        response.headers.set(key, value);
+      });
+      return response;
+    }
+
     const body = await request.json();
 
     // Validate input
     const { urls } = bulkUrlsSchema.parse(body);
 
-    // Check if user is authenticated
-    const session = await auth();
-    const userId = session?.user?.id;
-
     // Check bulk limits if user is authenticated
     if (userId) {
       const limitCheck = await checkBulkLimit(userId, urls.length);
       if (!limitCheck.allowed) {
-        return NextResponse.json(
+        return ApiError.planLimitReached(
+          limitCheck.message || 'Bulk limit reached',
           {
-            error: limitCheck.message || 'Bulk limit reached',
             limit: limitCheck.limit,
             used: limitCheck.used,
             remaining: limitCheck.remaining,
-          },
-          { status: 429 }
+          }
         );
       }
     }
@@ -90,20 +111,19 @@ export async function POST(request: NextRequest) {
       });
     }
 
-    return NextResponse.json(result, { status: 200 });
+    const response = NextResponse.json(result, { status: 200 });
+    const headers = getRateLimitHeaders(rateLimitResult);
+    Object.entries(headers).forEach(([key, value]) => {
+      response.headers.set(key, value);
+    });
+    return response;
   } catch (error) {
     console.error('Bulk shorten error:', error);
 
     if (error instanceof ZodError) {
-      return NextResponse.json(
-        { error: error.errors[0].message },
-        { status: 400 }
-      );
+      return handleZodError(error);
     }
 
-    return NextResponse.json(
-      { error: 'Internal server error' },
-      { status: 500 }
-    );
+    return ApiError.internal();
   }
 }

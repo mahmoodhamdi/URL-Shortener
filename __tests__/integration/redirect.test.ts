@@ -56,7 +56,7 @@ describe('Redirect Handler Integration', () => {
         createdAt: new Date(),
       };
 
-      vi.mocked(getLinkByCode).mockResolvedValue(mockLink);
+      vi.mocked(getLinkByCode).mockResolvedValue(mockLink as never);
 
       const link = await getLinkByCode('abc123');
 
@@ -245,7 +245,7 @@ describe('Redirect Handler Integration', () => {
     it('should generate JS redirect cloaked page', () => {
       vi.mocked(generateCloakedPage).mockReturnValue('<html><script>window.location.href="https://example.com"</script></html>');
 
-      const html = generateCloakedPage('JS_REDIRECT', {
+      const html = generateCloakedPage('JAVASCRIPT' as never, {
         destinationUrl: 'https://example.com',
       });
 
@@ -265,7 +265,7 @@ describe('Redirect Handler Integration', () => {
         cloakingEnabled: false,
       };
 
-      vi.mocked(getLinkByCode).mockResolvedValue(mockLink);
+      vi.mocked(getLinkByCode).mockResolvedValue(mockLink as never);
       vi.mocked(isLinkExpired).mockReturnValue(false);
       vi.mocked(selectAndTrackVariant).mockResolvedValue(null);
       vi.mocked(resolveTargetUrl).mockResolvedValue('https://example.com');
@@ -301,7 +301,7 @@ describe('Redirect Handler Integration', () => {
         cloakingEnabled: false,
       };
 
-      vi.mocked(getLinkByCode).mockResolvedValue(mockLink);
+      vi.mocked(getLinkByCode).mockResolvedValue(mockLink as never);
       vi.mocked(verifyPassword).mockResolvedValue(true);
 
       // Get link
@@ -328,7 +328,7 @@ describe('Redirect Handler Integration', () => {
         cloakingFavicon: null,
       };
 
-      vi.mocked(getLinkByCode).mockResolvedValue(mockLink);
+      vi.mocked(getLinkByCode).mockResolvedValue(mockLink as never);
 
       // Get link
       const link = await getLinkByCode('abc123');
@@ -355,7 +355,7 @@ describe('Redirect Handler Integration', () => {
         cloakingEnabled: false,
       };
 
-      vi.mocked(getLinkByCode).mockResolvedValue(mockLink);
+      vi.mocked(getLinkByCode).mockResolvedValue(mockLink as never);
       vi.mocked(selectAndTrackVariant).mockResolvedValue('https://variant-a.example.com');
 
       // Get link

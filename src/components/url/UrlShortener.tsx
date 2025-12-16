@@ -8,10 +8,11 @@ import { Label } from '@/components/ui/label';
 import { Card, CardContent } from '@/components/ui/card';
 import { Link2, Loader2, ChevronDown, ChevronUp } from 'lucide-react';
 import { UrlResult } from './UrlResult';
+import { ErrorBoundaryWrapper } from '@/components/ErrorBoundaryWrapper';
 import { cn } from '@/lib/utils';
 import type { Link } from '@/types';
 
-export function UrlShortener() {
+function UrlShortenerContent() {
   const t = useTranslations();
   const [url, setUrl] = useState('');
   const [customAlias, setCustomAlias] = useState('');
@@ -142,5 +143,13 @@ export function UrlShortener() {
         </form>
       </CardContent>
     </Card>
+  );
+}
+
+export function UrlShortener() {
+  return (
+    <ErrorBoundaryWrapper>
+      <UrlShortenerContent />
+    </ErrorBoundaryWrapper>
   );
 }

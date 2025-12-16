@@ -212,7 +212,7 @@ describe('Stripe Integration', () => {
 
     describe('Session Creation', () => {
       it('should require authentication', async () => {
-        vi.mocked(auth).mockResolvedValue(null);
+        vi.mocked(auth).mockResolvedValue(null as never);
 
         const session = await auth();
         expect(session).toBeNull();

@@ -211,7 +211,13 @@
     "linkExpired": "This link has expired",
     "serverError": "Server error. Please try again.",
     "rateLimited": "Too many requests. Please wait.",
-    "networkError": "Network error. Check your connection."
+    "networkError": "Network error. Check your connection.",
+    "boundary": {
+      "title": "Something went wrong",
+      "description": "An unexpected error occurred. Please try again.",
+      "retry": "Try again",
+      "goHome": "Go to homepage"
+    }
   },
   "footer": {
     "copyright": "© {year} URL Shortener. All rights reserved.",

@@ -53,16 +53,18 @@ vi.mock('@/lib/auth', () => ({
 
 // Mock rate limiter
 vi.mock('@/lib/rate-limit', () => ({
-  checkRateLimit: vi.fn().mockResolvedValue({ allowed: true, remaining: 100, limit: 100, reset: Date.now() + 60000 }),
+  checkRateLimit: vi.fn().mockResolvedValue({ allowed: true, remaining: 100, limit: 100, resetAt: Date.now() + 60000 }),
   getClientIp: vi.fn().mockReturnValue('127.0.0.1'),
   getRateLimitHeaders: vi.fn().mockReturnValue({
     'X-RateLimit-Limit': '100',
     'X-RateLimit-Remaining': '99',
-    'X-RateLimit-Reset': String(Date.now() + 60000),
+    'X-RateLimit-Reset': String(Math.ceil((Date.now() + 60000) / 1000)),
   }),
   RATE_LIMIT_PRESETS: {
     api: {
       shorten: { limit: 100, windowMs: 60000 },
+      bulk: { limit: 10, windowMs: 60000 },
+      qr: { limit: 50, windowMs: 60000 },
     },
   },
 }));
@@ -397,7 +399,7 @@ describe('URL Shortening Integration', () => {
         allowed: true,
         remaining: 99,
         limit: 100,
-        reset: Date.now() + 60000,
+        resetAt: Date.now() + 60000,
       });
 
       // Rate limit is checked internally in the API route
@@ -412,7 +414,7 @@ describe('URL Shortening Integration', () => {
         allowed: false,
         remaining: 0,
         limit: 100,
-        reset: Date.now() + 60000,
+        resetAt: Date.now() + 60000,
       });
 
       const result = await checkRateLimit('127.0.0.1', { limit: 100, windowMs: 60000 });
@@ -429,6 +431,7 @@ describe('URL Shortening Integration', () => {
         limit: 100,
         used: 50,
         remaining: 50,
+        plan: 'FREE',
       });
 
       const result = await checkLinkLimit('user-123');
@@ -443,6 +446,7 @@ describe('URL Shortening Integration', () => {
         limit: 100,
         used: 100,
         remaining: 0,
+        plan: 'FREE',
         message: 'Link limit reached for your plan',
       });
 
@@ -458,7 +462,7 @@ describe('URL Shortening Integration', () => {
       vi.mocked(auth).mockResolvedValue({
         user: { id: 'user-123', name: 'Test User', email: 'test@example.com' },
         expires: new Date(Date.now() + 3600000).toISOString(),
-      });
+      } as never);
 
       const session = await auth();
 
@@ -466,7 +470,7 @@ describe('URL Shortening Integration', () => {
     });
 
     it('should return null for unauthenticated request', async () => {
-      vi.mocked(auth).mockResolvedValue(null);
+      vi.mocked(auth).mockResolvedValue(null as never);
 
       const session = await auth();
 

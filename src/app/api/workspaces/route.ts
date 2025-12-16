@@ -1,6 +1,6 @@
 import { NextResponse } from 'next/server';
 import { auth } from '@/lib/auth';
-
+import { ApiError } from '@/lib/api/errors';
 import {
   createWorkspace,
   getUserWorkspaces,
@@ -15,7 +15,7 @@ export async function GET() {
   try {
     const session = await auth();
     if (!session?.user?.id) {
-      return NextResponse.json({ error: 'Unauthorized' }, { status: 401 });
+      return ApiError.unauthorized();
     }
 
     const workspaces = await getUserWorkspaces(session.user.id);
@@ -37,10 +37,7 @@ export async function GET() {
     return NextResponse.json(workspacesWithRole);
   } catch (error) {
     console.error('Error fetching workspaces:', error);
-    return NextResponse.json(
-      { error: 'Failed to fetch workspaces' },
-      { status: 500 }
-    );
+    return ApiError.internal('Failed to fetch workspaces');
   }
 }
 
@@ -52,33 +49,24 @@ export async function POST(request: Request) {
   try {
     const session = await auth();
     if (!session?.user?.id) {
-      return NextResponse.json({ error: 'Unauthorized' }, { status: 401 });
+      return ApiError.unauthorized();
     }
 
     // Check workspace limits
     const limitCheck = await checkWorkspaceLimits(session.user.id);
     if (!limitCheck.allowed) {
-      return NextResponse.json(
-        { error: limitCheck.message },
-        { status: 403 }
-      );
+      return ApiError.planLimitReached(limitCheck.message || 'Workspace limit reached');
     }
 
     const body = await request.json();
     const { name, description, logo } = body;
 
     if (!name || typeof name !== 'string' || name.trim().length === 0) {
-      return NextResponse.json(
-        { error: 'Workspace name is required' },
-        { status: 400 }
-      );
+      return ApiError.validationError('Workspace name is required', { field: 'name' });
     }
 
     if (name.length > 100) {
-      return NextResponse.json(
-        { error: 'Workspace name must be less than 100 characters' },
-        { status: 400 }
-      );
+      return ApiError.validationError('Workspace name must be less than 100 characters', { field: 'name' });
     }
 
     const workspace = await createWorkspace(session.user.id, {
@@ -104,9 +92,6 @@ export async function POST(request: Request) {
     );
   } catch (error) {
     console.error('Error creating workspace:', error);
-    return NextResponse.json(
-      { error: 'Failed to create workspace' },
-      { status: 500 }
-    );
+    return ApiError.internal('Failed to create workspace');
   }
 }

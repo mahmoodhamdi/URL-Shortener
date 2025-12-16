@@ -74,7 +74,7 @@ describe('Auth Middleware', () => {
 
     it('should return AuthResult interface', async () => {
       const { auth } = await import('@/lib/auth');
-      vi.mocked(auth).mockResolvedValueOnce(null);
+      vi.mocked(auth).mockResolvedValueOnce(null as never);
 
       const { requireAuth } = await import('@/lib/auth/middleware');
       const result = await requireAuth();
@@ -84,7 +84,7 @@ describe('Auth Middleware', () => {
 
     it('should return authenticated false when no session', async () => {
       const { auth } = await import('@/lib/auth');
-      vi.mocked(auth).mockResolvedValueOnce(null);
+      vi.mocked(auth).mockResolvedValueOnce(null as never);
 
       const { requireAuth } = await import('@/lib/auth/middleware');
       const result = await requireAuth();
@@ -98,7 +98,7 @@ describe('Auth Middleware', () => {
       vi.mocked(auth).mockResolvedValueOnce({
         user: { id: 'user-123', name: 'Test User', email: 'test@example.com' },
         expires: new Date(Date.now() + 3600000).toISOString(),
-      });
+      } as never);
 
       const { requireAuth } = await import('@/lib/auth/middleware');
       const result = await requireAuth();
@@ -117,7 +117,7 @@ describe('Auth Middleware', () => {
 
     it('should return empty object when no session', async () => {
       const { auth } = await import('@/lib/auth');
-      vi.mocked(auth).mockResolvedValueOnce(null);
+      vi.mocked(auth).mockResolvedValueOnce(null as never);
 
       const { getOptionalAuth } = await import('@/lib/auth/middleware');
       const result = await getOptionalAuth();
@@ -131,7 +131,7 @@ describe('Auth Middleware', () => {
       vi.mocked(auth).mockResolvedValueOnce({
         user: { id: 'user-456', name: 'Test User', email: 'test@example.com' },
         expires: new Date(Date.now() + 3600000).toISOString(),
-      });
+      } as never);
 
       const { getOptionalAuth } = await import('@/lib/auth/middleware');
       const result = await getOptionalAuth();

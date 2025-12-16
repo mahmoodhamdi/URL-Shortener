@@ -73,13 +73,13 @@ describe('Domain SSL', () => {
 
       expect(dnsStep.title).toContain('DNS');
       expect(dnsStep.records).toBeDefined();
-      expect(dnsStep.records.length).toBeGreaterThan(0);
+      expect(dnsStep.records!.length).toBeGreaterThan(0);
     });
 
     it('should include TXT record for verification', () => {
       const instructions = getDomainSetupInstructions(testDomain, testToken);
       const dnsStep = instructions.steps[0];
-      const txtRecord = dnsStep.records.find(r => r.type === 'TXT');
+      const txtRecord = dnsStep.records!.find(r => r.type === 'TXT');
 
       expect(txtRecord).toBeDefined();
       expect(txtRecord?.name).toContain(testDomain);
@@ -90,7 +90,7 @@ describe('Domain SSL', () => {
     it('should include CNAME record for routing', () => {
       const instructions = getDomainSetupInstructions(testDomain, testToken);
       const dnsStep = instructions.steps[0];
-      const cnameRecord = dnsStep.records.find(r => r.type === 'CNAME');
+      const cnameRecord = dnsStep.records!.find(r => r.type === 'CNAME');
 
       expect(cnameRecord).toBeDefined();
       expect(cnameRecord?.name).toBe(testDomain);
@@ -127,13 +127,13 @@ describe('Domain SSL', () => {
       const instructions = getDomainSetupInstructions(subDomain, testToken);
       const dnsStep = instructions.steps[0];
 
-      expect(dnsStep.records.some(r => r.name.includes(subDomain))).toBe(true);
+      expect(dnsStep.records!.some(r => r.name.includes(subDomain))).toBe(true);
     });
 
     it('should use correct TXT record format', () => {
       const instructions = getDomainSetupInstructions(testDomain, testToken);
       const dnsStep = instructions.steps[0];
-      const txtRecord = dnsStep.records.find(r => r.type === 'TXT');
+      const txtRecord = dnsStep.records!.find(r => r.type === 'TXT');
 
       expect(txtRecord?.name).toBe(`_url-shortener.${testDomain}`);
       expect(txtRecord?.value).toBe(`url-shortener-verify=${testToken}`);

@@ -4,6 +4,7 @@ import { createLinkSchema } from '@/lib/url/validator';
 import { auth } from '@/lib/auth';
 import { checkLinkLimit } from '@/lib/limits';
 import { checkRateLimit, getClientIp, getRateLimitHeaders, RATE_LIMIT_PRESETS } from '@/lib/rate-limit';
+import { ApiError, handleZodError } from '@/lib/api/errors';
 import { ZodError } from 'zod';
 
 export async function POST(request: NextRequest) {
@@ -17,9 +18,13 @@ export async function POST(request: NextRequest) {
     const rateLimitResult = await checkRateLimit(identifier, RATE_LIMIT_PRESETS.api.shorten);
 
     if (!rateLimitResult.allowed) {
-      const response = NextResponse.json(
-        { error: 'Too many requests. Please try again later.' },
-        { status: 429 }
+      const response = ApiError.rateLimitExceeded(
+        'Too many requests. Please try again later.',
+        {
+          limit: rateLimitResult.limit,
+          remaining: rateLimitResult.remaining,
+          resetAt: rateLimitResult.resetAt,
+        }
       );
       const headers = getRateLimitHeaders(rateLimitResult);
       Object.entries(headers).forEach(([key, value]) => {
@@ -37,14 +42,13 @@ export async function POST(request: NextRequest) {
     if (userId) {
       const limitCheck = await checkLinkLimit(userId);
       if (!limitCheck.allowed) {
-        return NextResponse.json(
+        return ApiError.planLimitReached(
+          limitCheck.message || 'Link limit reached',
           {
-            error: limitCheck.message || 'Link limit reached',
             limit: limitCheck.limit,
             used: limitCheck.used,
             remaining: limitCheck.remaining,
-          },
-          { status: 429 }
+          }
         );
       }
     }
@@ -65,30 +69,18 @@ export async function POST(request: NextRequest) {
     console.error('Shorten error:', error);
 
     if (error instanceof ZodError) {
-      return NextResponse.json(
-        { error: error.errors[0].message },
-        { status: 400 }
-      );
+      return handleZodError(error);
     }
 
     if (error instanceof Error) {
       if (error.message.includes('already taken')) {
-        return NextResponse.json(
-          { error: 'Alias already taken' },
-          { status: 409 }
-        );
+        return ApiError.alreadyExists('Alias');
       }
       if (error.message.includes('Invalid')) {
-        return NextResponse.json(
-          { error: error.message },
-          { status: 400 }
-        );
+        return ApiError.badRequest(error.message);
       }
     }
 
-    return NextResponse.json(
-      { error: 'Internal server error' },
-      { status: 500 }
-    );
+    return ApiError.internal();
   }
 }

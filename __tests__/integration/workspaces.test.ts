@@ -277,6 +277,7 @@ describe('Workspaces Integration', () => {
           role: 'MEMBER',
           token: 'inv_token123',
           expiresAt: new Date(Date.now() + 7 * 24 * 60 * 60 * 1000),
+          invitedBy: 'user-123',
         },
       });
 

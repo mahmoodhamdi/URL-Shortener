@@ -13,11 +13,12 @@ import {
   SelectValue,
 } from '@/components/ui/select';
 import { LinksList } from '@/components/url/LinksList';
+import { ErrorBoundaryWrapper } from '@/components/ErrorBoundaryWrapper';
 import { Link2, MousePointerClick, CheckCircle, XCircle, Search, Loader2 } from 'lucide-react';
 import { formatNumber } from '@/lib/utils';
 import type { Link, SortOption, FilterOption } from '@/types';
 
-export default function DashboardPage() {
+function DashboardContent() {
   const t = useTranslations();
   const [links, setLinks] = useState<Link[]>([]);
   const [loading, setLoading] = useState(true);
@@ -156,5 +157,13 @@ export default function DashboardPage() {
         <LinksList links={links} onDelete={handleDelete} />
       )}
     </div>
+  );
+}
+
+export default function DashboardPage() {
+  return (
+    <ErrorBoundaryWrapper>
+      <DashboardContent />
+    </ErrorBoundaryWrapper>
   );
 }

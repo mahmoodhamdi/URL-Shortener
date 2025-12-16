@@ -225,7 +225,7 @@ describe('Environment Validation', () => {
       process.env.GOOGLE_CLIENT_SECRET = 'google-secret';
       process.env.GITHUB_CLIENT_ID = 'github-id';
       process.env.GITHUB_CLIENT_SECRET = 'github-secret';
-      process.env.NODE_ENV = 'test';
+      (process.env as Record<string, string | undefined>).NODE_ENV = 'test';
 
       const info = getEnvInfo();
 
@@ -254,7 +254,7 @@ describe('Environment Validation', () => {
     });
 
     it('should default to development when NODE_ENV is not set', () => {
-      delete process.env.NODE_ENV;
+      (process.env as Record<string, string | undefined>).NODE_ENV = undefined;
 
       const info = getEnvInfo();
 

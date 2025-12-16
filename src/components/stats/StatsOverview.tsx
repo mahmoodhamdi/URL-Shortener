@@ -3,6 +3,7 @@
 import { useTranslations } from 'next-intl';
 import { Card, CardContent, CardHeader, CardTitle } from '@/components/ui/card';
 import { MousePointerClick, Users, Clock, Calendar } from 'lucide-react';
+import { ErrorBoundaryWrapper } from '@/components/ErrorBoundaryWrapper';
 import { formatNumber, formatDate } from '@/lib/utils';
 import type { LinkStats, Link } from '@/types';
 
@@ -12,7 +13,7 @@ interface StatsOverviewProps {
   locale: string;
 }
 
-export function StatsOverview({ link, stats, locale }: StatsOverviewProps) {
+function StatsOverviewContent({ link, stats, locale }: StatsOverviewProps) {
   const t = useTranslations();
 
   const cards = [
@@ -54,5 +55,13 @@ export function StatsOverview({ link, stats, locale }: StatsOverviewProps) {
         </Card>
       ))}
     </div>
+  );
+}
+
+export function StatsOverview(props: StatsOverviewProps) {
+  return (
+    <ErrorBoundaryWrapper>
+      <StatsOverviewContent {...props} />
+    </ErrorBoundaryWrapper>
   );
 }

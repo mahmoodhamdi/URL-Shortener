@@ -35,8 +35,8 @@ describe('Custom Domains Integration', () => {
         domain: 'links.example.com',
         userId: 'user-123',
         verified: false,
-        verificationCode: 'verify_abc123',
-        sslStatus: 'pending',
+        verifyToken: 'verify_abc123',
+        sslStatus: 'PENDING',
         createdAt: new Date(),
         updatedAt: new Date(),
       };
@@ -47,8 +47,8 @@ describe('Custom Domains Integration', () => {
         data: {
           domain: 'links.example.com',
           userId: 'user-123',
-          verificationCode: 'verify_abc123',
-          sslStatus: 'pending',
+          verifyToken: 'verify_abc123',
+          sslStatus: 'PENDING',
         },
       });
 
@@ -114,7 +114,7 @@ describe('Custom Domains Integration', () => {
         domain: 'links.example.com',
         verified: true,
         verifiedAt: new Date(),
-        sslStatus: 'active',
+        sslStatus: 'ACTIVE',
         updatedAt: new Date(),
       };
 
@@ -125,12 +125,12 @@ describe('Custom Domains Integration', () => {
         data: {
           verified: true,
           verifiedAt: new Date(),
-          sslStatus: 'active',
+          sslStatus: 'ACTIVE',
         },
       });
 
       expect(result.verified).toBe(true);
-      expect(result.sslStatus).toBe('active');
+      expect(result.sslStatus).toBe('ACTIVE');
     });
 
     it('should delete domain', async () => {

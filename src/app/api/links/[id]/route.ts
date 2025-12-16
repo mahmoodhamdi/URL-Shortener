@@ -1,6 +1,7 @@
 import { NextRequest, NextResponse } from 'next/server';
 import { getLinkById, updateLink, deleteLink } from '@/lib/url/shortener';
 import { updateLinkSchema } from '@/lib/url/validator';
+import { ApiError, handleZodError } from '@/lib/api/errors';
 import { ZodError } from 'zod';
 
 interface RouteContext {
@@ -15,19 +16,13 @@ export async function GET(
     const link = await getLinkById(params.id);
 
     if (!link) {
-      return NextResponse.json(
-        { error: 'Link not found' },
-        { status: 404 }
-      );
+      return ApiError.notFound('Link');
     }
 
     return NextResponse.json(link);
   } catch (error) {
     console.error('Get link error:', error);
-    return NextResponse.json(
-      { error: 'Internal server error' },
-      { status: 500 }
-    );
+    return ApiError.internal();
   }
 }
 
@@ -48,25 +43,16 @@ export async function PATCH(
     console.error('Update link error:', error);
 
     if (error instanceof ZodError) {
-      return NextResponse.json(
-        { error: error.errors[0].message },
-        { status: 400 }
-      );
+      return handleZodError(error);
     }
 
     if (error instanceof Error) {
       if (error.message.includes('already taken')) {
-        return NextResponse.json(
-          { error: 'Alias already taken' },
-          { status: 409 }
-        );
+        return ApiError.alreadyExists('Alias');
       }
     }
 
-    return NextResponse.json(
-      { error: 'Internal server error' },
-      { status: 500 }
-    );
+    return ApiError.internal();
   }
 }
 
@@ -79,9 +65,6 @@ export async function DELETE(
     return new NextResponse(null, { status: 204 });
   } catch (error) {
     console.error('Delete link error:', error);
-    return NextResponse.json(
-      { error: 'Internal server error' },
-      { status: 500 }
-    );
+    return ApiError.internal();
   }
 }

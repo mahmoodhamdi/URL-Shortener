@@ -106,6 +106,7 @@ export const RATE_LIMIT_PRESETS = {
     shorten: { limit: 100, windowMs: 60 * 1000 },      // 100 per minute
     bulk: { limit: 10, windowMs: 60 * 1000 },          // 10 per minute
     stats: { limit: 300, windowMs: 60 * 1000 },        // 300 per minute
+    qr: { limit: 50, windowMs: 60 * 1000 },            // 50 per minute
     default: { limit: 60, windowMs: 60 * 1000 },       // 60 per minute
   },
   // Auth endpoints

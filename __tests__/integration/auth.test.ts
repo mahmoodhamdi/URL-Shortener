@@ -24,7 +24,7 @@ vi.mock('bcryptjs', () => ({
 
 // Mock rate limiter
 vi.mock('@/lib/rate-limit/limiter', () => ({
-  checkRateLimit: vi.fn().mockResolvedValue({ allowed: true, remaining: 10, limit: 10, reset: Date.now() + 60000 }),
+  checkRateLimit: vi.fn().mockResolvedValue({ allowed: true, remaining: 10, limit: 10, resetAt: Date.now() + 60000 }),
   getClientIp: vi.fn().mockReturnValue('127.0.0.1'),
   getRateLimitHeaders: vi.fn().mockReturnValue({
     'X-RateLimit-Limit': '10',
@@ -276,7 +276,7 @@ describe('Authentication Integration', () => {
           allowed: true,
           remaining: 9,
           limit: 10,
-          reset: Date.now() + 60000,
+          resetAt: Date.now() + 60000,
         });
 
         const clientIp = getClientIp(new Headers());
@@ -294,7 +294,7 @@ describe('Authentication Integration', () => {
           allowed: false,
           remaining: 0,
           limit: 10,
-          reset: Date.now() + 60000,
+          resetAt: Date.now() + 60000,
         });
 
         const rateLimitResult = await checkRateLimit(
@@ -311,7 +311,7 @@ describe('Authentication Integration', () => {
           allowed: true,
           remaining: 9,
           limit: 10,
-          reset: Date.now() + 60000,
+          resetAt: Date.now() + 60000,
         });
 
         expect(headers['X-RateLimit-Limit']).toBe('10');
@@ -344,7 +344,7 @@ describe('Authentication Integration', () => {
           allowed: true,
           remaining: 9,
           limit: 10,
-          reset: Date.now() + 60000,
+          resetAt: Date.now() + 60000,
         });
 
         const rateLimitResult = await checkRateLimit(
@@ -410,7 +410,7 @@ describe('Authentication Integration', () => {
           allowed: true,
           remaining: 9,
           limit: 10,
-          reset: Date.now() + 60000,
+          resetAt: Date.now() + 60000,
         });
 
         // Email already exists
@@ -432,7 +432,7 @@ describe('Authentication Integration', () => {
           allowed: false,
           remaining: 0,
           limit: 10,
-          reset: Date.now() + 60000,
+          resetAt: Date.now() + 60000,
         });
 
         const rateLimitResult = await checkRateLimit(

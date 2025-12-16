@@ -65,7 +65,7 @@ describe('Firebase Client SDK', () => {
     });
 
     it('should return existing app if already initialized', async () => {
-      mockGetApps.mockReturnValue([{ name: '[DEFAULT]' }]);
+      mockGetApps.mockReturnValue([{ name: '[DEFAULT]' }] as never);
       const { getFirebaseApp } = await import('@/lib/firebase/client');
 
       const app = getFirebaseApp();
@@ -79,7 +79,7 @@ describe('Firebase Client SDK', () => {
     it('should return auth instance', async () => {
       const mockAuthInstance = { currentUser: null };
       mockGetAuth.mockReturnValue(mockAuthInstance);
-      mockGetApps.mockReturnValue([{ name: '[DEFAULT]' }]);
+      mockGetApps.mockReturnValue([{ name: '[DEFAULT]' }] as never);
 
       const { getClientAuth } = await import('@/lib/firebase/client');
       const auth = getClientAuth();
@@ -97,7 +97,7 @@ describe('Firebase Client SDK', () => {
         getIdToken: vi.fn().mockResolvedValue('id-token-123'),
       };
 
-      mockGetApps.mockReturnValue([{ name: '[DEFAULT]' }]);
+      mockGetApps.mockReturnValue([{ name: '[DEFAULT]' }] as never);
       mockSignInWithPopup.mockResolvedValue({ user: mockUser });
 
       const { signInWithGoogle } = await import('@/lib/firebase/client');
@@ -114,7 +114,7 @@ describe('Firebase Client SDK', () => {
     });
 
     it('should return null on sign-in failure', async () => {
-      mockGetApps.mockReturnValue([{ name: '[DEFAULT]' }]);
+      mockGetApps.mockReturnValue([{ name: '[DEFAULT]' }] as never);
       mockSignInWithPopup.mockRejectedValue(new Error('Sign-in cancelled'));
 
       const { signInWithGoogle } = await import('@/lib/firebase/client');
@@ -152,7 +152,7 @@ describe('Firebase Client SDK', () => {
 
   describe('onForegroundMessage', () => {
     it('should register message handler', async () => {
-      mockGetApps.mockReturnValue([{ name: '[DEFAULT]' }]);
+      mockGetApps.mockReturnValue([{ name: '[DEFAULT]' }] as never);
       const unsubscribe = vi.fn();
       mockOnMessage.mockReturnValue(unsubscribe);
 

@@ -67,10 +67,11 @@ describe('Webhooks Integration', () => {
       const result = await prisma.webhook.create({
         data: {
           userId: 'user-123',
+          name: 'My Webhook',
           url: 'https://example.com/webhook',
           events: ['link.created', 'link.clicked'],
           secret: 'whsec_test123',
-          active: true,
+          isActive: true,
         },
       });
 
@@ -252,11 +253,11 @@ describe('Webhooks Integration', () => {
         id: 'log-123',
         webhookId: 'webhook-123',
         event: 'link.created',
-        url: 'https://example.com/webhook',
-        status: 200,
-        request: '{"event":"link.created"}',
+        payload: { event: 'link.created' },
+        statusCode: 200,
         response: '{"success":true}',
         duration: 150,
+        success: true,
         createdAt: new Date(),
       };
 
@@ -266,16 +267,16 @@ describe('Webhooks Integration', () => {
         data: {
           webhookId: 'webhook-123',
           event: 'link.created',
-          url: 'https://example.com/webhook',
-          status: 200,
-          request: '{"event":"link.created"}',
+          payload: { event: 'link.created' },
+          statusCode: 200,
           response: '{"success":true}',
           duration: 150,
+          success: true,
         },
       });
 
       expect(result).toBeDefined();
-      expect(result.status).toBe(200);
+      expect(result.statusCode).toBe(200);
       expect(result.duration).toBe(150);
     });
 
