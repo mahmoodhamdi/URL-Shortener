@@ -1,6 +1,6 @@
 import { NextRequest, NextResponse } from 'next/server';
 import { getLinkByCode, isLinkExpired, verifyPassword } from '@/lib/url/shortener';
-import { trackClick } from '@/lib/analytics/tracker';
+import { trackClickAsync } from '@/lib/analytics/tracker';
 import { resolveTargetUrl } from '@/lib/targeting';
 import { selectAndTrackVariant } from '@/lib/ab-testing';
 import { generateCloakedPage, getCloakedPageContentType } from '@/lib/cloaking';
@@ -56,7 +56,7 @@ export async function GET(
       }
     }
 
-    // Track click
+    // Track click asynchronously (fire-and-forget for faster redirects)
     const headersList = await headers();
     const userAgent = headersList.get('user-agent') || undefined;
     const referrer = headersList.get('referer') || undefined;
@@ -64,7 +64,8 @@ export async function GET(
                headersList.get('x-real-ip') ||
                undefined;
 
-    await trackClick({
+    // Non-blocking click tracking - doesn't slow down the redirect
+    trackClickAsync({
       linkId: link.id,
       ip,
       userAgent,

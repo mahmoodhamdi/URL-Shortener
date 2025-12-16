@@ -44,22 +44,247 @@ A production-ready, enterprise-grade URL shortener built with Next.js 14, TypeSc
 - **Dark/Light Mode** - Theme toggle with persistence
 - **Responsive Design** - Mobile-first, works on all devices
 
-## Screenshots
+## Screenshots Gallery
 
-### Desktop View
-![Desktop English](screenshots/10-desktop-en.png)
+All screenshots are available in both `screenshots/` and `docs/screenshots/` folders.
 
-### Mobile View
-![Mobile English](screenshots/07-mobile-en.png)
+---
 
-### Arabic RTL Support
-![Arabic](screenshots/06-home-ar.png)
+### 🏠 Homepage
 
-### Dashboard
-![Dashboard](screenshots/12-dashboard-desktop.png)
+The homepage features a clean, modern interface for URL shortening with real-time validation.
 
-### QR Code Generation
-![QR Code](screenshots/04-qr-code.png)
+<table>
+<tr>
+<td width="50%">
+
+**English Version**
+
+![Homepage English](docs/screenshots/01-home-en.png)
+
+*Clean interface with URL input, custom alias options, and feature highlights*
+
+</td>
+<td width="50%">
+
+**Arabic Version (RTL)**
+
+![Homepage Arabic](docs/screenshots/06-home-ar.png)
+
+*Full RTL support with Arabic translations and mirrored layout*
+
+</td>
+</tr>
+</table>
+
+---
+
+### 🔗 URL Shortening Flow
+
+Step-by-step URL shortening process with instant results.
+
+<table>
+<tr>
+<td width="33%">
+
+**Step 1: Enter URL**
+
+![URL Input](docs/screenshots/02-url-entered.png)
+
+*Paste or type your long URL*
+
+</td>
+<td width="33%">
+
+**Step 2: Get Result**
+
+![Result](docs/screenshots/03-result.png)
+
+*Instant short URL with copy button*
+
+</td>
+<td width="33%">
+
+**Step 3: QR Code**
+
+![QR Code](docs/screenshots/04-qr-code.png)
+
+*Auto-generated QR code for sharing*
+
+</td>
+</tr>
+</table>
+
+---
+
+### 📊 Dashboard
+
+Comprehensive dashboard for managing all your shortened links.
+
+<table>
+<tr>
+<td width="50%">
+
+**Desktop View**
+
+![Dashboard Desktop](docs/screenshots/12-dashboard-desktop.png)
+
+*Full-featured dashboard with link management, analytics overview, and quick actions*
+
+</td>
+<td width="50%">
+
+**Analytics View**
+
+![Dashboard Analytics](docs/screenshots/15-dashboard.png)
+
+*Detailed click analytics with charts and geographic data*
+
+</td>
+</tr>
+</table>
+
+---
+
+### 📱 Responsive Design
+
+Mobile-first design ensures a great experience on all devices.
+
+<table>
+<tr>
+<td width="25%">
+
+**Mobile - English**
+
+![Mobile English](docs/screenshots/07-mobile-en.png)
+
+*Optimized for touch*
+
+</td>
+<td width="25%">
+
+**Mobile - Arabic**
+
+![Mobile Arabic](docs/screenshots/08-mobile-ar.png)
+
+*RTL on mobile*
+
+</td>
+<td width="25%">
+
+**Tablet View**
+
+![Tablet](docs/screenshots/09-tablet-en.png)
+
+*Adaptive layout*
+
+</td>
+<td width="25%">
+
+**Desktop View**
+
+![Desktop](docs/screenshots/10-desktop-en.png)
+
+*Full experience*
+
+</td>
+</tr>
+</table>
+
+---
+
+### 📦 Bulk Shortening
+
+Shorten multiple URLs at once (up to 100 URLs).
+
+<table>
+<tr>
+<td width="50%">
+
+**Desktop**
+
+![Bulk Desktop](docs/screenshots/14-bulk-desktop.png)
+
+*Multi-URL input with batch processing*
+
+</td>
+<td width="50%">
+
+**Mobile**
+
+![Bulk Mobile](docs/screenshots/13-bulk-mobile.png)
+
+*Mobile-friendly bulk interface*
+
+</td>
+</tr>
+</table>
+
+---
+
+### 📱 Dashboard Mobile Experience
+
+<table>
+<tr>
+<td width="50%">
+
+**Dashboard Mobile**
+
+![Dashboard Mobile](docs/screenshots/11-dashboard-mobile.png)
+
+*Full dashboard features on mobile with touch-friendly controls*
+
+</td>
+<td width="50%">
+
+**Features on Mobile**
+- Swipe actions for link management
+- Collapsible analytics panels
+- Touch-optimized copy buttons
+- Pull-to-refresh functionality
+
+</td>
+</tr>
+</table>
+
+---
+
+### 🌐 Language Support
+
+| Language | Direction | Status |
+|----------|-----------|--------|
+| English | LTR | ✅ Full Support |
+| Arabic | RTL | ✅ Full Support |
+
+Both languages include:
+- Complete UI translations
+- Date/number localization
+- Direction-aware layouts
+- Language-specific fonts
+
+---
+
+### 🎨 Theme Support
+
+| Theme | Description |
+|-------|-------------|
+| Light Mode | Clean, bright interface for daytime use |
+| Dark Mode | Eye-friendly dark theme for night use |
+| System | Automatically matches OS preference |
+
+---
+
+### 📐 Viewport Breakpoints
+
+| Breakpoint | Width | Optimized For |
+|------------|-------|---------------|
+| Mobile SM | 320px | Small phones |
+| Mobile MD | 375px | Standard phones (iPhone) |
+| Mobile LG | 414px | Large phones |
+| Tablet | 768px | iPad/Tablets |
+| Laptop | 1024px | Small laptops |
+| Desktop | 1440px | Standard monitors |
+| Desktop XL | 1920px | Large monitors |
 
 ## Tech Stack
 
@@ -136,10 +361,10 @@ docker-compose -f docker/docker-compose.prod.yml up -d
 ## Testing
 
 ```bash
-# Unit tests (890 tests)
+# Unit tests (826 tests)
 npm run test:unit
 
-# Integration tests (295 tests)
+# Integration tests (218 tests)
 npm run test:integration
 
 # E2E tests (16 test files)
@@ -147,7 +372,15 @@ npm run test:e2e
 
 # Coverage report
 npm run test:coverage
+
+# Run single test file
+npx vitest run path/to/test.test.ts --config vitest.config.ts
+
+# Run single E2E test file
+npx playwright test path/to/test.spec.ts
 ```
+
+**Total Tests: 1,044+** (Unit + Integration)
 
 ## Environment Variables
 

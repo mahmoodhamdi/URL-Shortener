@@ -31,6 +31,41 @@ export async function trackClick(input: TrackClickInput): Promise<Click> {
   return click as Click;
 }
 
+/**
+ * Track click asynchronously (fire-and-forget)
+ * Use this for redirect handlers where response speed is critical.
+ * The click is tracked in the background without blocking the redirect.
+ *
+ * @param input - Click tracking data
+ * @returns void - Does not wait for the database write to complete
+ */
+export function trackClickAsync(input: TrackClickInput): void {
+  // Fire and forget - don't await
+  trackClick(input).catch((error) => {
+    // Log error but don't throw - we don't want to affect the redirect
+    console.error('[Analytics] Failed to track click asynchronously:', error);
+  });
+}
+
+/**
+ * Track click with optional background processing
+ * Allows choosing between synchronous (for accuracy) and async (for speed)
+ *
+ * @param input - Click tracking data
+ * @param options - Processing options
+ * @returns Promise<Click | void> depending on async option
+ */
+export async function trackClickWithOptions(
+  input: TrackClickInput,
+  options: { async?: boolean } = {}
+): Promise<Click | void> {
+  if (options.async) {
+    trackClickAsync(input);
+    return;
+  }
+  return trackClick(input);
+}
+
 export async function getClicksByLinkId(linkId: string): Promise<Click[]> {
   const clicks = await prisma.click.findMany({
     where: { linkId },

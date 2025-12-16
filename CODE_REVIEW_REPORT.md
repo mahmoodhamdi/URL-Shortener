@@ -1,6 +1,6 @@
 # Code Review Report - URL Shortener
 
-**Review Date:** December 15, 2025
+**Review Date:** December 16, 2025
 **Project:** URL Shortener - Next.js 14 Production Application
 **Reviewer:** Claude Code
 
@@ -130,27 +130,26 @@ The project has excellent SSRF protection in `src/lib/security/ssrf.ts`:
 
 ## 5. Code Quality Issues
 
-### 5.1 React Hook Dependencies
-Multiple components have missing useEffect dependencies which can cause stale closures:
+### 5.1 React Hook Dependencies ✅ FIXED
+All components now use `useCallback` for fetch functions with proper dependencies:
 
-**Files affected:**
-- `src/app/[locale]/dashboard/page.tsx`
-- `src/app/[locale]/[shortCode]/stats/page.tsx`
-- `src/components/targeting/TargetingRules.tsx`
+**Files fixed:**
+- `src/app/[locale]/dashboard/page.tsx` - Uses `useCallback` for `fetchLinks` ✅
+- `src/app/[locale]/[shortCode]/stats/page.tsx` - Uses `useCallback` for `fetchStats` ✅
+- `src/components/targeting/TargetingRules.tsx` - Uses `useCallback` for `fetchTargets` ✅
 
-**Fix:** Use `useCallback` for fetch functions and include them in dependencies.
+### 5.2 Image Optimization ✅ FIXED
+- `src/components/auth/UserMenu.tsx` - Now uses Next.js `<Image>` component ✅
+- `src/components/url/QrGenerator.tsx` - Uses `<img>` intentionally for data URLs (with ESLint exception comment) ✅
 
-### 5.2 Image Optimization
-Two components use `<img>` instead of Next.js `<Image>`:
-- `src/components/auth/UserMenu.tsx`
-- `src/components/url/QrGenerator.tsx`
+**Note:** QrGenerator uses `<img>` because Next.js Image component doesn't work well with data URLs (base64). This is intentional and documented with an eslint-disable comment.
 
-**Impact:** Slower LCP and higher bandwidth usage.
-
-### 5.3 Type Safety Improvements Needed
-**Files with `any` or loose typing:**
-- `src/lib/url/shortener.ts:190` - Uses `Record<string, unknown>`
-- Some API routes could benefit from stricter request/response typing
+### 5.3 Type Safety Improvements ✅ FIXED
+**Fixed files:**
+- `src/lib/url/shortener.ts` - Now uses proper Prisma types instead of `Record<string, unknown>`:
+  - Line 191: Uses `Prisma.LinkUpdateInput` ✅
+  - Line 258: Uses `Prisma.LinkWhereInput` ✅
+  - Line 288: Uses `Prisma.LinkOrderByWithRelationInput` ✅
 
 ---
 
@@ -212,36 +211,67 @@ E2E tests now cover comprehensive flows:
 
 ## 7. Performance Improvements
 
-### 7.1 Database Query Optimization
-**File:** `src/lib/url/shortener.ts:303`
-**Issue:** Sorting by clicks count is done in memory after fetching all results.
+### 7.1 Database Query Optimization ✅ FIXED
+**File:** `src/lib/url/shortener.ts`
+**Issue:** Sorting by clicks count was done in memory after fetching all results.
+**Fix Applied:**
+- Added `getLinksOrderedByClicks()` function using raw SQL with LEFT JOIN
+- Sorting now happens at the database level for better performance
+- Uses parameterized queries for security
+- Properly handles all filter conditions (search, active, expired, protected)
 
 ```typescript
-// Current implementation
-if (options?.sort === 'clicks') {
-  links.sort((a, b) => (b._count?.clicks || 0) - (a._count?.clicks || 0));
-}
+// New implementation uses raw SQL
+const query = `
+  SELECT l.*, COALESCE(c.click_count, 0) as click_count
+  FROM "Link" l
+  LEFT JOIN (
+    SELECT "linkId", COUNT(*) as click_count
+    FROM "Click" GROUP BY "linkId"
+  ) c ON l.id = c."linkId"
+  ${whereClause}
+  ORDER BY click_count DESC, l."createdAt" DESC
+`;
 ```
 
-**Recommendation:** Consider using raw SQL or Prisma's raw queries for large datasets.
+### 7.2 Rate Limit Store ✅ ALREADY IMPLEMENTED
+**File:** `src/lib/rate-limit/store.ts`, `src/lib/rate-limit/redis-store.ts`
+**Status:** Redis-backed rate limiting is fully implemented:
+- `RedisStore` class with connection pooling and auto-reconnect
+- Automatic fallback to in-memory store if Redis unavailable
+- `getRateLimitStore()` factory function auto-selects based on `REDIS_URL` env var
+- Production-ready for multi-server deployments
 
-### 7.2 Rate Limit Store
-**File:** `src/lib/rate-limit/store.ts`
-**Issue:** In-memory rate limiting won't scale across multiple server instances.
-**Recommendation:** Consider Redis-backed rate limiting for production at scale.
+### 7.3 Click Tracking ✅ FIXED
+**File:** `src/lib/analytics/tracker.ts`, `src/app/api/r/[shortCode]/route.ts`
+**Issue:** Click tracking was synchronous and slowed down redirects.
+**Fix Applied:**
+- Added `trackClickAsync()` - fire-and-forget click tracking
+- Added `trackClickWithOptions()` - flexible sync/async option
+- Updated redirect handler to use async tracking
+- Click tracking no longer blocks redirect response
 
-### 7.3 Click Tracking
-**File:** `src/lib/analytics/tracker.ts`
-**Issue:** Click tracking is synchronous and could slow down redirects.
-**Recommendation:** Consider background queue processing for high-traffic scenarios.
+```typescript
+// New async tracking function
+export function trackClickAsync(input: TrackClickInput): void {
+  trackClick(input).catch((error) => {
+    console.error('[Analytics] Failed to track click asynchronously:', error);
+  });
+}
+```
 
 ---
 
 ## 8. Documentation Gaps
 
-### 8.1 API Documentation
-- API documentation exists in translations but no OpenAPI/Swagger spec
-- Missing rate limit documentation per endpoint
+### 8.1 API Documentation ✅ ALREADY IMPLEMENTED
+**File:** `src/app/api/openapi.yaml`
+**Status:** Comprehensive OpenAPI 3.1 specification exists with:
+- All 60+ API endpoints documented
+- Rate limit information per plan (Anonymous, Free, Starter, Pro, Business, Enterprise)
+- Request/response schemas
+- Authentication requirements
+- Error responses
 
 ### 8.2 Environment Variables ✅ IMPROVED
 - `.env.example` exists with good documentation
@@ -266,6 +296,7 @@ if (options?.sort === 'clicks') {
 - [x] Fix useEffect dependency warnings in TargetingRules
 - [x] Replace `<img>` with `<Image>` in UserMenu
 - [x] Replace `<img>` with `<Image>` in QrGenerator (ESLint exception added)
+- [x] Fix type safety in shortener.ts (use Prisma types)
 
 ### Priority 3: Medium (Recommended)
 - [x] Add SSRF validation tests (49 tests added)
@@ -286,6 +317,11 @@ if (options?.sort === 'clicks') {
 - [x] Add auth middleware tests (19 tests added)
 - [x] Add environment variable validation (27 tests added)
 
+### Priority 5: Performance Optimizations
+- [x] Optimize database query for sorting by clicks (raw SQL implementation)
+- [x] Implement Redis-backed rate limiting (already implemented)
+- [x] Make click tracking asynchronous (fire-and-forget pattern)
+
 ---
 
 ## Summary
@@ -295,12 +331,13 @@ The URL Shortener project is well-architected with strong security practices. Al
 ### Completed Fixes:
 1. ✅ **3 TypeScript compilation errors** - All fixed
 2. ✅ **5 ESLint warnings** - All fixed (React hooks and image optimization)
-3. ✅ **2 Security improvements implemented**:
+3. ✅ **Type safety improvements** - Replaced `Record<string, unknown>` with proper Prisma types in shortener.ts
+4. ✅ **2 Security improvements implemented**:
    - Deep link SSRF validation (blocks internal URLs, private IPs, cloud metadata)
    - Bio page CSS sanitization (prevents CSS injection attacks)
-4. ✅ **1 Configuration improvement implemented**:
+5. ✅ **1 Configuration improvement implemented**:
    - Environment variable validation module with comprehensive utilities
-5. ✅ **332 new unit tests added** - Coverage significantly improved:
+6. ✅ **332 new unit tests added** - Coverage significantly improved:
    - SSRF security protection: 49 tests
    - URL shortener core: 14 tests
    - Analytics tracker: 15 tests
@@ -313,28 +350,32 @@ The URL Shortener project is well-architected with strong security practices. Al
    - Stripe subscription: 20 tests
    - Auth middleware: 19 tests
    - Environment validation: 27 tests
-6. ✅ **97 new integration tests added** - API route coverage:
+7. ✅ **97 new integration tests added** - API route coverage:
    - URL shortening operations: 27 tests
    - Webhook integration: 24 tests
    - Workspace integration: 24 tests
    - Domain integration: 22 tests
-7. ✅ **6 new E2E test files added** - Complete flow coverage:
+8. ✅ **6 new E2E test files added** - Complete flow coverage:
    - Authentication flow: `auth-flow.spec.ts`
    - Link lifecycle: `link-lifecycle.spec.ts`
    - Workspace collaboration: `workspace-flow.spec.ts`
    - Multi-user collaboration: `multi-user-collaboration.spec.ts`
    - Subscription/pricing: `subscription-flow.spec.ts`
    - Error handling: `error-handling.spec.ts`
-8. ✅ **Redis rate limiting for scale** - Production-ready distributed rate limiting:
+9. ✅ **Redis rate limiting for scale** - Production-ready distributed rate limiting:
    - Redis store implementation with connection pooling
    - Automatic fallback to in-memory store
    - Factory function for store selection
    - 42 new tests added for Redis rate limiting
-9. ✅ **OpenAPI documentation** - Comprehensive API documentation:
+10. ✅ **OpenAPI documentation** - Comprehensive API documentation:
    - Full OpenAPI 3.1 specification (`src/app/api/openapi.yaml`)
    - API docs endpoint (`/api/docs`)
    - Enhanced API docs page with rate limit info
    - Documents all 60+ API endpoints
+11. ✅ **Performance optimizations implemented**:
+   - Database query optimization: Raw SQL for sorting by clicks (JOIN-based, no in-memory sorting)
+   - Async click tracking: Fire-and-forget pattern for faster redirects
+   - Redis rate limiting: Already implemented with auto-fallback to in-memory
 
 ### Current Status:
 - **All unit tests passing (826)**
@@ -342,12 +383,17 @@ The URL Shortener project is well-architected with strong security practices. Al
 - **E2E tests covering all major flows (16 test files)**
 - **No TypeScript errors in source code**
 - **No ESLint warnings**
+- **Type safety improved** with proper Prisma types
 - **All security concerns addressed**
+- **All code quality issues resolved**
+- **All performance optimizations applied**
 - **Environment validation ready for production**
 - **Comprehensive API route coverage**
 - **Complete E2E flow coverage**
 - **Redis rate limiting ready for scale**
 - **OpenAPI documentation complete**
+- **Database queries optimized** for large datasets
+- **Click tracking non-blocking** for faster redirects
 
 ### Test Coverage Summary:
 | Test Type | Count | Status |
@@ -357,8 +403,8 @@ The URL Shortener project is well-architected with strong security practices. Al
 | E2E Test Files | 16 | ✅ Comprehensive coverage |
 | Total Unit/Integration | 1044 | ✅ All passing |
 
-The project is now **production-ready** with comprehensive test coverage, E2E flow testing, security hardening, scalable rate limiting, and complete API documentation.
+The project is now **production-ready** with comprehensive test coverage, E2E flow testing, security hardening, scalable rate limiting, performance optimizations, and complete API documentation.
 
 ---
 
-*Generated and updated by Claude Code on December 15, 2025*
+*Generated and updated by Claude Code on December 16, 2025*

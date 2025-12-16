@@ -26,6 +26,9 @@ npx vitest run path/to/test.test.ts --config vitest.config.ts
 # Run single integration test file (uses 30s timeout)
 npx vitest run path/to/test.test.ts --config vitest.integration.config.ts
 
+# Run single E2E test file
+npx playwright test path/to/test.spec.ts
+
 # Database (Prisma + PostgreSQL)
 npm run db:generate            # Generate Prisma client
 npm run db:push                # Push schema to database
@@ -65,9 +68,11 @@ npm run db:studio              # Open Prisma Studio
 | `extension/` | Browser extension token management |
 | `domains/` | Custom domain verification and SSL |
 | `security/` | SSRF protection for URL validation |
+| `firebase/` | Firebase Admin SDK, FCM push notifications, token management |
 
 ### Key Patterns
 - **Internationalization**: Uses `next-intl` with locale routing (`/en/...`, `/ar/...`). Translation files in `src/messages/`. When adding UI text, update both `en.json` and `ar.json`. Use navigation exports from `src/i18n/routing.ts` (`Link`, `redirect`, `usePathname`, `useRouter`) instead of next/navigation.
+- **Firebase Client**: In React components, import Firebase client directly from `@/lib/firebase/client` to avoid importing server-side code.
 - **Path Alias**: Use `@/` to import from `src/` (configured in tsconfig and vitest)
 - **Authentication**: NextAuth.js v5 with JWT strategy. Get session via `auth()` from `@/lib/auth`. User ID available in `session.user.id`.
 - **Plan Limits**: Feature availability is gated by subscription plan (FREE, STARTER, PRO, BUSINESS, ENTERPRISE). Each module has a `*_LIMITS` constant (e.g., `WEBHOOK_LIMITS`, `TARGETING_LIMITS`). Use `checkLinkLimit()`, `checkWebhookLimits()`, etc. before creating resources.
@@ -127,7 +132,10 @@ Stripe (optional):
 - `STRIPE_SECRET_KEY`, `STRIPE_WEBHOOK_SECRET`
 - `NEXT_PUBLIC_STRIPE_PUBLISHABLE_KEY`
 
-Optional:
+Redis (optional):
+- `REDIS_URL` - Redis connection URL (falls back to in-memory rate limiting)
+
+Other:
 - `NEXT_PUBLIC_APP_URL` - Base URL (default: http://localhost:3000)
 
 ## Docker

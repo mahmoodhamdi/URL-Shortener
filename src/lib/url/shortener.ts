@@ -4,6 +4,7 @@ import { normalizeUrl, isValidUrl, isValidAlias } from './validator';
 import bcrypt from 'bcryptjs';
 import type { Link, CreateLinkInput, UpdateLinkInput } from '@/types';
 import { getPlanLimits } from '@/lib/stripe/plans';
+import type { Prisma } from '@prisma/client';
 
 export interface CreateLinkOptions extends CreateLinkInput {
   userId?: string;
@@ -187,7 +188,7 @@ export async function getLinkById(id: string): Promise<Link | null> {
 }
 
 export async function updateLink(id: string, input: UpdateLinkInput): Promise<Link> {
-  const updateData: Record<string, unknown> = {};
+  const updateData: Prisma.LinkUpdateInput = {};
 
   if (input.originalUrl) {
     const normalizedUrl = normalizeUrl(input.originalUrl);
@@ -254,7 +255,7 @@ export async function getAllLinks(options?: {
   filter?: 'all' | 'active' | 'expired' | 'protected';
   sort?: 'date' | 'clicks' | 'alpha';
 }): Promise<Link[]> {
-  const where: Record<string, unknown> = {};
+  const where: Prisma.LinkWhereInput = {};
 
   if (options?.search) {
     where.OR = [
@@ -284,7 +285,12 @@ export async function getAllLinks(options?: {
     }
   }
 
-  let orderBy: Record<string, unknown> = { createdAt: 'desc' };
+  // For sorting by clicks, use raw SQL for better performance on large datasets
+  if (options?.sort === 'clicks') {
+    return await getLinksOrderedByClicks(where);
+  }
+
+  let orderBy: Prisma.LinkOrderByWithRelationInput = { createdAt: 'desc' };
   if (options?.sort === 'alpha') {
     orderBy = { originalUrl: 'asc' };
   }
@@ -299,12 +305,136 @@ export async function getAllLinks(options?: {
     },
   });
 
-  // If sorting by clicks, do it in memory (Prisma doesn't support ordering by count)
-  if (options?.sort === 'clicks') {
-    links.sort((a, b) => (b._count?.clicks || 0) - (a._count?.clicks || 0));
+  return links as Link[];
+}
+
+/**
+ * Get links ordered by click count using raw SQL for better performance
+ * This is more efficient than in-memory sorting for large datasets
+ */
+async function getLinksOrderedByClicks(where: Prisma.LinkWhereInput): Promise<Link[]> {
+  // Build WHERE clause conditions
+  const conditions: string[] = [];
+  const params: unknown[] = [];
+  let paramIndex = 1;
+
+  if (where.isActive !== undefined) {
+    conditions.push(`l."isActive" = $${paramIndex}`);
+    params.push(where.isActive);
+    paramIndex++;
   }
 
-  return links as Link[];
+  if (where.password !== undefined) {
+    if (where.password && typeof where.password === 'object' && 'not' in where.password) {
+      conditions.push(`l."password" IS NOT NULL`);
+    }
+  }
+
+  if (where.expiresAt !== undefined) {
+    if (where.expiresAt && typeof where.expiresAt === 'object') {
+      if ('lt' in where.expiresAt) {
+        conditions.push(`l."expiresAt" < $${paramIndex}`);
+        params.push(where.expiresAt.lt);
+        paramIndex++;
+      }
+      if ('gt' in where.expiresAt) {
+        conditions.push(`l."expiresAt" > $${paramIndex}`);
+        params.push(where.expiresAt.gt);
+        paramIndex++;
+      }
+    }
+  }
+
+  // Handle OR conditions for search
+  if (where.OR && Array.isArray(where.OR)) {
+    const orConditions: string[] = [];
+    for (const orClause of where.OR) {
+      if (orClause.originalUrl && typeof orClause.originalUrl === 'object' && 'contains' in orClause.originalUrl) {
+        orConditions.push(`l."originalUrl" ILIKE $${paramIndex}`);
+        params.push(`%${orClause.originalUrl.contains}%`);
+        paramIndex++;
+      }
+      if (orClause.shortCode && typeof orClause.shortCode === 'object' && 'contains' in orClause.shortCode) {
+        orConditions.push(`l."shortCode" ILIKE $${paramIndex}`);
+        params.push(`%${orClause.shortCode.contains}%`);
+        paramIndex++;
+      }
+      if (orClause.customAlias && typeof orClause.customAlias === 'object' && 'contains' in orClause.customAlias) {
+        orConditions.push(`l."customAlias" ILIKE $${paramIndex}`);
+        params.push(`%${orClause.customAlias.contains}%`);
+        paramIndex++;
+      }
+      if (orClause.title && typeof orClause.title === 'object' && 'contains' in orClause.title) {
+        orConditions.push(`l."title" ILIKE $${paramIndex}`);
+        params.push(`%${orClause.title.contains}%`);
+        paramIndex++;
+      }
+      // Handle expiresAt in OR clause (for active filter)
+      if (orClause.expiresAt === null) {
+        orConditions.push(`l."expiresAt" IS NULL`);
+      }
+      if (orClause.expiresAt && typeof orClause.expiresAt === 'object' && 'gt' in orClause.expiresAt) {
+        orConditions.push(`l."expiresAt" > $${paramIndex}`);
+        params.push(orClause.expiresAt.gt);
+        paramIndex++;
+      }
+    }
+    if (orConditions.length > 0) {
+      conditions.push(`(${orConditions.join(' OR ')})`);
+    }
+  }
+
+  const whereClause = conditions.length > 0 ? `WHERE ${conditions.join(' AND ')}` : '';
+
+  const query = `
+    SELECT
+      l.*,
+      COALESCE(c.click_count, 0) as click_count
+    FROM "Link" l
+    LEFT JOIN (
+      SELECT "linkId", COUNT(*) as click_count
+      FROM "Click"
+      GROUP BY "linkId"
+    ) c ON l.id = c."linkId"
+    ${whereClause}
+    ORDER BY click_count DESC, l."createdAt" DESC
+  `;
+
+  const results = await prisma.$queryRawUnsafe<Array<Record<string, unknown>>>(query, ...params);
+
+  // Transform results to match Link type with _count
+  return results.map((row) => ({
+    id: row.id as string,
+    originalUrl: row.originalUrl as string,
+    shortCode: row.shortCode as string,
+    customAlias: row.customAlias as string | null,
+    title: row.title as string | null,
+    description: row.description as string | null,
+    password: row.password as string | null,
+    expiresAt: row.expiresAt as Date | null,
+    isActive: row.isActive as boolean,
+    isFavorite: row.isFavorite as boolean,
+    createdAt: row.createdAt as Date,
+    updatedAt: row.updatedAt as Date,
+    userId: row.userId as string | null,
+    folderId: row.folderId as string | null,
+    customDomainId: row.customDomainId as string | null,
+    workspaceId: row.workspaceId as string | null,
+    utmSource: row.utmSource as string | null,
+    utmMedium: row.utmMedium as string | null,
+    utmCampaign: row.utmCampaign as string | null,
+    utmTerm: row.utmTerm as string | null,
+    utmContent: row.utmContent as string | null,
+    cloakingEnabled: row.cloakingEnabled as boolean,
+    cloakingType: row.cloakingType as Link['cloakingType'],
+    cloakingTitle: row.cloakingTitle as string | null,
+    cloakingFavicon: row.cloakingFavicon as string | null,
+    deepLinkEnabled: row.deepLinkEnabled as boolean,
+    deepLinkConfig: row.deepLinkConfig as Record<string, unknown> | null,
+    _count: {
+      clicks: Number(row.click_count) || 0,
+    },
+  })) as Link[];
 }
 
 export async function verifyPassword(linkId: string, password: string): Promise<boolean> {
