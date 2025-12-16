@@ -254,8 +254,14 @@ export async function getAllLinks(options?: {
   search?: string;
   filter?: 'all' | 'active' | 'expired' | 'protected';
   sort?: 'date' | 'clicks' | 'alpha';
+  userId?: string;
 }): Promise<Link[]> {
   const where: Prisma.LinkWhereInput = {};
+
+  // Filter by user if userId is provided
+  if (options?.userId) {
+    where.userId = options.userId;
+  }
 
   if (options?.search) {
     where.OR = [
@@ -317,6 +323,12 @@ async function getLinksOrderedByClicks(where: Prisma.LinkWhereInput): Promise<Li
   const conditions: string[] = [];
   const params: unknown[] = [];
   let paramIndex = 1;
+
+  if (where.userId !== undefined) {
+    conditions.push(`l."userId" = $${paramIndex}`);
+    params.push(where.userId);
+    paramIndex++;
+  }
 
   if (where.isActive !== undefined) {
     conditions.push(`l."isActive" = $${paramIndex}`);

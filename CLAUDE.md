@@ -26,8 +26,11 @@ npx vitest run path/to/test.test.ts --config vitest.config.ts
 # Run single integration test file (uses 30s timeout)
 npx vitest run path/to/test.test.ts --config vitest.integration.config.ts
 
-# Run single E2E test file
+# Run single E2E test file (requires dev server running)
 npx playwright test path/to/test.spec.ts
+
+# Run E2E tests with specific browser
+npx playwright test --project=chromium
 
 # Database (Prisma + PostgreSQL)
 npm run db:generate            # Generate Prisma client
@@ -74,7 +77,7 @@ npm run db:studio              # Open Prisma Studio
 - **Internationalization**: Uses `next-intl` with locale routing (`/en/...`, `/ar/...`). Translation files in `src/messages/`. When adding UI text, update both `en.json` and `ar.json`. Use navigation exports from `src/i18n/routing.ts` (`Link`, `redirect`, `usePathname`, `useRouter`) instead of next/navigation.
 - **Firebase Client**: In React components, import Firebase client directly from `@/lib/firebase/client` to avoid importing server-side code.
 - **Path Alias**: Use `@/` to import from `src/` (configured in tsconfig and vitest)
-- **Authentication**: NextAuth.js v5 with JWT strategy. Get session via `auth()` from `@/lib/auth`. User ID available in `session.user.id`.
+- **Authentication**: NextAuth.js v5 with JWT strategy. Import `auth`, `signIn`, `signOut` from `@/lib/auth`. Get session via `auth()` in server components/API routes. User ID available in `session.user.id`.
 - **Plan Limits**: Feature availability is gated by subscription plan (FREE, STARTER, PRO, BUSINESS, ENTERPRISE). Each module has a `*_LIMITS` constant (e.g., `WEBHOOK_LIMITS`, `TARGETING_LIMITS`). Use `checkLinkLimit()`, `checkWebhookLimits()`, etc. before creating resources.
 - **Validation**: Zod schemas in `src/lib/url/validator.ts` for URL and alias validation
 - **Short Code Generation**: Uses `nanoid` (7 chars) in `src/lib/url/shortener.ts`
@@ -115,8 +118,9 @@ Advanced Features:
 
 ### Testing Structure
 - Unit tests: `__tests__/unit/` - Test isolated utilities (`vitest.config.ts`)
-- Integration tests: `__tests__/integration/` - Test with database (`vitest.integration.config.ts`)
-- E2E tests: `__tests__/e2e/` - Playwright browser tests
+- Integration tests: `__tests__/integration/` - Test with database (`vitest.integration.config.ts`, 30s timeout)
+- E2E tests: `__tests__/e2e/` - Playwright browser tests (Chromium + Mobile Chrome)
+- Test setup: `src/test/setup.ts` - Testing Library and DOM matchers
 
 ## Environment Variables
 
@@ -134,6 +138,10 @@ Stripe (optional):
 
 Redis (optional):
 - `REDIS_URL` - Redis connection URL (falls back to in-memory rate limiting)
+
+Firebase (optional):
+- `FIREBASE_PROJECT_ID`, `FIREBASE_CLIENT_EMAIL`, `FIREBASE_PRIVATE_KEY` - Admin SDK
+- `NEXT_PUBLIC_FIREBASE_API_KEY`, `NEXT_PUBLIC_FIREBASE_AUTH_DOMAIN`, etc. - Client SDK
 
 Other:
 - `NEXT_PUBLIC_APP_URL` - Base URL (default: http://localhost:3000)
