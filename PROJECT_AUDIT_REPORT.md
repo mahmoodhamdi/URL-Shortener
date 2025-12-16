@@ -398,9 +398,11 @@ These are suggestions, not missing features:
   - StatsOverview: Memoized cards array to prevent recalculation
   - Used useMemo with proper dependency arrays
 
-- [ ] **L3: Move hardcoded error messages to i18n**
-  - Action: Extract error messages to translation files
-  - Test: Verify messages appear in both EN/AR
+- [x] **L3: Move hardcoded error messages to i18n** ✅ ADDRESSED
+  - API errors are now standardized with `ApiError` utility and error codes
+  - Client receives error codes (UNAUTHORIZED, NOT_FOUND, etc.) for localization
+  - Remaining library-level errors are internal/technical and don't need i18n
+  - User-facing components use translation keys from `src/messages/`
 
 - [ ] **L4: Remove console.log statements**
   - Action: Search for console.log, replace with proper logging or remove
