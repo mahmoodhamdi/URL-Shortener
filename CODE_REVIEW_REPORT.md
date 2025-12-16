@@ -182,9 +182,9 @@ Two components use `<img>` instead of Next.js `<Image>`:
 | Webhooks | `/api/webhooks/*` | ✅ 24 tests added |
 | Workspaces | `/api/workspaces/*` | ✅ 24 tests added |
 | Domains | `/api/domains/*` | ✅ 22 tests added |
-| Redirect Handler | `/api/r/[shortCode]` | ❌ No tests |
-| Authentication | `/api/auth/*` | ❌ No tests |
-| Stripe Integration | `/api/stripe/*` | ❌ No tests |
+| Redirect Handler | `/api/r/[shortCode]` | ✅ 21 tests added |
+| Authentication | `/api/auth/*` | ✅ 22 tests added |
+| Stripe Integration | `/api/stripe/*` | ✅ 34 tests added |
 
 ### 6.3 E2E Test Coverage ✅ IMPROVED
 E2E tests now cover comprehensive flows:
