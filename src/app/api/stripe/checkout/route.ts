@@ -12,11 +12,23 @@ const checkoutSchema = z.object({
 
 export async function POST(request: NextRequest) {
   try {
+    // Check if Stripe is configured
+    if (!process.env.STRIPE_SECRET_KEY) {
+      return NextResponse.json(
+        {
+          error: 'Stripe not configured',
+          message: 'STRIPE_SECRET_KEY environment variable is not set. Please configure Stripe to enable payments.',
+          code: 'STRIPE_NOT_CONFIGURED'
+        },
+        { status: 400 }
+      );
+    }
+
     const session = await auth();
 
     if (!session?.user?.id) {
       return NextResponse.json(
-        { error: 'Unauthorized' },
+        { error: 'Unauthorized', message: 'Please sign in to upgrade your plan.' },
         { status: 401 }
       );
     }
@@ -39,8 +51,15 @@ export async function POST(request: NextRequest) {
       : planConfig.stripePriceIdMonthly;
 
     if (!priceId) {
+      const envVarName = billingPeriod === 'yearly'
+        ? `STRIPE_${plan}_YEARLY_PRICE_ID`
+        : `STRIPE_${plan}_MONTHLY_PRICE_ID`;
       return NextResponse.json(
-        { error: 'Price not configured for this plan' },
+        {
+          error: 'Price not configured',
+          message: `Stripe price ID not configured for ${plan} plan (${billingPeriod}). Please set the ${envVarName} environment variable.`,
+          code: 'PRICE_NOT_CONFIGURED'
+        },
         { status: 400 }
       );
     }

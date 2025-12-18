@@ -42,12 +42,28 @@ export function PricingTable({ currentPlan, locale = 'en' }: PricingTableProps) 
         body: JSON.stringify({ plan, billingPeriod }),
       });
 
+      const data = await response.json();
+
       if (!response.ok) {
-        throw new Error('Failed to create checkout session');
+        // Show specific error message based on error code
+        let errorMessage: string;
+        if (data.code === 'STRIPE_NOT_CONFIGURED') {
+          errorMessage = t('stripeNotConfigured');
+        } else if (data.code === 'PRICE_NOT_CONFIGURED') {
+          errorMessage = t('priceNotConfigured');
+        } else {
+          errorMessage = data.message || data.error || t('checkoutError');
+        }
+        console.error('Checkout error:', errorMessage, data);
+        alert(errorMessage);
+        return;
       }
 
-      const { url } = await response.json();
-      window.location.href = url;
+      if (data.url) {
+        window.location.href = data.url;
+      } else {
+        throw new Error('No checkout URL returned');
+      }
     } catch (error) {
       console.error('Checkout error:', error);
       alert(t('checkoutError'));

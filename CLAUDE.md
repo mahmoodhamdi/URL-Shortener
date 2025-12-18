@@ -97,6 +97,8 @@ Key models (see `prisma/schema.prisma` for full schema):
 - `BioPage`, `BioLink` - Link-in-bio pages
 - `ZapierSubscription` - Zapier webhook subscriptions
 - `ExtensionToken` - Browser extension authentication
+- `CustomDomain` - Custom domain verification and SSL status
+- `FCMToken` - Firebase Cloud Messaging device tokens
 
 ### API Routes
 Core:

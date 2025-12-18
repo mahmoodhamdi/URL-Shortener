@@ -312,6 +312,8 @@
     "upgradeTo": "الترقية إلى",
     "processing": "جاري المعالجة...",
     "checkoutError": "فشل بدء الدفع. حاول مرة أخرى.",
+    "stripeNotConfigured": "لم يتم تكوين المدفوعات بعد. يرجى التواصل مع المسؤول.",
+    "priceNotConfigured": "هذه الخطة غير متاحة للشراء حالياً.",
     "portalError": "فشل فتح بوابة الفواتير. حاول مرة أخرى.",
     "manageSubscription": "إدارة الاشتراك",
     "upgradeSuccess": "تم ترقية الاشتراك بنجاح! مرحباً بك في خطتك الجديدة.",
@@ -542,11 +544,11 @@
     "events": "الأحداث",
     "eventsHelp": "اختر الأحداث التي تفعّل هذا الويب هوك",
     "event": {
-      "link.created": "تم إنشاء رابط",
-      "link.updated": "تم تحديث رابط",
-      "link.deleted": "تم حذف رابط",
-      "link.clicked": "تم النقر على رابط",
-      "link.expired": "انتهت صلاحية رابط"
+      "linkCreated": "تم إنشاء رابط",
+      "linkUpdated": "تم تحديث رابط",
+      "linkDeleted": "تم حذف رابط",
+      "linkClicked": "تم النقر على رابط",
+      "linkExpired": "انتهت صلاحية رابط"
     },
     "status": "الحالة",
     "active": "نشط",

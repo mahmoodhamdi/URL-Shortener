@@ -312,6 +312,8 @@
     "upgradeTo": "Upgrade to",
     "processing": "Processing...",
     "checkoutError": "Failed to start checkout. Please try again.",
+    "stripeNotConfigured": "Payments are not configured yet. Please contact the administrator.",
+    "priceNotConfigured": "This plan is not available for purchase yet.",
     "portalError": "Failed to open billing portal. Please try again.",
     "manageSubscription": "Manage Subscription",
     "upgradeSuccess": "Subscription upgraded successfully! Welcome to your new plan.",
@@ -542,11 +544,11 @@
     "events": "Events",
     "eventsHelp": "Select which events trigger this webhook",
     "event": {
-      "link.created": "Link Created",
-      "link.updated": "Link Updated",
-      "link.deleted": "Link Deleted",
-      "link.clicked": "Link Clicked",
-      "link.expired": "Link Expired"
+      "linkCreated": "Link Created",
+      "linkUpdated": "Link Updated",
+      "linkDeleted": "Link Deleted",
+      "linkClicked": "Link Clicked",
+      "linkExpired": "Link Expired"
     },
     "status": "Status",
     "active": "Active",

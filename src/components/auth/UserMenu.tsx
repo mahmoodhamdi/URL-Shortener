@@ -52,7 +52,8 @@ export function UserMenu() {
               alt={session.user.name || 'User'}
               width={32}
               height={32}
-              className="h-8 w-8 rounded-full object-cover"
+              className="rounded-full object-cover"
+              style={{ width: 32, height: 32 }}
               unoptimized
             />
           ) : (
