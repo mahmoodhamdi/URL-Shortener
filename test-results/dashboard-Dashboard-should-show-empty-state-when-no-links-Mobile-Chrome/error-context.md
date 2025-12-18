@@ -1,0 +1,103 @@
+# Page snapshot
+
+```yaml
+- generic [active] [ref=e1]:
+  - generic [ref=e2]:
+    - banner [ref=e3]:
+      - generic [ref=e4]:
+        - link [ref=e6] [cursor=pointer]:
+          - /url: /en
+          - img [ref=e7]
+        - generic [ref=e10]:
+          - generic [ref=e12]:
+            - link "Sign In" [ref=e13] [cursor=pointer]:
+              - /url: /en/login
+            - link "Sign Up" [ref=e14] [cursor=pointer]:
+              - /url: /en/register
+          - button [ref=e15] [cursor=pointer]:
+            - img [ref=e16]
+      - navigation [ref=e18]:
+        - link "Home" [ref=e19] [cursor=pointer]:
+          - /url: /en
+          - img [ref=e20]
+          - text: Home
+        - link "Dashboard" [ref=e23] [cursor=pointer]:
+          - /url: /en/dashboard
+          - img [ref=e24]
+          - text: Dashboard
+        - link "Bulk Shorten" [ref=e29] [cursor=pointer]:
+          - /url: /en/bulk
+          - img [ref=e30]
+          - text: Bulk Shorten
+        - link "Pricing" [ref=e34] [cursor=pointer]:
+          - /url: /en/pricing
+          - img [ref=e35]
+          - text: Pricing
+        - link "API Docs" [ref=e37] [cursor=pointer]:
+          - /url: /en/api-docs
+          - img [ref=e38]
+          - text: API Docs
+        - generic [ref=e43]:
+          - button "Change language" [ref=e44] [cursor=pointer]:
+            - img [ref=e45]
+          - button "Switch to dark mode" [ref=e49] [cursor=pointer]:
+            - img [ref=e50]
+    - main [ref=e52]:
+      - generic [ref=e53]:
+        - generic [ref=e54]:
+          - img [ref=e56]
+          - heading "Something went wrong" [level=3] [ref=e58]
+          - paragraph [ref=e59]: An unexpected error occurred. Please try again.
+        - generic [ref=e60]:
+          - button "Try again" [ref=e61] [cursor=pointer]:
+            - img [ref=e62]
+            - text: Try again
+          - button "Go to homepage" [ref=e67] [cursor=pointer]:
+            - img [ref=e68]
+            - text: Go to homepage
+          - group [ref=e71]:
+            - generic "Error details" [ref=e72] [cursor=pointer]
+    - contentinfo [ref=e73]:
+      - generic [ref=e75]:
+        - generic [ref=e76]:
+          - img [ref=e77]
+          - generic [ref=e80]: URL Shortener
+        - navigation [ref=e81]:
+          - link "Privacy Policy" [ref=e82] [cursor=pointer]:
+            - /url: /en
+          - link "Terms of Service" [ref=e83] [cursor=pointer]:
+            - /url: /en
+          - link "Contact" [ref=e84] [cursor=pointer]:
+            - /url: /en
+        - paragraph [ref=e85]: © 2025 URL Shortener. All rights reserved.
+    - navigation [ref=e86]:
+      - generic [ref=e87]:
+        - link "Home" [ref=e88] [cursor=pointer]:
+          - /url: /en
+          - img [ref=e89]
+          - generic [ref=e92]: Home
+        - link "Dashboard" [ref=e93] [cursor=pointer]:
+          - /url: /en/dashboard
+          - img [ref=e94]
+          - generic [ref=e99]: Dashboard
+        - link "Bulk Shorten" [ref=e100] [cursor=pointer]:
+          - /url: /en/bulk
+          - img [ref=e101]
+          - generic [ref=e105]: Bulk Shorten
+        - link "API Docs" [ref=e106] [cursor=pointer]:
+          - /url: /en/api-docs
+          - img [ref=e107]
+          - generic [ref=e112]: API Docs
+        - link "Settings" [ref=e113] [cursor=pointer]:
+          - /url: /en/settings
+          - img [ref=e114]
+          - generic [ref=e117]: Settings
+  - region "Notifications (F8)":
+    - list
+  - alert [ref=e118]
+  - generic [ref=e121] [cursor=pointer]:
+    - img [ref=e122]
+    - generic [ref=e124]: 2 errors
+    - button "Hide Errors" [ref=e125]:
+      - img [ref=e126]
+```

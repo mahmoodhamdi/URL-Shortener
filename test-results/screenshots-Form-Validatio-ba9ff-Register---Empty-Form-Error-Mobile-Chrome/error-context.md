@@ -1,0 +1,127 @@
+# Page snapshot
+
+```yaml
+- generic [active] [ref=e1]:
+  - generic [ref=e2]:
+    - banner [ref=e3]:
+      - generic [ref=e4]:
+        - link [ref=e6] [cursor=pointer]:
+          - /url: /en
+          - img [ref=e7]
+        - generic [ref=e10]:
+          - generic [ref=e12]:
+            - link "Sign In" [ref=e13] [cursor=pointer]:
+              - /url: /en/login
+            - link "Sign Up" [ref=e14] [cursor=pointer]:
+              - /url: /en/register
+          - button [ref=e15] [cursor=pointer]:
+            - img [ref=e16]
+      - navigation [ref=e18]:
+        - link "Home" [ref=e19] [cursor=pointer]:
+          - /url: /en
+          - img [ref=e20]
+          - text: Home
+        - link "Dashboard" [ref=e23] [cursor=pointer]:
+          - /url: /en/dashboard
+          - img [ref=e24]
+          - text: Dashboard
+        - link "Bulk Shorten" [ref=e29] [cursor=pointer]:
+          - /url: /en/bulk
+          - img [ref=e30]
+          - text: Bulk Shorten
+        - link "Pricing" [ref=e34] [cursor=pointer]:
+          - /url: /en/pricing
+          - img [ref=e35]
+          - text: Pricing
+        - link "API Docs" [ref=e37] [cursor=pointer]:
+          - /url: /en/api-docs
+          - img [ref=e38]
+          - text: API Docs
+        - generic [ref=e43]:
+          - button "Change language" [ref=e44] [cursor=pointer]:
+            - img [ref=e45]
+          - button "Switch to dark mode" [ref=e49] [cursor=pointer]:
+            - img [ref=e50]
+    - main [ref=e52]:
+      - generic [ref=e54]:
+        - generic [ref=e55]:
+          - heading "Create Account" [level=3] [ref=e56]
+          - paragraph [ref=e57]: Create an account to start shortening URLs
+        - generic [ref=e58]:
+          - generic [ref=e59]:
+            - button "Google" [ref=e60] [cursor=pointer]:
+              - img [ref=e61]
+              - text: Google
+            - button "GitHub" [ref=e66] [cursor=pointer]:
+              - img [ref=e67]
+              - text: GitHub
+          - generic [ref=e74]: Or continue with
+          - generic [ref=e75]:
+            - generic [ref=e76]:
+              - text: Name
+              - generic [ref=e77]:
+                - img [ref=e78]
+                - textbox "Name" [ref=e81]:
+                  - /placeholder: Your name
+            - generic [ref=e82]:
+              - text: Email
+              - generic [ref=e83]:
+                - img [ref=e84]
+                - textbox "Email" [ref=e87]:
+                  - /placeholder: name@example.com
+            - generic [ref=e88]:
+              - text: Password
+              - generic [ref=e89]:
+                - img [ref=e90]
+                - textbox "Password" [ref=e93]:
+                  - /placeholder: Enter your password
+            - generic [ref=e94]:
+              - text: Confirm Password
+              - generic [ref=e95]:
+                - img [ref=e96]
+                - textbox "Confirm Password" [ref=e99]:
+                  - /placeholder: Confirm your password
+            - button "Create Account" [disabled]
+        - paragraph [ref=e101]:
+          - text: Already have an account?
+          - link "Sign In" [ref=e102] [cursor=pointer]:
+            - /url: /en/login
+    - contentinfo [ref=e103]:
+      - generic [ref=e105]:
+        - generic [ref=e106]:
+          - img [ref=e107]
+          - generic [ref=e110]: URL Shortener
+        - navigation [ref=e111]:
+          - link "Privacy Policy" [ref=e112] [cursor=pointer]:
+            - /url: /en
+          - link "Terms of Service" [ref=e113] [cursor=pointer]:
+            - /url: /en
+          - link "Contact" [ref=e114] [cursor=pointer]:
+            - /url: /en
+        - paragraph [ref=e115]: © 2025 URL Shortener. All rights reserved.
+    - navigation [ref=e116]:
+      - generic [ref=e117]:
+        - link "Home" [ref=e118] [cursor=pointer]:
+          - /url: /en
+          - img [ref=e119]
+          - generic [ref=e122]: Home
+        - link "Dashboard" [ref=e123] [cursor=pointer]:
+          - /url: /en/dashboard
+          - img [ref=e124]
+          - generic [ref=e129]: Dashboard
+        - link "Bulk Shorten" [ref=e130] [cursor=pointer]:
+          - /url: /en/bulk
+          - img [ref=e131]
+          - generic [ref=e135]: Bulk Shorten
+        - link "API Docs" [ref=e136] [cursor=pointer]:
+          - /url: /en/api-docs
+          - img [ref=e137]
+          - generic [ref=e142]: API Docs
+        - link "Settings" [ref=e143] [cursor=pointer]:
+          - /url: /en/settings
+          - img [ref=e144]
+          - generic [ref=e147]: Settings
+  - region "Notifications (F8)":
+    - list
+  - alert [ref=e148]
+```

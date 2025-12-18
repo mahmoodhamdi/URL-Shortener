@@ -1,0 +1,120 @@
+# Page snapshot
+
+```yaml
+- generic [active] [ref=e1]:
+  - generic [ref=e2]:
+    - banner [ref=e3]:
+      - generic [ref=e4]:
+        - link [ref=e6] [cursor=pointer]:
+          - /url: /en
+          - img [ref=e7]
+        - generic [ref=e10]:
+          - generic [ref=e12]:
+            - link "Sign In" [ref=e13] [cursor=pointer]:
+              - /url: /en/login
+            - link "Sign Up" [ref=e14] [cursor=pointer]:
+              - /url: /en/register
+          - button [ref=e15] [cursor=pointer]:
+            - img [ref=e16]
+      - navigation [ref=e18]:
+        - link "Home" [ref=e19] [cursor=pointer]:
+          - /url: /en
+          - img [ref=e20]
+          - text: Home
+        - link "Dashboard" [ref=e23] [cursor=pointer]:
+          - /url: /en/dashboard
+          - img [ref=e24]
+          - text: Dashboard
+        - link "Bulk Shorten" [ref=e29] [cursor=pointer]:
+          - /url: /en/bulk
+          - img [ref=e30]
+          - text: Bulk Shorten
+        - link "Pricing" [ref=e34] [cursor=pointer]:
+          - /url: /en/pricing
+          - img [ref=e35]
+          - text: Pricing
+        - link "API Docs" [ref=e37] [cursor=pointer]:
+          - /url: /en/api-docs
+          - img [ref=e38]
+          - text: API Docs
+        - generic [ref=e43]:
+          - button "Change language" [ref=e44] [cursor=pointer]:
+            - img [ref=e45]
+          - button "Switch to dark mode" [ref=e49] [cursor=pointer]:
+            - img [ref=e50]
+    - main [ref=e52]:
+      - generic [ref=e53]:
+        - generic [ref=e54]:
+          - heading "Shorten Your URLs" [level=1] [ref=e55]
+          - paragraph [ref=e56]: Create short, memorable links in seconds
+        - generic [ref=e59]:
+          - generic [ref=e60]:
+            - generic [ref=e61]: URL
+            - generic [ref=e62]:
+              - img [ref=e63]
+              - textbox "URL" [ref=e66]:
+                - /placeholder: Paste your long URL here...
+          - button "Customize" [ref=e67] [cursor=pointer]:
+            - text: Customize
+            - img [ref=e68]
+          - generic [ref=e70]:
+            - text: Custom alias (optional)
+            - textbox "Custom alias (optional)" [ref=e71]:
+              - /placeholder: my-custom-link
+          - button "Shorten URL" [disabled]
+        - generic [ref=e73]:
+          - generic [ref=e74]:
+            - img [ref=e76]
+            - heading "Lightning Fast" [level=3] [ref=e78]
+            - paragraph [ref=e79]: Generate short URLs instantly
+          - generic [ref=e80]:
+            - img [ref=e82]
+            - heading "Detailed Analytics" [level=3] [ref=e84]
+            - paragraph [ref=e85]: Track clicks, locations, and devices
+          - generic [ref=e86]:
+            - img [ref=e88]
+            - heading "QR Codes" [level=3] [ref=e94]
+            - paragraph [ref=e95]: Generate QR codes for any link
+          - generic [ref=e96]:
+            - img [ref=e98]
+            - heading "Secure" [level=3] [ref=e100]
+            - paragraph [ref=e101]: Password protect your links
+    - contentinfo [ref=e102]:
+      - generic [ref=e104]:
+        - generic [ref=e105]:
+          - img [ref=e106]
+          - generic [ref=e109]: URL Shortener
+        - navigation [ref=e110]:
+          - link "Privacy Policy" [ref=e111] [cursor=pointer]:
+            - /url: /en
+          - link "Terms of Service" [ref=e112] [cursor=pointer]:
+            - /url: /en
+          - link "Contact" [ref=e113] [cursor=pointer]:
+            - /url: /en
+        - paragraph [ref=e114]: © 2025 URL Shortener. All rights reserved.
+    - navigation [ref=e115]:
+      - generic [ref=e116]:
+        - link "Home" [ref=e117] [cursor=pointer]:
+          - /url: /en
+          - img [ref=e118]
+          - generic [ref=e121]: Home
+        - link "Dashboard" [ref=e122] [cursor=pointer]:
+          - /url: /en/dashboard
+          - img [ref=e123]
+          - generic [ref=e128]: Dashboard
+        - link "Bulk Shorten" [ref=e129] [cursor=pointer]:
+          - /url: /en/bulk
+          - img [ref=e130]
+          - generic [ref=e134]: Bulk Shorten
+        - link "API Docs" [ref=e135] [cursor=pointer]:
+          - /url: /en/api-docs
+          - img [ref=e136]
+          - generic [ref=e141]: API Docs
+        - link "Settings" [ref=e142] [cursor=pointer]:
+          - /url: /en/settings
+          - img [ref=e143]
+          - generic [ref=e146]: Settings
+  - region "Notifications (F8)":
+    - list
+  - alert [ref=e147]
+```

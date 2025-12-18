@@ -1,0 +1,80 @@
+# Page snapshot
+
+```yaml
+- generic [active] [ref=e1]:
+  - generic [ref=e2]:
+    - banner [ref=e3]:
+      - generic [ref=e4]:
+        - generic [ref=e5]:
+          - link "URL Shortener" [ref=e6] [cursor=pointer]:
+            - /url: /en
+            - img [ref=e7]
+            - generic [ref=e10]: URL Shortener
+          - navigation [ref=e11]:
+            - link "Home" [ref=e12] [cursor=pointer]:
+              - /url: /en
+              - img [ref=e13]
+              - text: Home
+            - link "Dashboard" [ref=e16] [cursor=pointer]:
+              - /url: /en/dashboard
+              - img [ref=e17]
+              - text: Dashboard
+            - link "Bulk Shorten" [ref=e22] [cursor=pointer]:
+              - /url: /en/bulk
+              - img [ref=e23]
+              - text: Bulk Shorten
+            - link "Pricing" [ref=e27] [cursor=pointer]:
+              - /url: /en/pricing
+              - img [ref=e28]
+              - text: Pricing
+            - link "API Docs" [ref=e30] [cursor=pointer]:
+              - /url: /en/api-docs
+              - img [ref=e31]
+              - text: API Docs
+        - generic [ref=e37]:
+          - button "Change language" [ref=e38] [cursor=pointer]:
+            - img [ref=e39]
+          - button "Switch to dark mode" [ref=e43] [cursor=pointer]:
+            - img [ref=e44]
+          - generic [ref=e46]:
+            - link "Sign In" [ref=e47] [cursor=pointer]:
+              - /url: /en/login
+            - link "Sign Up" [ref=e48] [cursor=pointer]:
+              - /url: /en/register
+    - main [ref=e49]:
+      - generic [ref=e50]:
+        - generic [ref=e51]:
+          - img [ref=e53]
+          - heading "Something went wrong" [level=3] [ref=e55]
+          - paragraph [ref=e56]: An unexpected error occurred. Please try again.
+        - generic [ref=e57]:
+          - button "Try again" [ref=e58] [cursor=pointer]:
+            - img [ref=e59]
+            - text: Try again
+          - button "Go to homepage" [ref=e64] [cursor=pointer]:
+            - img [ref=e65]
+            - text: Go to homepage
+          - group [ref=e68]:
+            - generic "Error details" [ref=e69] [cursor=pointer]
+    - contentinfo [ref=e70]:
+      - generic [ref=e72]:
+        - generic [ref=e73]:
+          - img [ref=e74]
+          - generic [ref=e77]: URL Shortener
+        - navigation [ref=e78]:
+          - link "Privacy Policy" [ref=e79] [cursor=pointer]:
+            - /url: /en
+          - link "Terms of Service" [ref=e80] [cursor=pointer]:
+            - /url: /en
+          - link "Contact" [ref=e81] [cursor=pointer]:
+            - /url: /en
+        - paragraph [ref=e82]: © 2025 URL Shortener. All rights reserved.
+  - region "Notifications (F8)":
+    - list
+  - alert [ref=e83]
+  - generic [ref=e86] [cursor=pointer]:
+    - img [ref=e87]
+    - generic [ref=e89]: 2 errors
+    - button "Hide Errors" [ref=e90]:
+      - img [ref=e91]
+```
