@@ -46,9 +46,19 @@ npm run db:studio              # Open Prisma Studio
 - `src/app/[locale]/` - Locale-based pages (Next.js App Router with next-intl)
 - `src/app/api/` - REST API routes
 - `src/lib/` - Core business logic modules (see Library Modules below)
-- `src/components/` - React components (ui/, url/, stats/, layout/)
+- `src/components/` - React components (ui/, url/, stats/, pricing/, payment/, layout/)
 - `src/messages/` - i18n translations (en.json, ar.json)
 - `src/types/index.ts` - TypeScript type definitions
+
+### UI Component Directories (`src/components/`)
+| Directory | Purpose |
+|-----------|---------|
+| `ui/` | shadcn/ui base components (Button, Card, Dialog, etc.) |
+| `url/` | URL shortening form, result display, QR code |
+| `stats/` | Analytics charts and statistics |
+| `pricing/` | Pricing table, plan cards, upgrade buttons |
+| `payment/` | Payment checkout dialog, method selector, kiosk/wallet components |
+| `layout/` | Header, footer, navigation, sidebar |
 
 ### Library Modules (`src/lib/`)
 | Module | Purpose |

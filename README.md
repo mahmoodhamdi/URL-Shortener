@@ -32,7 +32,9 @@ A production-ready, enterprise-grade URL shortener built with Next.js 14, TypeSc
 - **Custom Domains** - Use your own domain with SSL verification
 
 ### Integrations
-- **Stripe Subscriptions** - 5 plan tiers (Free, Starter, Pro, Business, Enterprise)
+- **Multi-Gateway Payments** - Stripe, Paymob (Egypt), PayTabs (MENA), Paddle (Global MoR)
+- **Payment Methods** - Cards, Mobile Wallets, Kiosk Payments, Apple Pay, Google Pay, Mada
+- **5 Subscription Tiers** - Free, Starter, Pro, Business, Enterprise
 - **Zapier Integration** - Triggers and actions for automation
 - **Webhooks** - HMAC-signed event notifications
 - **Firebase FCM** - Push notifications support
@@ -296,7 +298,7 @@ Both languages include:
 | **Components** | shadcn/ui |
 | **Database** | PostgreSQL + Prisma ORM |
 | **Authentication** | NextAuth.js v5 (Google, GitHub, Credentials) |
-| **Payments** | Stripe |
+| **Payments** | Stripe, Paymob, PayTabs, Paddle |
 | **Push Notifications** | Firebase FCM |
 | **Rate Limiting** | Redis (with in-memory fallback) |
 | **Internationalization** | next-intl |
@@ -361,7 +363,7 @@ docker-compose -f docker/docker-compose.prod.yml up -d
 ## Testing
 
 ```bash
-# Unit tests (826 tests)
+# Unit tests (1054 tests)
 npm run test:unit
 
 # Integration tests (218 tests)
@@ -380,7 +382,7 @@ npx vitest run path/to/test.test.ts --config vitest.config.ts
 npx playwright test path/to/test.spec.ts
 ```
 
-**Total Tests: 1,044+** (Unit + Integration)
+**Total Tests: 1,272+** (Unit + Integration)
 
 ## Environment Variables
 
@@ -398,12 +400,39 @@ npx playwright test path/to/test.spec.ts
 | `GITHUB_CLIENT_ID` | GitHub OAuth Client ID |
 | `GITHUB_CLIENT_SECRET` | GitHub OAuth Client Secret |
 
-### Optional - Stripe
+### Optional - Payment Gateways
+
+**Stripe (Global)**
 | Variable | Description |
 |----------|-------------|
 | `STRIPE_SECRET_KEY` | Stripe Secret API Key |
 | `STRIPE_WEBHOOK_SECRET` | Stripe Webhook Signing Secret |
 | `NEXT_PUBLIC_STRIPE_PUBLISHABLE_KEY` | Stripe Publishable Key |
+
+**Paymob (Egypt)**
+| Variable | Description |
+|----------|-------------|
+| `PAYMOB_API_KEY` | Paymob API Key |
+| `PAYMOB_INTEGRATION_ID_CARD` | Card integration ID |
+| `PAYMOB_INTEGRATION_ID_WALLET` | Mobile wallet integration ID |
+| `PAYMOB_HMAC_SECRET` | Webhook HMAC secret |
+| `PAYMOB_IFRAME_ID` | Iframe ID for card payments |
+
+**PayTabs (MENA)**
+| Variable | Description |
+|----------|-------------|
+| `PAYTABS_PROFILE_ID` | PayTabs profile ID |
+| `PAYTABS_SERVER_KEY` | Server authentication key |
+| `PAYTABS_REGION` | Region code (SAU, ARE, EGY, etc.) |
+
+**Paddle (Global MoR)**
+| Variable | Description |
+|----------|-------------|
+| `PADDLE_API_KEY` | Paddle API key |
+| `PADDLE_VENDOR_ID` | Vendor ID |
+| `PADDLE_PUBLIC_KEY` | Public key for verification |
+| `NEXT_PUBLIC_PADDLE_CLIENT_TOKEN` | Client-side token |
+| `PADDLE_ENVIRONMENT` | sandbox or production |
 
 ### Optional - Firebase
 | Variable | Description |
@@ -454,6 +483,23 @@ Content-Type: application/json
 GET /api/links/{id}/stats?period=30d
 ```
 
+### Payment Endpoints
+```http
+POST /api/payment/checkout
+Content-Type: application/json
+
+{
+  "planId": "PRO",
+  "billingCycle": "monthly",
+  "paymentMethod": "card"
+}
+```
+
+```http
+GET /api/payment/methods
+```
+Returns available payment methods for user's region.
+
 ### Advanced Endpoints
 - `/api/links/[id]/targets` - Link targeting rules
 - `/api/links/[id]/ab-test` - A/B test configuration
@@ -463,6 +509,9 @@ GET /api/links/{id}/stats?period=30d
 - `/api/bio/` - Bio page management
 - `/api/zapier/` - Zapier triggers and actions
 - `/api/extension/` - Browser extension endpoints
+- `/api/payment/webhooks/paymob` - Paymob webhook handler
+- `/api/payment/webhooks/paytabs` - PayTabs webhook handler
+- `/api/payment/webhooks/paddle` - Paddle webhook handler
 
 ## Project Structure
 
@@ -476,12 +525,15 @@ url-shortener/
 │   │   ├── ui/                 # shadcn components
 │   │   ├── url/                # URL-related components
 │   │   ├── stats/              # Statistics components
+│   │   ├── pricing/            # Pricing page components
+│   │   ├── payment/            # Payment checkout components
 │   │   └── layout/             # Layout components
 │   ├── lib/
 │   │   ├── url/                # URL shortening, validation, QR
 │   │   ├── auth/               # NextAuth.js configuration
 │   │   ├── analytics/          # Click tracking
-│   │   ├── stripe/             # Payment processing
+│   │   ├── stripe/             # Stripe payment processing
+│   │   ├── payment/            # Multi-gateway payments (Stripe, Paymob, PayTabs, Paddle)
 │   │   ├── workspace/          # Team workspaces
 │   │   ├── webhooks/           # Webhook management
 │   │   ├── targeting/          # Device/geo targeting

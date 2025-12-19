@@ -65,6 +65,8 @@ tags:
     description: Zapier integration endpoints
   - name: Subscription
     description: Plan and subscription management
+  - name: Payment
+    description: Multi-gateway payment processing (Stripe, Paymob, PayTabs, Paddle)
 
 paths:
   /shorten:
@@ -666,6 +668,107 @@ paths:
             application/json:
               schema:
                 $ref: '#/components/schemas/Subscription'
+
+  /payment/checkout:
+    post:
+      tags:
+        - Payment
+      summary: Create payment checkout session
+      description: |
+        Creates a checkout session using the appropriate payment gateway based on user's region.
+        Supports multiple payment methods: card, mobile wallet, kiosk, Apple Pay, Google Pay.
+      operationId: createCheckout
+      requestBody:
+        required: true
+        content:
+          application/json:
+            schema:
+              $ref: '#/components/schemas/CheckoutRequest'
+      responses:
+        '200':
+          description: Checkout session created
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/CheckoutResponse'
+        '401':
+          $ref: '#/components/responses/Unauthorized'
+        '400':
+          $ref: '#/components/responses/BadRequest'
+
+  /payment/methods:
+    get:
+      tags:
+        - Payment
+      summary: Get available payment methods
+      description: Returns payment methods available for the user's region
+      operationId: getPaymentMethods
+      responses:
+        '200':
+          description: Available payment methods
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/PaymentMethodsResponse'
+        '401':
+          $ref: '#/components/responses/Unauthorized'
+
+  /payment/webhooks/paymob:
+    post:
+      tags:
+        - Payment
+      summary: Paymob webhook handler
+      description: Handles payment notifications from Paymob (Egypt)
+      operationId: paymobWebhook
+      requestBody:
+        required: true
+        content:
+          application/json:
+            schema:
+              type: object
+      responses:
+        '200':
+          description: Webhook processed
+        '400':
+          description: Invalid webhook signature
+
+  /payment/webhooks/paytabs:
+    post:
+      tags:
+        - Payment
+      summary: PayTabs webhook handler
+      description: Handles payment notifications from PayTabs (MENA)
+      operationId: paytabsWebhook
+      requestBody:
+        required: true
+        content:
+          application/json:
+            schema:
+              type: object
+      responses:
+        '200':
+          description: Webhook processed
+        '400':
+          description: Invalid webhook signature
+
+  /payment/webhooks/paddle:
+    post:
+      tags:
+        - Payment
+      summary: Paddle webhook handler
+      description: Handles payment notifications from Paddle (Global MoR)
+      operationId: paddleWebhook
+      requestBody:
+        required: true
+        content:
+          application/json:
+            schema:
+              type: object
+      responses:
+        '200':
+          description: Webhook processed
+        '400':
+          description: Invalid webhook signature
 
   /usage:
     get:
@@ -1365,6 +1468,82 @@ components:
           format: date-time
         cancelAtPeriodEnd:
           type: boolean
+        paymentProvider:
+          type: string
+          enum: [STRIPE, PAYMOB, PAYTABS, PADDLE]
+
+    CheckoutRequest:
+      type: object
+      properties:
+        planId:
+          type: string
+          enum: [STARTER, PRO, BUSINESS, ENTERPRISE]
+          description: Plan to subscribe to
+        billingCycle:
+          type: string
+          enum: [monthly, yearly]
+          description: Billing frequency
+        paymentMethod:
+          type: string
+          enum: [card, wallet, kiosk, apple_pay, google_pay, mada]
+          description: Payment method to use
+        phoneNumber:
+          type: string
+          description: Phone number for wallet payments (Egypt)
+      required:
+        - planId
+        - billingCycle
+
+    CheckoutResponse:
+      type: object
+      properties:
+        checkoutUrl:
+          type: string
+          format: uri
+          description: URL to redirect user to for payment
+        provider:
+          type: string
+          enum: [stripe, paymob, paytabs, paddle]
+        kioskData:
+          type: object
+          properties:
+            billReference:
+              type: string
+              description: Reference code for kiosk payment
+            expiresAt:
+              type: string
+              format: date-time
+            amount:
+              type: number
+            currency:
+              type: string
+
+    PaymentMethodsResponse:
+      type: object
+      properties:
+        paymentMethods:
+          type: array
+          items:
+            $ref: '#/components/schemas/PaymentMethodInfo'
+        preferredGateway:
+          type: string
+          enum: [stripe, paymob, paytabs, paddle]
+
+    PaymentMethodInfo:
+      type: object
+      properties:
+        id:
+          type: string
+          description: Method identifier (card, wallet, kiosk, etc.)
+        name:
+          type: string
+          description: Display name
+        icon:
+          type: string
+          description: Icon identifier
+        description:
+          type: string
+          description: Method description
 
     Usage:
       type: object
