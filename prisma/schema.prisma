@@ -88,10 +88,25 @@ model Subscription {
   plan                 Plan               @default(FREE)
   status               SubscriptionStatus @default(ACTIVE)
 
+  // Payment Provider
+  paymentProvider      PaymentProvider    @default(STRIPE)
+
   // Stripe fields
   stripeCustomerId     String?            @unique
   stripeSubscriptionId String?            @unique
   stripePriceId        String?
+
+  // Paymob fields (Egyptian market)
+  paymobOrderId        String?            @unique
+  paymobTransactionId  String?
+
+  // PayTabs fields (MENA region)
+  paytabsCustomerRef   String?            @unique
+  paytabsTransactionRef String?
+
+  // Paddle fields (Global MoR)
+  paddleCustomerId     String?            @unique
+  paddleSubscriptionId String?            @unique
 
   // Billing period
   currentPeriodStart   DateTime?
@@ -105,7 +120,71 @@ model Subscription {
   createdAt            DateTime           @default(now())
   updatedAt            DateTime           @updatedAt
 
+  // Relations
+  payments             Payment[]
+
   @@index([stripeCustomerId])
+  @@index([paymobOrderId])
+  @@index([paytabsCustomerRef])
+  @@index([paddleCustomerId])
+}
+
+// Payment transaction history
+model Payment {
+  id                String          @id @default(cuid())
+  subscriptionId    String?
+  subscription      Subscription?   @relation(fields: [subscriptionId], references: [id], onDelete: SetNull)
+  userId            String
+
+  provider          PaymentProvider
+  amount            Int             // Amount in smallest currency unit (cents, piasters, etc.)
+  currency          String          @db.VarChar(3) @default("USD")
+  status            PaymentStatus
+
+  // Provider references
+  providerPaymentId String?         // External payment ID from provider
+  providerOrderId   String?         // External order ID from provider
+
+  // Payment method details
+  paymentMethod     String?         // card, wallet, kiosk, apple_pay, google_pay, mada
+  last4             String?         // Last 4 digits of card
+  brand             String?         // Visa, Mastercard, Mada, etc.
+
+  // Kiosk specific (Paymob)
+  kioskBillRef      String?         // Reference number for kiosk payment
+  kioskExpiry       DateTime?       // Expiry datetime for kiosk payment
+
+  // Metadata
+  metadata          Json?
+  failureReason     String?
+  description       String?         // Payment description
+
+  createdAt         DateTime        @default(now())
+  paidAt            DateTime?
+  refundedAt        DateTime?
+
+  @@index([subscriptionId])
+  @@index([userId])
+  @@index([provider])
+  @@index([status])
+  @@index([providerPaymentId])
+  @@index([createdAt])
+}
+
+enum PaymentProvider {
+  STRIPE
+  PAYMOB
+  PAYTABS
+  PADDLE
+}
+
+enum PaymentStatus {
+  PENDING
+  PROCESSING
+  COMPLETED
+  FAILED
+  REFUNDED
+  CANCELLED
 }
 
 enum Plan {

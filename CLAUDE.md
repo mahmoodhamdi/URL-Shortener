@@ -57,6 +57,7 @@ npm run db:studio              # Open Prisma Studio
 | `auth/` | NextAuth.js v5 config with Google, GitHub, Credentials providers |
 | `analytics/` | Click tracking and device detection (ua-parser-js) |
 | `stripe/` | Stripe subscriptions, checkout, webhooks |
+| `payment/` | Multi-gateway payments (Stripe, Paymob, PayTabs, Paddle) |
 | `limits/` | Plan-based feature limit checking |
 | `rate-limit/` | API rate limiting per user/plan |
 | `targeting/` | Device/geo/browser-based URL targeting |
@@ -72,6 +73,7 @@ npm run db:studio              # Open Prisma Studio
 | `domains/` | Custom domain verification and SSL |
 | `security/` | SSRF protection for URL validation |
 | `firebase/` | Firebase Admin SDK, FCM push notifications, token management |
+| `api/` | Shared API utilities and response helpers |
 
 ### Key Patterns
 - **Internationalization**: Uses `next-intl` with locale routing (`/en/...`, `/ar/...`). Translation files in `src/messages/`. When adding UI text, update both `en.json` and `ar.json`. Use navigation exports from `src/i18n/routing.ts` (`Link`, `redirect`, `usePathname`, `useRouter`) instead of next/navigation.
@@ -86,7 +88,8 @@ npm run db:studio              # Open Prisma Studio
 ### Database Schema (Prisma)
 Key models (see `prisma/schema.prisma` for full schema):
 - `User`, `Account`, `Session` - NextAuth.js authentication
-- `Subscription` - Stripe subscription with plan, usage tracking
+- `Subscription` - Multi-gateway subscription with plan, usage tracking
+- `Payment` - Payment transaction history across all gateways
 - `Link` - Core model with shortCode, targeting, cloaking, deep linking
 - `Click` - Analytics with IP, country, device, browser, referrer
 - `LinkTarget` - Device/geo/browser targeting rules
@@ -107,6 +110,13 @@ Core:
 - `GET/PUT/DELETE /api/links/[id]` - Single link operations
 - `GET /api/links/[id]/stats` - Link statistics
 - `GET /api/r/[shortCode]` - Redirect handler with targeting
+
+Payment (Multi-Gateway):
+- `POST /api/payment/checkout` - Unified checkout with auto gateway selection
+- `GET /api/payment/methods` - Get available payment methods for region
+- `POST /api/payment/webhooks/paymob` - Paymob webhook handler
+- `POST /api/payment/webhooks/paytabs` - PayTabs webhook handler
+- `POST /api/payment/webhooks/paddle` - Paddle webhook handler
 
 Advanced Features:
 - `/api/links/[id]/targets` - Link targeting rules
@@ -137,6 +147,17 @@ OAuth (optional):
 Stripe (optional):
 - `STRIPE_SECRET_KEY`, `STRIPE_WEBHOOK_SECRET`
 - `NEXT_PUBLIC_STRIPE_PUBLISHABLE_KEY`
+
+Paymob (Egyptian payments, optional):
+- `PAYMOB_API_KEY`, `PAYMOB_INTEGRATION_ID_CARD`, `PAYMOB_HMAC_SECRET`
+- `PAYMOB_IFRAME_ID`, `PAYMOB_INTEGRATION_ID_WALLET`
+
+PayTabs (MENA region, optional):
+- `PAYTABS_PROFILE_ID`, `PAYTABS_SERVER_KEY`, `PAYTABS_REGION`
+
+Paddle (Global MoR, optional):
+- `PADDLE_API_KEY`, `PADDLE_VENDOR_ID`, `PADDLE_PUBLIC_KEY`
+- `NEXT_PUBLIC_PADDLE_CLIENT_TOKEN`, `PADDLE_ENVIRONMENT`
 
 Redis (optional):
 - `REDIS_URL` - Redis connection URL (falls back to in-memory rate limiting)

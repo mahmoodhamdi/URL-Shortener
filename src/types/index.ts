@@ -114,6 +114,11 @@ export type TimePeriod = '7d' | '30d' | '90d' | 'all';
 export type Plan = 'FREE' | 'STARTER' | 'PRO' | 'BUSINESS' | 'ENTERPRISE';
 export type SubscriptionStatus = 'ACTIVE' | 'CANCELED' | 'PAST_DUE' | 'TRIALING' | 'INCOMPLETE';
 
+// Payment types
+export type PaymentProvider = 'STRIPE' | 'PAYMOB' | 'PAYTABS' | 'PADDLE';
+export type PaymentStatus = 'PENDING' | 'PROCESSING' | 'COMPLETED' | 'FAILED' | 'REFUNDED' | 'CANCELLED';
+export type PaymentMethod = 'card' | 'wallet' | 'kiosk' | 'apple_pay' | 'google_pay' | 'mada' | 'bank_transfer';
+
 export interface User {
   id: string;
   name: string | null;
@@ -127,11 +132,65 @@ export interface Subscription {
   userId: string;
   plan: Plan;
   status: SubscriptionStatus;
+  paymentProvider: PaymentProvider;
+  // Stripe
   stripeCustomerId: string | null;
   stripeSubscriptionId: string | null;
+  // Paymob
+  paymobOrderId: string | null;
+  paymobTransactionId: string | null;
+  // PayTabs
+  paytabsCustomerRef: string | null;
+  paytabsTransactionRef: string | null;
+  // Paddle
+  paddleCustomerId: string | null;
+  paddleSubscriptionId: string | null;
+  // Billing
   currentPeriodStart: Date | null;
   currentPeriodEnd: Date | null;
+  cancelAtPeriodEnd: boolean;
   linksUsedThisMonth: number;
+}
+
+export interface Payment {
+  id: string;
+  subscriptionId: string | null;
+  userId: string;
+  provider: PaymentProvider;
+  amount: number;
+  currency: string;
+  status: PaymentStatus;
+  providerPaymentId: string | null;
+  providerOrderId: string | null;
+  paymentMethod: string | null;
+  last4: string | null;
+  brand: string | null;
+  kioskBillRef: string | null;
+  kioskExpiry: Date | null;
+  metadata: Record<string, unknown> | null;
+  failureReason: string | null;
+  description: string | null;
+  createdAt: Date;
+  paidAt: Date | null;
+  refundedAt: Date | null;
+}
+
+export interface CreatePaymentInput {
+  provider: PaymentProvider;
+  amount: number;
+  currency: string;
+  paymentMethod?: PaymentMethod;
+  description?: string;
+  metadata?: Record<string, unknown>;
+}
+
+export interface PaymentResult {
+  success: boolean;
+  paymentId?: string;
+  checkoutUrl?: string;
+  kioskBillRef?: string;
+  kioskExpiry?: Date;
+  error?: string;
 }
 
 export interface Folder {
