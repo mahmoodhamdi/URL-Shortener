@@ -6,6 +6,7 @@ import { useSession } from 'next-auth/react';
 import { Plan } from '@/types';
 import { PLANS } from '@/lib/stripe/plans';
 import { PlanCard } from './PlanCard';
+import { PaymentCheckout } from '@/components/payment';
 import { useTranslations } from 'next-intl';
 
 interface PricingTableProps {
@@ -18,7 +19,8 @@ export function PricingTable({ currentPlan, locale = 'en' }: PricingTableProps) 
   const router = useRouter();
   const { data: session } = useSession();
   const [billingPeriod, setBillingPeriod] = useState<'monthly' | 'yearly'>('monthly');
-  const [loadingPlan, setLoadingPlan] = useState<Plan | null>(null);
+  const [checkoutOpen, setCheckoutOpen] = useState(false);
+  const [selectedPlan, setSelectedPlan] = useState<Plan | null>(null);
 
   const handleSelectPlan = async (plan: Plan) => {
     if (plan === 'FREE') {
@@ -33,43 +35,19 @@ export function PricingTable({ currentPlan, locale = 'en' }: PricingTableProps) 
       return;
     }
 
-    setLoadingPlan(plan);
+    // Open the payment checkout dialog
+    setSelectedPlan(plan);
+    setCheckoutOpen(true);
+  };
 
-    try {
-      const response = await fetch('/api/stripe/checkout', {
-        method: 'POST',
-        headers: { 'Content-Type': 'application/json' },
-        body: JSON.stringify({ plan, billingPeriod }),
-      });
+  const handleCheckoutSuccess = () => {
+    setCheckoutOpen(false);
+    router.push(`/${locale}/dashboard?payment=success`);
+  };
 
-      const data = await response.json();
-
-      if (!response.ok) {
-        // Show specific error message based on error code
-        let errorMessage: string;
-        if (data.code === 'STRIPE_NOT_CONFIGURED') {
-          errorMessage = t('stripeNotConfigured');
-        } else if (data.code === 'PRICE_NOT_CONFIGURED') {
-          errorMessage = t('priceNotConfigured');
-        } else {
-          errorMessage = data.message || data.error || t('checkoutError');
-        }
-        console.error('Checkout error:', errorMessage, data);
-        alert(errorMessage);
-        return;
-      }
-
-      if (data.url) {
-        window.location.href = data.url;
-      } else {
-        throw new Error('No checkout URL returned');
-      }
-    } catch (error) {
-      console.error('Checkout error:', error);
-      alert(t('checkoutError'));
-    } finally {
-      setLoadingPlan(null);
-    }
+  const handleCheckoutCancel = () => {
+    setCheckoutOpen(false);
+    setSelectedPlan(null);
   };
 
   const plans: Plan[] = ['FREE', 'STARTER', 'PRO', 'BUSINESS', 'ENTERPRISE'];
@@ -113,7 +91,7 @@ export function PricingTable({ currentPlan, locale = 'en' }: PricingTableProps) 
             billingPeriod={billingPeriod}
             currentPlan={currentPlan}
             onSelect={handleSelectPlan}
-            isLoading={loadingPlan === plan}
+            isLoading={false}
           />
         ))}
       </div>
@@ -130,6 +108,18 @@ export function PricingTable({ currentPlan, locale = 'en' }: PricingTableProps) 
           {t('contactSales')}
         </a>
       </div>
+
+      {/* Payment Checkout Dialog */}
+      {selectedPlan && (
+        <PaymentCheckout
+          open={checkoutOpen}
+          onOpenChange={setCheckoutOpen}
+          planId={selectedPlan}
+          billingCycle={billingPeriod}
+          onSuccess={handleCheckoutSuccess}
+          onCancel={handleCheckoutCancel}
+        />
+      )}
     </div>
   );
 }
