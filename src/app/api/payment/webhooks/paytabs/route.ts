@@ -15,6 +15,41 @@ import {
 } from '@/lib/payment/handlers';
 import { PaymentStatus, PaymentProvider } from '@prisma/client';
 
+// Type definitions for PayTabs webhook data
+interface PayTabsUserDefined {
+  udf1?: string;
+  udf2?: string;
+  udf3?: string;
+}
+
+interface PayTabsPaymentResult {
+  response_status?: string;
+  response_code?: string;
+  response_message?: string;
+}
+
+interface PayTabsPaymentInfo {
+  payment_method?: string;
+  card_scheme?: string;
+  card_type?: string;
+}
+
+interface PayTabsCustomerDetails {
+  email?: string;
+}
+
+interface PayTabsWebhookData {
+  cart_id?: string;
+  cart_amount?: number;
+  cart_currency?: string;
+  tran_ref?: string;
+  customer_ref?: string;
+  user_defined?: PayTabsUserDefined;
+  payment_result?: PayTabsPaymentResult;
+  payment_info?: PayTabsPaymentInfo;
+  customer_details?: PayTabsCustomerDetails;
+}
+
 const gateway = new PayTabsGateway();
 
 export async function POST(request: NextRequest) {
@@ -34,7 +69,7 @@ export async function POST(request: NextRequest) {
     }
 
     const event = verification.event!;
-    const data = event.data;
+    const data = event.data as unknown as PayTabsWebhookData;
 
     // Extract user data from cart_id
     // Format: {userId}-{timestamp}
@@ -78,7 +113,7 @@ export async function POST(request: NextRequest) {
       await handleSubscriptionEvent({
         provider: PaymentProvider.PAYTABS,
         userId,
-        providerSubscriptionId: data.tran_ref,
+        providerSubscriptionId: data.tran_ref || '',
         providerCustomerId: data.customer_ref,
         plan: mapPlanId(planId),
         status: 'active',

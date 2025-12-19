@@ -306,7 +306,7 @@ export function PaymentCheckout({
           {(state === 'wallet' || state === 'wallet-success') && (
             <WalletPayment
               onSubmit={handleWalletSubmit}
-              isLoading={state === 'processing'}
+              isLoading={false}
               error={error}
               success={state === 'wallet-success'}
             />

@@ -17,6 +17,50 @@ import {
 } from '@/lib/payment/handlers';
 import { PaymentStatus, PaymentProvider } from '@prisma/client';
 
+// Type definitions for Paddle webhook data
+interface PaddleCustomData {
+  user_id?: string;
+  plan_id?: string;
+  billing_cycle?: string;
+}
+
+interface PaddleWebhookData {
+  id: string;
+  status?: string;
+  customer_id?: string;
+  currency_code?: string;
+  subscription_id?: string;
+  invoice_id?: string;
+  custom_data?: PaddleCustomData;
+  current_billing_period?: {
+    starts_at?: string;
+    ends_at?: string;
+  };
+  scheduled_change?: {
+    action?: string;
+  };
+  details?: {
+    totals?: {
+      total?: string;
+    };
+  };
+  items?: Array<{
+    price?: {
+      custom_data?: PaddleCustomData;
+    };
+  }>;
+  payments?: Array<{
+    method_details?: {
+      type?: string;
+      card?: {
+        last4?: string;
+        type?: string;
+      };
+    };
+    error_code?: string;
+  }>;
+}
+
 const gateway = new PaddleGateway();
 
 export async function POST(request: NextRequest) {
@@ -36,7 +80,7 @@ export async function POST(request: NextRequest) {
     }
 
     const event = verification.event!;
-    const data = event.data;
+    const data = event.data as unknown as PaddleWebhookData;
 
     // Extract user ID from custom_data
     const userId = data.custom_data?.user_id;

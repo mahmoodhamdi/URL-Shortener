@@ -5,7 +5,7 @@
  * These handlers update the database when payment events occur.
  */
 
-import { prisma } from '@/lib/prisma';
+import { prisma } from '@/lib/db/prisma';
 import { PaymentProvider, PaymentStatus, Plan } from '@prisma/client';
 
 export interface PaymentEventData {
@@ -96,7 +96,6 @@ export async function updatePaymentStatus(
     data: {
       status,
       failureReason,
-      updatedAt: new Date(),
     },
   });
 
@@ -153,16 +152,9 @@ export async function handleSubscriptionEvent(data: SubscriptionEventData): Prom
     console.log(`[Subscription] Created new subscription for user ${userId}`);
   }
 
-  // Update user's plan
+  // Log successful subscription update
   if (status === 'active') {
-    await prisma.user.update({
-      where: { id: userId },
-      data: {
-        plan,
-        updatedAt: new Date(),
-      },
-    });
-    console.log(`[User] Updated user ${userId} to plan ${plan}`);
+    console.log(`[Subscription] User ${userId} subscribed to plan ${plan}`);
   }
 }
 
@@ -186,20 +178,12 @@ export async function handleSubscriptionCancellation(
   }
 
   if (immediate) {
-    // Immediate cancellation - downgrade to FREE
+    // Immediate cancellation - downgrade subscription to FREE
     await prisma.subscription.update({
       where: { id: subscription.id },
       data: {
-        cancelAtPeriodEnd: false,
-        updatedAt: new Date(),
-      },
-    });
-
-    await prisma.user.update({
-      where: { id: subscription.userId },
-      data: {
         plan: 'FREE',
-        updatedAt: new Date(),
+        cancelAtPeriodEnd: false,
       },
     });
 
@@ -210,7 +194,6 @@ export async function handleSubscriptionCancellation(
       where: { id: subscription.id },
       data: {
         cancelAtPeriodEnd: true,
-        updatedAt: new Date(),
       },
     });
 

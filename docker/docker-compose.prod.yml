@@ -1,33 +1,69 @@
-version: '3.8'
-
 services:
-  app:
-    image: mwmsoftware/url-shortener:latest
+  url-shortener-app:
+    container_name: url-shortener-app-prod
+    image: url-shortener:prod
+    build:
+      context: ..
+      dockerfile: docker/Dockerfile
     ports:
-      - "3000:3000"
+      - "${APP_PORT:-3000}:3000"
     environment:
       - DATABASE_URL=${DATABASE_URL}
       - NEXT_PUBLIC_APP_URL=${NEXT_PUBLIC_APP_URL:-http://localhost:3000}
       - NODE_ENV=production
+      - AUTH_SECRET=${AUTH_SECRET}
+      # Stripe
+      - STRIPE_SECRET_KEY=${STRIPE_SECRET_KEY}
+      - STRIPE_WEBHOOK_SECRET=${STRIPE_WEBHOOK_SECRET}
+      - NEXT_PUBLIC_STRIPE_PUBLISHABLE_KEY=${NEXT_PUBLIC_STRIPE_PUBLISHABLE_KEY}
+      # Paymob
+      - PAYMOB_API_KEY=${PAYMOB_API_KEY}
+      - PAYMOB_INTEGRATION_ID_CARD=${PAYMOB_INTEGRATION_ID_CARD}
+      - PAYMOB_INTEGRATION_ID_WALLET=${PAYMOB_INTEGRATION_ID_WALLET}
+      - PAYMOB_HMAC_SECRET=${PAYMOB_HMAC_SECRET}
+      - PAYMOB_IFRAME_ID=${PAYMOB_IFRAME_ID}
+      # PayTabs
+      - PAYTABS_PROFILE_ID=${PAYTABS_PROFILE_ID}
+      - PAYTABS_SERVER_KEY=${PAYTABS_SERVER_KEY}
+      - PAYTABS_REGION=${PAYTABS_REGION}
+      # Paddle
+      - PADDLE_API_KEY=${PADDLE_API_KEY}
+      - PADDLE_VENDOR_ID=${PADDLE_VENDOR_ID}
+      - PADDLE_PUBLIC_KEY=${PADDLE_PUBLIC_KEY}
+      - PADDLE_ENVIRONMENT=${PADDLE_ENVIRONMENT:-production}
+      - NEXT_PUBLIC_PADDLE_CLIENT_TOKEN=${NEXT_PUBLIC_PADDLE_CLIENT_TOKEN}
     depends_on:
-      db:
+      url-shortener-db:
         condition: service_healthy
     restart: always
+    networks:
+      - url-shortener-network
 
-  db:
+  url-shortener-db:
+    container_name: url-shortener-db-prod
     image: postgres:15-alpine
+    ports:
+      - "${DB_PORT:-5432}:5432"
     environment:
       - POSTGRES_USER=${POSTGRES_USER:-postgres}
       - POSTGRES_PASSWORD=${POSTGRES_PASSWORD:-postgres}
       - POSTGRES_DB=${POSTGRES_DB:-urlshortener}
     volumes:
-      - postgres_data:/var/lib/postgresql/data
+      - url-shortener-postgres-data-prod:/var/lib/postgresql/data
     healthcheck:
-      test: ["CMD-SHELL", "pg_isready -U postgres"]
+      test: ["CMD-SHELL", "pg_isready -U ${POSTGRES_USER:-postgres}"]
       interval: 10s
       timeout: 5s
       retries: 5
     restart: always
+    networks:
+      - url-shortener-network
+
+networks:
+  url-shortener-network:
+    name: url-shortener-network-prod
+    driver: bridge
 
 volumes:
-  postgres_data:
+  url-shortener-postgres-data-prod:
+    name: url-shortener-postgres-data-prod

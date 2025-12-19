@@ -94,7 +94,8 @@ export class StripeGateway implements PaymentGateway {
         userId: params.userId,
         ...params.metadata,
       },
-      locale: params.locale === 'ar' ? 'ar' : 'en',
+      // Note: Stripe doesn't support 'ar' locale, defaulting to 'auto' for Arabic users
+      locale: params.locale === 'ar' ? 'auto' : 'en',
     });
 
     return {
@@ -284,7 +285,7 @@ export class StripeGateway implements PaymentGateway {
           id: event.id,
           type: event.type,
           provider: this.provider,
-          data: event.data.object as Record<string, unknown>,
+          data: event.data.object as unknown as Record<string, unknown>,
           timestamp: new Date(event.created * 1000),
         },
       };
@@ -299,15 +300,15 @@ export class StripeGateway implements PaymentGateway {
   async handleWebhook(event: WebhookEvent): Promise<void> {
     switch (event.type) {
       case 'customer.subscription.created':
-        await this.handleSubscriptionCreated(event.data as Stripe.Subscription);
+        await this.handleSubscriptionCreated(event.data as unknown as Stripe.Subscription);
         break;
 
       case 'customer.subscription.updated':
-        await this.handleSubscriptionUpdated(event.data as Stripe.Subscription);
+        await this.handleSubscriptionUpdated(event.data as unknown as Stripe.Subscription);
         break;
 
       case 'customer.subscription.deleted':
-        await this.handleSubscriptionDeleted(event.data as Stripe.Subscription);
+        await this.handleSubscriptionDeleted(event.data as unknown as Stripe.Subscription);
         break;
 
       case 'invoice.payment_succeeded':

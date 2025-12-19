@@ -19,6 +19,38 @@ import {
 } from '@/lib/payment/handlers';
 import { PaymentStatus, PaymentProvider } from '@prisma/client';
 
+// Type definitions for Paymob webhook data
+interface PaymobOrder {
+  id?: number;
+  merchant_order_id?: string;
+}
+
+interface PaymobSourceData {
+  type?: string;
+  sub_type?: string;
+  pan?: string;
+}
+
+interface PaymobPaymentKeyClaims {
+  billing_data?: {
+    last_name?: string;
+  };
+}
+
+interface PaymobWebhookData {
+  id?: number;
+  order?: PaymobOrder;
+  amount_cents?: number;
+  currency?: string;
+  source_data?: PaymobSourceData;
+  payment_key_claims?: PaymobPaymentKeyClaims;
+  integration_id?: string;
+  is_3d_secure?: boolean;
+  is_refunded?: boolean;
+  data_message?: string;
+  txn_response_code?: string;
+}
+
 const gateway = new PaymobGateway();
 
 export async function POST(request: NextRequest) {
@@ -38,7 +70,7 @@ export async function POST(request: NextRequest) {
     }
 
     const event = verification.event!;
-    const data = event.data;
+    const data = event.data as unknown as PaymobWebhookData;
 
     // Extract user data from Paymob's merchant_order_id
     // Format: {userId}-{timestamp}
@@ -77,7 +109,7 @@ export async function POST(request: NextRequest) {
       await handleSubscriptionEvent({
         provider: PaymentProvider.PAYMOB,
         userId,
-        providerSubscriptionId: data.order?.id?.toString() || data.id?.toString(),
+        providerSubscriptionId: data.order?.id?.toString() || data.id?.toString() || '',
         plan: mapPlanId(planId),
         status: 'active',
         currentPeriodStart: new Date(),

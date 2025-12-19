@@ -1,36 +1,48 @@
-version: '3.8'
-
 services:
-  app:
+  url-shortener-app:
+    container_name: url-shortener-app
+    image: url-shortener:dev
     build:
       context: ..
       dockerfile: docker/Dockerfile
     ports:
-      - "3000:3000"
+      - "${APP_PORT:-3000}:3000"
     environment:
-      - DATABASE_URL=postgresql://postgres:postgres@db:5432/urlshortener
-      - NEXT_PUBLIC_APP_URL=http://localhost:3000
+      - DATABASE_URL=postgresql://postgres:postgres@url-shortener-db:5432/urlshortener
+      - NEXT_PUBLIC_APP_URL=http://localhost:${APP_PORT:-3000}
+      - NODE_ENV=development
     depends_on:
-      db:
+      url-shortener-db:
         condition: service_healthy
     restart: unless-stopped
+    networks:
+      - url-shortener-network
 
-  db:
+  url-shortener-db:
+    container_name: url-shortener-db
     image: postgres:15-alpine
     ports:
-      - "5432:5432"
+      - "${DB_PORT:-5432}:5432"
     environment:
       - POSTGRES_USER=postgres
       - POSTGRES_PASSWORD=postgres
       - POSTGRES_DB=urlshortener
     volumes:
-      - postgres_data:/var/lib/postgresql/data
+      - url-shortener-postgres-data:/var/lib/postgresql/data
     healthcheck:
       test: ["CMD-SHELL", "pg_isready -U postgres"]
       interval: 10s
       timeout: 5s
       retries: 5
     restart: unless-stopped
+    networks:
+      - url-shortener-network
+
+networks:
+  url-shortener-network:
+    name: url-shortener-network
+    driver: bridge
 
 volumes:
-  postgres_data:
+  url-shortener-postgres-data:
+    name: url-shortener-postgres-data
