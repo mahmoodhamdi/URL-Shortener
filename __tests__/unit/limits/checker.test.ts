@@ -99,6 +99,40 @@ import {
   checkCustomDomainLimit,
 } from '@/lib/limits/checker';
 
+// Helper to create mock subscription with all required fields
+const createMockSubscription = (overrides: {
+  id?: string;
+  userId?: string;
+  plan?: 'FREE' | 'STARTER' | 'PRO' | 'BUSINESS' | 'ENTERPRISE';
+  status?: 'ACTIVE' | 'CANCELED' | 'PAST_DUE' | 'TRIALING' | 'INCOMPLETE';
+  linksUsedThisMonth?: number;
+  linksResetAt?: Date;
+} = {}) => ({
+  id: '1',
+  userId: 'user-1',
+  plan: 'FREE' as const,
+  status: 'ACTIVE' as const,
+  linksUsedThisMonth: 50,
+  linksResetAt: new Date(),
+  stripeCustomerId: null,
+  stripeSubscriptionId: null,
+  stripePriceId: null,
+  currentPeriodStart: null,
+  currentPeriodEnd: null,
+  cancelAtPeriodEnd: false,
+  createdAt: new Date(),
+  updatedAt: new Date(),
+  // Payment provider fields
+  paymentProvider: 'STRIPE' as const,
+  paymobOrderId: null,
+  paymobTransactionId: null,
+  paytabsCustomerRef: null,
+  paytabsTransactionRef: null,
+  paddleSubscriptionId: null,
+  paddleCustomerId: null,
+  ...overrides,
+});
+
 describe('Limits Checker', () => {
   beforeEach(() => {
     vi.clearAllMocks();
@@ -106,22 +140,9 @@ describe('Limits Checker', () => {
 
   describe('checkLinkLimit', () => {
     it('should allow link creation when under limit', async () => {
-      vi.mocked(prisma.subscription.findUnique).mockResolvedValue({
-        id: '1',
-        userId: 'user-1',
-        plan: 'FREE',
-        status: 'ACTIVE',
-        linksUsedThisMonth: 50,
-        linksResetAt: new Date(),
-        stripeCustomerId: null,
-        stripeSubscriptionId: null,
-        stripePriceId: null,
-        currentPeriodStart: null,
-        currentPeriodEnd: null,
-        cancelAtPeriodEnd: false,
-        createdAt: new Date(),
-        updatedAt: new Date(),
-      });
+      vi.mocked(prisma.subscription.findUnique).mockResolvedValue(
+        createMockSubscription({ linksUsedThisMonth: 50 })
+      );
 
       const result = await checkLinkLimit('user-1');
 
@@ -133,22 +154,9 @@ describe('Limits Checker', () => {
     });
 
     it('should deny link creation when at limit', async () => {
-      vi.mocked(prisma.subscription.findUnique).mockResolvedValue({
-        id: '1',
-        userId: 'user-1',
-        plan: 'FREE',
-        status: 'ACTIVE',
-        linksUsedThisMonth: 100,
-        linksResetAt: new Date(),
-        stripeCustomerId: null,
-        stripeSubscriptionId: null,
-        stripePriceId: null,
-        currentPeriodStart: null,
-        currentPeriodEnd: null,
-        cancelAtPeriodEnd: false,
-        createdAt: new Date(),
-        updatedAt: new Date(),
-      });
+      vi.mocked(prisma.subscription.findUnique).mockResolvedValue(
+        createMockSubscription({ linksUsedThisMonth: 100 })
+      );
 
       const result = await checkLinkLimit('user-1');
 
@@ -160,22 +168,9 @@ describe('Limits Checker', () => {
     });
 
     it('should always allow for unlimited plans', async () => {
-      vi.mocked(prisma.subscription.findUnique).mockResolvedValue({
-        id: '1',
-        userId: 'user-1',
-        plan: 'ENTERPRISE',
-        status: 'ACTIVE',
-        linksUsedThisMonth: 10000,
-        linksResetAt: new Date(),
-        stripeCustomerId: null,
-        stripeSubscriptionId: null,
-        stripePriceId: null,
-        currentPeriodStart: null,
-        currentPeriodEnd: null,
-        cancelAtPeriodEnd: false,
-        createdAt: new Date(),
-        updatedAt: new Date(),
-      });
+      vi.mocked(prisma.subscription.findUnique).mockResolvedValue(
+        createMockSubscription({ plan: 'ENTERPRISE', linksUsedThisMonth: 10000 })
+      );
 
       const result = await checkLinkLimit('user-1');
 
@@ -199,22 +194,9 @@ describe('Limits Checker', () => {
 
   describe('checkBulkLimit', () => {
     it('should allow bulk creation within per-request limit', async () => {
-      vi.mocked(prisma.subscription.findUnique).mockResolvedValue({
-        id: '1',
-        userId: 'user-1',
-        plan: 'FREE',
-        status: 'ACTIVE',
-        linksUsedThisMonth: 50,
-        linksResetAt: new Date(),
-        stripeCustomerId: null,
-        stripeSubscriptionId: null,
-        stripePriceId: null,
-        currentPeriodStart: null,
-        currentPeriodEnd: null,
-        cancelAtPeriodEnd: false,
-        createdAt: new Date(),
-        updatedAt: new Date(),
-      });
+      vi.mocked(prisma.subscription.findUnique).mockResolvedValue(
+        createMockSubscription({ linksUsedThisMonth: 50 })
+      );
 
       const result = await checkBulkLimit('user-1', 5);
 
@@ -222,22 +204,9 @@ describe('Limits Checker', () => {
     });
 
     it('should deny bulk creation exceeding per-request limit', async () => {
-      vi.mocked(prisma.subscription.findUnique).mockResolvedValue({
-        id: '1',
-        userId: 'user-1',
-        plan: 'FREE',
-        status: 'ACTIVE',
-        linksUsedThisMonth: 50,
-        linksResetAt: new Date(),
-        stripeCustomerId: null,
-        stripeSubscriptionId: null,
-        stripePriceId: null,
-        currentPeriodStart: null,
-        currentPeriodEnd: null,
-        cancelAtPeriodEnd: false,
-        createdAt: new Date(),
-        updatedAt: new Date(),
-      });
+      vi.mocked(prisma.subscription.findUnique).mockResolvedValue(
+        createMockSubscription({ linksUsedThisMonth: 50 })
+      );
 
       const result = await checkBulkLimit('user-1', 15);
 
@@ -246,22 +215,9 @@ describe('Limits Checker', () => {
     });
 
     it('should deny if bulk would exceed monthly limit', async () => {
-      vi.mocked(prisma.subscription.findUnique).mockResolvedValue({
-        id: '1',
-        userId: 'user-1',
-        plan: 'FREE',
-        status: 'ACTIVE',
-        linksUsedThisMonth: 95,
-        linksResetAt: new Date(),
-        stripeCustomerId: null,
-        stripeSubscriptionId: null,
-        stripePriceId: null,
-        currentPeriodStart: null,
-        currentPeriodEnd: null,
-        cancelAtPeriodEnd: false,
-        createdAt: new Date(),
-        updatedAt: new Date(),
-      });
+      vi.mocked(prisma.subscription.findUnique).mockResolvedValue(
+        createMockSubscription({ linksUsedThisMonth: 95 })
+      );
 
       const result = await checkBulkLimit('user-1', 10);
 
@@ -272,22 +228,9 @@ describe('Limits Checker', () => {
 
   describe('checkCustomDomainLimit', () => {
     it('should deny custom domains for free plan', async () => {
-      vi.mocked(prisma.subscription.findUnique).mockResolvedValue({
-        id: '1',
-        userId: 'user-1',
-        plan: 'FREE',
-        status: 'ACTIVE',
-        linksUsedThisMonth: 50,
-        linksResetAt: new Date(),
-        stripeCustomerId: null,
-        stripeSubscriptionId: null,
-        stripePriceId: null,
-        currentPeriodStart: null,
-        currentPeriodEnd: null,
-        cancelAtPeriodEnd: false,
-        createdAt: new Date(),
-        updatedAt: new Date(),
-      });
+      vi.mocked(prisma.subscription.findUnique).mockResolvedValue(
+        createMockSubscription({ linksUsedThisMonth: 50 })
+      );
       vi.mocked(prisma.customDomain.count).mockResolvedValue(0);
 
       const result = await checkCustomDomainLimit('user-1');
@@ -298,22 +241,9 @@ describe('Limits Checker', () => {
     });
 
     it('should allow custom domains for PRO plan', async () => {
-      vi.mocked(prisma.subscription.findUnique).mockResolvedValue({
-        id: '1',
-        userId: 'user-1',
-        plan: 'PRO',
-        status: 'ACTIVE',
-        linksUsedThisMonth: 50,
-        linksResetAt: new Date(),
-        stripeCustomerId: null,
-        stripeSubscriptionId: null,
-        stripePriceId: null,
-        currentPeriodStart: null,
-        currentPeriodEnd: null,
-        cancelAtPeriodEnd: false,
-        createdAt: new Date(),
-        updatedAt: new Date(),
-      });
+      vi.mocked(prisma.subscription.findUnique).mockResolvedValue(
+        createMockSubscription({ plan: 'PRO', linksUsedThisMonth: 50 })
+      );
       vi.mocked(prisma.customDomain.count).mockResolvedValue(1);
 
       const result = await checkCustomDomainLimit('user-1');
@@ -325,22 +255,9 @@ describe('Limits Checker', () => {
     });
 
     it('should deny when domain limit reached', async () => {
-      vi.mocked(prisma.subscription.findUnique).mockResolvedValue({
-        id: '1',
-        userId: 'user-1',
-        plan: 'PRO',
-        status: 'ACTIVE',
-        linksUsedThisMonth: 50,
-        linksResetAt: new Date(),
-        stripeCustomerId: null,
-        stripeSubscriptionId: null,
-        stripePriceId: null,
-        currentPeriodStart: null,
-        currentPeriodEnd: null,
-        cancelAtPeriodEnd: false,
-        createdAt: new Date(),
-        updatedAt: new Date(),
-      });
+      vi.mocked(prisma.subscription.findUnique).mockResolvedValue(
+        createMockSubscription({ plan: 'PRO', linksUsedThisMonth: 50 })
+      );
       vi.mocked(prisma.customDomain.count).mockResolvedValue(3);
 
       const result = await checkCustomDomainLimit('user-1');

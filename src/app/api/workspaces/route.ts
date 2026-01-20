@@ -1,11 +1,19 @@
 import { NextResponse } from 'next/server';
 import { auth } from '@/lib/auth';
+import { z } from 'zod';
 import { ApiError } from '@/lib/api/errors';
 import {
   createWorkspace,
   getUserWorkspaces,
   checkWorkspaceLimits,
 } from '@/lib/workspace';
+
+// Validation schema for creating workspace
+const createWorkspaceSchema = z.object({
+  name: z.string().min(1, 'Workspace name is required').max(100, 'Workspace name must be less than 100 characters'),
+  description: z.string().max(500).optional(),
+  logo: z.string().url().optional(),
+});
 
 /**
  * GET /api/workspaces
@@ -59,15 +67,14 @@ export async function POST(request: Request) {
     }
 
     const body = await request.json();
-    const { name, description, logo } = body;
 
-    if (!name || typeof name !== 'string' || name.trim().length === 0) {
-      return ApiError.validationError('Workspace name is required', { field: 'name' });
+    // Validate with Zod schema
+    const validation = createWorkspaceSchema.safeParse(body);
+    if (!validation.success) {
+      return ApiError.validationError('Invalid request', { details: validation.error.errors });
     }
 
-    if (name.length > 100) {
-      return ApiError.validationError('Workspace name must be less than 100 characters', { field: 'name' });
-    }
+    const { name, description, logo } = validation.data;
 
     const workspace = await createWorkspace(session.user.id, {
       name: name.trim(),

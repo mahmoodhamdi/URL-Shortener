@@ -1,6 +1,8 @@
 import { NextRequest, NextResponse } from 'next/server';
+import { auth } from '@/lib/auth';
 import { getLinkById } from '@/lib/url/shortener';
 import { getLinkStats } from '@/lib/analytics/tracker';
+import { ApiError } from '@/lib/api/errors';
 import type { TimePeriod } from '@/types';
 
 interface RouteContext {
@@ -12,6 +14,12 @@ export async function GET(
   { params }: RouteContext
 ) {
   try {
+    // Authentication check
+    const session = await auth();
+    if (!session?.user?.id) {
+      return ApiError.unauthorized();
+    }
+
     const { searchParams } = new URL(request.url);
     const period = (searchParams.get('period') as TimePeriod) || 'all';
 
@@ -24,6 +32,11 @@ export async function GET(
       );
     }
 
+    // Authorization check - verify user owns the link
+    if (link.userId !== session.user.id) {
+      return ApiError.forbidden('You do not have permission to view stats for this link');
+    }
+
     const stats = await getLinkStats(params.id, period);
 
     return NextResponse.json({
@@ -32,9 +45,6 @@ export async function GET(
     });
   } catch (error) {
     console.error('Get stats error:', error);
-    return NextResponse.json(
-      { error: 'Internal server error' },
-      { status: 500 }
-    );
+    return ApiError.internal();
   }
 }

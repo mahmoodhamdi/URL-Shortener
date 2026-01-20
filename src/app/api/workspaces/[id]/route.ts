@@ -1,5 +1,6 @@
 import { NextResponse } from 'next/server';
 import { auth } from '@/lib/auth';
+import { z } from 'zod';
 
 import {
   getWorkspaceById,
@@ -8,6 +9,13 @@ import {
   getUserRole,
   checkWorkspacePermission,
 } from '@/lib/workspace';
+
+// Validation schema for updating workspace
+const updateWorkspaceSchema = z.object({
+  name: z.string().min(1, 'Workspace name cannot be empty').max(100, 'Workspace name must be less than 100 characters').optional(),
+  description: z.string().max(500).nullable().optional(),
+  logo: z.string().url().nullable().optional(),
+});
 
 interface RouteParams {
   params: Promise<{ id: string }>;
@@ -79,32 +87,30 @@ export async function PUT(request: Request, { params }: RouteParams) {
     }
 
     const body = await request.json();
-    const { name, description, logo } = body;
+
+    // Validate with Zod schema
+    const validation = updateWorkspaceSchema.safeParse(body);
+    if (!validation.success) {
+      return NextResponse.json(
+        { error: 'Invalid request', details: validation.error.errors },
+        { status: 400 }
+      );
+    }
+
+    const { name, description, logo } = validation.data;
 
     const updateData: { name?: string; description?: string; logo?: string } = {};
 
     if (name !== undefined) {
-      if (typeof name !== 'string' || name.trim().length === 0) {
-        return NextResponse.json(
-          { error: 'Workspace name cannot be empty' },
-          { status: 400 }
-        );
-      }
-      if (name.length > 100) {
-        return NextResponse.json(
-          { error: 'Workspace name must be less than 100 characters' },
-          { status: 400 }
-        );
-      }
       updateData.name = name.trim();
     }
 
     if (description !== undefined) {
-      updateData.description = description?.trim() || null;
+      updateData.description = description?.trim() || undefined;
     }
 
     if (logo !== undefined) {
-      updateData.logo = logo || null;
+      updateData.logo = logo || undefined;
     }
 
     const workspace = await updateWorkspace(id, updateData);

@@ -1,4 +1,5 @@
 import { Metadata } from 'next';
+import { Suspense } from 'react';
 import { getTranslations } from 'next-intl/server';
 import { LoginForm } from '@/components/auth/LoginForm';
 
@@ -10,10 +11,25 @@ export async function generateMetadata(): Promise<Metadata> {
   };
 }
 
+function LoginFormFallback() {
+  return (
+    <div className="w-full max-w-md space-y-6 animate-pulse">
+      <div className="h-8 bg-muted rounded w-1/2 mx-auto" />
+      <div className="space-y-4">
+        <div className="h-10 bg-muted rounded" />
+        <div className="h-10 bg-muted rounded" />
+        <div className="h-10 bg-muted rounded" />
+      </div>
+    </div>
+  );
+}
+
 export default function LoginPage() {
   return (
     <div className="min-h-[80vh] flex items-center justify-center px-4 py-12">
-      <LoginForm />
+      <Suspense fallback={<LoginFormFallback />}>
+        <LoginForm />
+      </Suspense>
     </div>
   );
 }

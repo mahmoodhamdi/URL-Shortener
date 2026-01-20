@@ -26,11 +26,12 @@ npx vitest run path/to/test.test.ts --config vitest.config.ts
 # Run single integration test file (uses 30s timeout)
 npx vitest run path/to/test.test.ts --config vitest.integration.config.ts
 
-# Run single E2E test file (requires dev server running)
+# Run single E2E test file (auto-starts dev server or reuses existing)
 npx playwright test path/to/test.spec.ts
 
 # Run E2E tests with specific browser
 npx playwright test --project=chromium
+# Available projects: chromium, "Mobile Chrome"
 
 # Database (Prisma + PostgreSQL)
 npm run db:generate            # Generate Prisma client
@@ -139,9 +140,9 @@ Advanced Features:
 - `/api/extension/` - Browser extension endpoints
 
 ### Testing Structure
-- Unit tests: `__tests__/unit/` - Test isolated utilities (`vitest.config.ts`)
-- Integration tests: `__tests__/integration/` - Test with database (`vitest.integration.config.ts`, 30s timeout)
-- E2E tests: `__tests__/e2e/` - Playwright browser tests (Chromium + Mobile Chrome)
+- Unit tests: `__tests__/unit/` - 1054 tests for isolated utilities (`vitest.config.ts`)
+- Integration tests: `__tests__/integration/` - 218 tests with database (`vitest.integration.config.ts`, 30s timeout)
+- E2E tests: `__tests__/e2e/` - 16 Playwright test files (Chromium + Mobile Chrome)
 - Test setup: `src/test/setup.ts` - Testing Library and DOM matchers
 
 ## Environment Variables

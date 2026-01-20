@@ -1,6 +1,7 @@
 import { NextResponse } from 'next/server';
 import { auth } from '@/lib/auth';
 import { prisma } from '@/lib/db/prisma';
+import { z } from 'zod';
 import {
   checkTargetingLimit,
   createLinkTarget,
@@ -9,6 +10,15 @@ import {
 import { isValidTargetValue, normalizeTargetValue } from '@/lib/targeting/matcher';
 import { validateUrl } from '@/lib/url/validator';
 import type { TargetType } from '@/types';
+
+// Validation schema for creating a target
+const createTargetSchema = z.object({
+  type: z.enum(['DEVICE', 'OS', 'BROWSER', 'COUNTRY', 'LANGUAGE']),
+  value: z.string().min(1).max(50),
+  targetUrl: z.string().url({ message: 'Invalid target URL' }),
+  priority: z.number().int().min(0).max(100).optional().default(0),
+  isActive: z.boolean().optional().default(true),
+});
 
 interface RouteParams {
   params: Promise<{ id: string }>;
@@ -90,35 +100,28 @@ export async function POST(request: Request, { params }: RouteParams) {
       );
     }
 
-    // Parse request body
+    // Parse and validate request body with Zod
     const body = await request.json();
-    const { type, value, targetUrl, priority, isActive } = body;
+    const validation = createTargetSchema.safeParse(body);
 
-    // Validate type
-    const validTypes: TargetType[] = ['DEVICE', 'OS', 'BROWSER', 'COUNTRY', 'LANGUAGE'];
-    if (!type || !validTypes.includes(type)) {
+    if (!validation.success) {
       return NextResponse.json(
-        { error: 'Invalid target type' },
+        { error: 'Invalid request', details: validation.error.errors },
         { status: 400 }
       );
     }
 
-    // Validate value
-    if (!value || !isValidTargetValue(type, value)) {
+    const { type, value, targetUrl, priority, isActive } = validation.data;
+
+    // Validate value matches the type
+    if (!isValidTargetValue(type, value)) {
       return NextResponse.json(
         { error: 'Invalid target value for this type' },
         { status: 400 }
       );
     }
 
-    // Validate target URL
-    if (!targetUrl) {
-      return NextResponse.json(
-        { error: 'Target URL is required' },
-        { status: 400 }
-      );
-    }
-
+    // Additional URL validation
     const urlValidation = validateUrl(targetUrl);
     if (!urlValidation.isValid) {
       return NextResponse.json(

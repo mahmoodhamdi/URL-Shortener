@@ -1,6 +1,7 @@
 import { NextRequest, NextResponse } from 'next/server';
 import { auth } from '@/lib/auth';
 import { prisma } from '@/lib/db/prisma';
+import { z } from 'zod';
 import {
   createBioPage,
   getUserBioPages,
@@ -9,6 +10,18 @@ import {
   isSlugAvailable,
 } from '@/lib/bio-page';
 import { Plan } from '@/types';
+
+// Validation schema for bio page creation
+const createBioPageSchema = z.object({
+  slug: z.string().min(3).max(30).regex(/^[a-zA-Z0-9_-]+$/, {
+    message: 'Slug must contain only alphanumeric characters, hyphens, or underscores',
+  }),
+  title: z.string().min(1).max(100),
+  bio: z.string().max(500).optional(),
+  avatar: z.string().url().optional(),
+  theme: z.enum(['DEFAULT', 'DARK', 'LIGHT', 'GRADIENT', 'MINIMAL', 'COLORFUL']).optional(),
+  socialLinks: z.record(z.string().url()).optional(),
+});
 
 // GET /api/bio - List user's bio pages
 export async function GET() {
@@ -62,17 +75,19 @@ export async function POST(request: NextRequest) {
     }
 
     const body = await request.json();
-    const { slug, title, bio, avatar, theme, socialLinks } = body;
 
-    // Validate required fields
-    if (!slug || !title) {
+    // Validate with Zod schema
+    const validation = createBioPageSchema.safeParse(body);
+    if (!validation.success) {
       return NextResponse.json(
-        { error: 'Slug and title are required' },
+        { error: 'Invalid request', details: validation.error.errors },
         { status: 400 }
       );
     }
 
-    // Validate slug format
+    const { slug, title, bio, avatar, theme, socialLinks } = validation.data;
+
+    // Validate slug format with additional checks
     if (!isValidSlug(slug)) {
       return NextResponse.json(
         { error: 'Invalid slug format. Use 3-30 alphanumeric characters, hyphens, or underscores.' },

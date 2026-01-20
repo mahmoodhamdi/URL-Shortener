@@ -1,5 +1,6 @@
 import { NextResponse } from 'next/server';
 import { auth } from '@/lib/auth';
+import { z } from 'zod';
 
 import { checkWorkspacePermission, checkMemberLimits, getWorkspaceById } from '@/lib/workspace';
 import {
@@ -9,6 +10,12 @@ import {
   isAlreadyMember,
 } from '@/lib/workspace/invitations';
 import type { WorkspaceRole } from '@/lib/workspace/permissions';
+
+// Validation schema for creating invitation
+const createInvitationSchema = z.object({
+  email: z.string().email('Invalid email address'),
+  role: z.enum(['ADMIN', 'MEMBER', 'VIEWER']).default('MEMBER'),
+});
 
 interface RouteParams {
   params: Promise<{ id: string }>;
@@ -73,26 +80,17 @@ export async function POST(request: Request, { params }: RouteParams) {
     }
 
     const body = await request.json();
-    const { email, role = 'MEMBER' } = body;
 
-    // Validate email
-    if (!email || typeof email !== 'string') {
-      return NextResponse.json({ error: 'Email is required' }, { status: 400 });
-    }
-
-    const emailRegex = /^[^\s@]+@[^\s@]+\.[^\s@]+$/;
-    if (!emailRegex.test(email)) {
-      return NextResponse.json({ error: 'Invalid email address' }, { status: 400 });
-    }
-
-    // Validate role
-    const validRoles: WorkspaceRole[] = ['ADMIN', 'MEMBER', 'VIEWER'];
-    if (!validRoles.includes(role)) {
+    // Validate with Zod schema
+    const validation = createInvitationSchema.safeParse(body);
+    if (!validation.success) {
       return NextResponse.json(
-        { error: 'Invalid role. Must be ADMIN, MEMBER, or VIEWER' },
+        { error: 'Invalid request', details: validation.error.errors },
         { status: 400 }
       );
     }
+
+    const { email, role } = validation.data;
 
     // Get workspace to check owner
     const workspace = await getWorkspaceById(id);

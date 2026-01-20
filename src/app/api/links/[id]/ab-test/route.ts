@@ -1,6 +1,7 @@
 import { NextRequest, NextResponse } from 'next/server';
 import { auth } from '@/lib/auth';
 import { prisma } from '@/lib/db/prisma';
+import { z } from 'zod';
 import {
   createABTest,
   getABTestByLinkId,
@@ -10,6 +11,25 @@ import {
   canAddVariant,
 } from '@/lib/ab-testing';
 import { Plan } from '@/types';
+
+// Validation schema for A/B test variant
+const variantSchema = z.object({
+  name: z.string().min(1, 'Variant name is required').max(100),
+  url: z.string().url('Invalid variant URL'),
+  weight: z.number().int().min(1).max(100, 'Weight must be between 1 and 100'),
+});
+
+// Validation schema for creating A/B test
+const createABTestSchema = z.object({
+  name: z.string().min(1).max(100).optional(),
+  variants: z.array(variantSchema).min(2, 'At least 2 variants are required'),
+});
+
+// Validation schema for updating A/B test
+const updateABTestSchema = z.object({
+  name: z.string().min(1).max(100).optional(),
+  isActive: z.boolean().optional(),
+});
 
 interface RouteContext {
   params: { id: string };
@@ -119,15 +139,17 @@ export async function POST(
     }
 
     const body = await request.json();
-    const { name, variants } = body;
 
-    // Validate variants
-    if (!variants || !Array.isArray(variants) || variants.length < 2) {
+    // Validate with Zod schema
+    const validation = createABTestSchema.safeParse(body);
+    if (!validation.success) {
       return NextResponse.json(
-        { error: 'At least 2 variants are required' },
+        { error: 'Invalid request', details: validation.error.errors },
         { status: 400 }
       );
     }
+
+    const { name, variants } = validation.data;
 
     // Check variant limit
     const variantCheck = canAddVariant(variants.length, plan);
@@ -136,22 +158,6 @@ export async function POST(
         { error: variantCheck.reason },
         { status: 403 }
       );
-    }
-
-    // Validate each variant
-    for (const variant of variants) {
-      if (!variant.name || !variant.url) {
-        return NextResponse.json(
-          { error: 'Each variant must have a name and URL' },
-          { status: 400 }
-        );
-      }
-      if (typeof variant.weight !== 'number' || variant.weight < 1 || variant.weight > 100) {
-        return NextResponse.json(
-          { error: 'Variant weight must be between 1 and 100' },
-          { status: 400 }
-        );
-      }
     }
 
     const test = await createABTest({
@@ -209,7 +215,17 @@ export async function PUT(
     }
 
     const body = await request.json();
-    const { name, isActive } = body;
+
+    // Validate with Zod schema
+    const validation = updateABTestSchema.safeParse(body);
+    if (!validation.success) {
+      return NextResponse.json(
+        { error: 'Invalid request', details: validation.error.errors },
+        { status: 400 }
+      );
+    }
+
+    const { name, isActive } = validation.data;
 
     const test = await updateABTest(existingTest.id, { name, isActive });
 
