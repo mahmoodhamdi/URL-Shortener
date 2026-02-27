@@ -1,0 +1,97 @@
+# Page snapshot
+
+```yaml
+- generic [ref=e1]:
+  - generic [ref=e2]:
+    - banner [ref=e3]:
+      - generic [ref=e4]:
+        - generic [ref=e5]:
+          - link "URL Shortener" [ref=e6] [cursor=pointer]:
+            - /url: /en
+            - img [ref=e7]
+            - generic [ref=e10]: URL Shortener
+          - navigation [ref=e11]:
+            - link "Home" [ref=e12] [cursor=pointer]:
+              - /url: /en
+              - img [ref=e13]
+              - text: Home
+            - link "Dashboard" [ref=e16] [cursor=pointer]:
+              - /url: /en/dashboard
+              - img [ref=e17]
+              - text: Dashboard
+            - link "Bulk Shorten" [ref=e22] [cursor=pointer]:
+              - /url: /en/bulk
+              - img [ref=e23]
+              - text: Bulk Shorten
+            - link "Pricing" [active] [ref=e27] [cursor=pointer]:
+              - /url: /en/pricing
+              - img [ref=e28]
+              - text: Pricing
+            - link "API Docs" [ref=e30] [cursor=pointer]:
+              - /url: /en/api-docs
+              - img [ref=e31]
+              - text: API Docs
+        - generic [ref=e37]:
+          - button "Change language" [ref=e38] [cursor=pointer]:
+            - img [ref=e39]
+          - button "Switch to dark mode" [ref=e43] [cursor=pointer]:
+            - img [ref=e44]
+          - generic [ref=e46]:
+            - link "Sign In" [ref=e47] [cursor=pointer]:
+              - /url: /en/login
+            - link "Sign Up" [ref=e48] [cursor=pointer]:
+              - /url: /en/register
+    - main [ref=e49]:
+      - generic [ref=e50]:
+        - generic [ref=e51]:
+          - heading "Shorten Your URLs" [level=1] [ref=e52]
+          - paragraph [ref=e53]: Create short, memorable links in seconds
+        - generic [ref=e56]:
+          - generic [ref=e57]:
+            - generic [ref=e58]: URL
+            - generic [ref=e59]:
+              - img [ref=e60]
+              - textbox "URL" [ref=e63]:
+                - /placeholder: Paste your long URL here...
+          - button "Customize" [ref=e64] [cursor=pointer]:
+            - text: Customize
+            - img [ref=e65]
+          - generic [ref=e67]:
+            - text: Custom alias (optional)
+            - textbox "Custom alias (optional)" [ref=e68]:
+              - /placeholder: my-custom-link
+          - button "Shorten URL" [disabled]
+        - generic [ref=e70]:
+          - generic [ref=e71]:
+            - img [ref=e73]
+            - heading "Lightning Fast" [level=3] [ref=e75]
+            - paragraph [ref=e76]: Generate short URLs instantly
+          - generic [ref=e77]:
+            - img [ref=e79]
+            - heading "Detailed Analytics" [level=3] [ref=e81]
+            - paragraph [ref=e82]: Track clicks, locations, and devices
+          - generic [ref=e83]:
+            - img [ref=e85]
+            - heading "QR Codes" [level=3] [ref=e91]
+            - paragraph [ref=e92]: Generate QR codes for any link
+          - generic [ref=e93]:
+            - img [ref=e95]
+            - heading "Secure" [level=3] [ref=e97]
+            - paragraph [ref=e98]: Password protect your links
+    - contentinfo [ref=e99]:
+      - generic [ref=e101]:
+        - generic [ref=e102]:
+          - img [ref=e103]
+          - generic [ref=e106]: URL Shortener
+        - navigation [ref=e107]:
+          - link "Privacy Policy" [ref=e108] [cursor=pointer]:
+            - /url: /en
+          - link "Terms of Service" [ref=e109] [cursor=pointer]:
+            - /url: /en
+          - link "Contact" [ref=e110] [cursor=pointer]:
+            - /url: /en
+        - paragraph [ref=e111]: © 2026 URL Shortener. All rights reserved.
+  - region "Notifications (F8)":
+    - list
+  - alert [ref=e112]
+```

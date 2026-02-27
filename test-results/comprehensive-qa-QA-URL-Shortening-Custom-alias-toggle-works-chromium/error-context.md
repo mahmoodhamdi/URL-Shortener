@@ -1,0 +1,92 @@
+# Page snapshot
+
+```yaml
+- generic [active] [ref=e1]:
+  - generic [ref=e2]:
+    - banner [ref=e3]:
+      - generic [ref=e4]:
+        - generic [ref=e5]:
+          - link "URL Shortener" [ref=e6] [cursor=pointer]:
+            - /url: /en
+            - img [ref=e7]
+            - generic [ref=e10]: URL Shortener
+          - navigation [ref=e11]:
+            - link "Home" [ref=e12] [cursor=pointer]:
+              - /url: /en
+              - img [ref=e13]
+              - text: Home
+            - link "Dashboard" [ref=e16] [cursor=pointer]:
+              - /url: /en/dashboard
+              - img [ref=e17]
+              - text: Dashboard
+            - link "Bulk Shorten" [ref=e22] [cursor=pointer]:
+              - /url: /en/bulk
+              - img [ref=e23]
+              - text: Bulk Shorten
+            - link "Pricing" [ref=e27] [cursor=pointer]:
+              - /url: /en/pricing
+              - img [ref=e28]
+              - text: Pricing
+            - link "API Docs" [ref=e30] [cursor=pointer]:
+              - /url: /en/api-docs
+              - img [ref=e31]
+              - text: API Docs
+        - generic [ref=e37]:
+          - button "Change language" [ref=e38] [cursor=pointer]:
+            - img [ref=e39]
+          - button "Switch to dark mode" [ref=e43] [cursor=pointer]:
+            - img [ref=e44]
+    - main [ref=e47]:
+      - generic [ref=e48]:
+        - generic [ref=e49]:
+          - heading "Shorten Your URLs" [level=1] [ref=e50]
+          - paragraph [ref=e51]: Create short, memorable links in seconds
+        - generic [ref=e54]:
+          - generic [ref=e55]:
+            - generic [ref=e56]: URL
+            - generic [ref=e57]:
+              - img [ref=e58]
+              - textbox "URL" [ref=e61]:
+                - /placeholder: Paste your long URL here...
+          - button "Customize" [ref=e62] [cursor=pointer]:
+            - text: Customize
+            - img [ref=e63]
+          - generic [ref=e65]:
+            - text: Custom alias (optional)
+            - textbox "Custom alias (optional)" [ref=e66]:
+              - /placeholder: my-custom-link
+          - button "Shorten URL" [disabled]
+        - generic [ref=e68]:
+          - generic [ref=e69]:
+            - img [ref=e71]
+            - heading "Lightning Fast" [level=3] [ref=e73]
+            - paragraph [ref=e74]: Generate short URLs instantly
+          - generic [ref=e75]:
+            - img [ref=e77]
+            - heading "Detailed Analytics" [level=3] [ref=e79]
+            - paragraph [ref=e80]: Track clicks, locations, and devices
+          - generic [ref=e81]:
+            - img [ref=e83]
+            - heading "QR Codes" [level=3] [ref=e89]
+            - paragraph [ref=e90]: Generate QR codes for any link
+          - generic [ref=e91]:
+            - img [ref=e93]
+            - heading "Secure" [level=3] [ref=e95]
+            - paragraph [ref=e96]: Password protect your links
+    - contentinfo [ref=e97]:
+      - generic [ref=e99]:
+        - generic [ref=e100]:
+          - img [ref=e101]
+          - generic [ref=e104]: URL Shortener
+        - navigation [ref=e105]:
+          - link "Privacy Policy" [ref=e106] [cursor=pointer]:
+            - /url: /en
+          - link "Terms of Service" [ref=e107] [cursor=pointer]:
+            - /url: /en
+          - link "Contact" [ref=e108] [cursor=pointer]:
+            - /url: /en
+        - paragraph [ref=e109]: © 2026 URL Shortener. All rights reserved.
+  - region "Notifications (F8)":
+    - list
+  - alert [ref=e110]
+```

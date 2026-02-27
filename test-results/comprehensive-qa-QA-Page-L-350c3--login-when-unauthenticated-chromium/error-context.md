@@ -1,0 +1,95 @@
+# Page snapshot
+
+```yaml
+- generic [active] [ref=e1]:
+  - generic [ref=e2]:
+    - banner [ref=e3]:
+      - generic [ref=e4]:
+        - generic [ref=e5]:
+          - link "URL Shortener" [ref=e6] [cursor=pointer]:
+            - /url: /en
+            - img [ref=e7]
+            - generic [ref=e10]: URL Shortener
+          - navigation [ref=e11]:
+            - link "Home" [ref=e12] [cursor=pointer]:
+              - /url: /en
+              - img [ref=e13]
+              - text: Home
+            - link "Dashboard" [ref=e16] [cursor=pointer]:
+              - /url: /en/dashboard
+              - img [ref=e17]
+              - text: Dashboard
+            - link "Bulk Shorten" [ref=e22] [cursor=pointer]:
+              - /url: /en/bulk
+              - img [ref=e23]
+              - text: Bulk Shorten
+            - link "Pricing" [ref=e27] [cursor=pointer]:
+              - /url: /en/pricing
+              - img [ref=e28]
+              - text: Pricing
+            - link "API Docs" [ref=e30] [cursor=pointer]:
+              - /url: /en/api-docs
+              - img [ref=e31]
+              - text: API Docs
+        - generic [ref=e37]:
+          - button "Change language" [ref=e38] [cursor=pointer]:
+            - img [ref=e39]
+          - button "Switch to dark mode" [ref=e43] [cursor=pointer]:
+            - img [ref=e44]
+    - main [ref=e47]:
+      - generic [ref=e48]:
+        - generic [ref=e49]:
+          - heading "Your Links" [level=1] [ref=e50]
+          - paragraph [ref=e51]: Manage all your shortened URLs
+        - generic [ref=e52]:
+          - generic [ref=e54]:
+            - img [ref=e56]
+            - generic [ref=e59]:
+              - paragraph [ref=e60]: "0"
+              - paragraph [ref=e61]: Total Links
+          - generic [ref=e63]:
+            - img [ref=e65]
+            - generic [ref=e71]:
+              - paragraph [ref=e72]: "0"
+              - paragraph [ref=e73]: Total Clicks
+          - generic [ref=e75]:
+            - img [ref=e77]
+            - generic [ref=e80]:
+              - paragraph [ref=e81]: "0"
+              - paragraph [ref=e82]: Active Links
+          - generic [ref=e84]:
+            - img [ref=e86]
+            - generic [ref=e90]:
+              - paragraph [ref=e91]: "0"
+              - paragraph [ref=e92]: Expired Links
+        - generic [ref=e93]:
+          - generic [ref=e94]:
+            - generic [ref=e95]:
+              - img [ref=e96]
+              - textbox "Search links..." [ref=e99]
+            - button "Search" [ref=e100] [cursor=pointer]
+          - generic [ref=e101]:
+            - combobox [ref=e102] [cursor=pointer]:
+              - generic: Date Created
+              - img [ref=e103]
+            - combobox [ref=e105] [cursor=pointer]:
+              - generic: All
+              - img [ref=e106]
+        - img [ref=e109]
+    - contentinfo [ref=e111]:
+      - generic [ref=e113]:
+        - generic [ref=e114]:
+          - img [ref=e115]
+          - generic [ref=e118]: URL Shortener
+        - navigation [ref=e119]:
+          - link "Privacy Policy" [ref=e120] [cursor=pointer]:
+            - /url: /en
+          - link "Terms of Service" [ref=e121] [cursor=pointer]:
+            - /url: /en
+          - link "Contact" [ref=e122] [cursor=pointer]:
+            - /url: /en
+        - paragraph [ref=e123]: © 2026 URL Shortener. All rights reserved.
+  - region "Notifications (F8)":
+    - list
+  - alert [ref=e124]
+```

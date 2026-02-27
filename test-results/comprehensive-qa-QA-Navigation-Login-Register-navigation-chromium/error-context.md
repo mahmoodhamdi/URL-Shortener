@@ -1,0 +1,95 @@
+# Page snapshot
+
+```yaml
+- generic [ref=e1]:
+  - generic [ref=e2]:
+    - banner [ref=e3]:
+      - generic [ref=e4]:
+        - generic [ref=e5]:
+          - link "URL Shortener" [ref=e6] [cursor=pointer]:
+            - /url: /en
+            - img [ref=e7]
+            - generic [ref=e10]: URL Shortener
+          - navigation [ref=e11]:
+            - link "Home" [ref=e12] [cursor=pointer]:
+              - /url: /en
+              - img [ref=e13]
+              - text: Home
+            - link "Dashboard" [ref=e16] [cursor=pointer]:
+              - /url: /en/dashboard
+              - img [ref=e17]
+              - text: Dashboard
+            - link "Bulk Shorten" [ref=e22] [cursor=pointer]:
+              - /url: /en/bulk
+              - img [ref=e23]
+              - text: Bulk Shorten
+            - link "Pricing" [ref=e27] [cursor=pointer]:
+              - /url: /en/pricing
+              - img [ref=e28]
+              - text: Pricing
+            - link "API Docs" [ref=e30] [cursor=pointer]:
+              - /url: /en/api-docs
+              - img [ref=e31]
+              - text: API Docs
+        - generic [ref=e37]:
+          - button "Change language" [ref=e38] [cursor=pointer]:
+            - img [ref=e39]
+          - button "Switch to dark mode" [ref=e43] [cursor=pointer]:
+            - img [ref=e44]
+          - generic [ref=e46]:
+            - link "Sign In" [ref=e47] [cursor=pointer]:
+              - /url: /en/login
+            - link "Sign Up" [active] [ref=e48] [cursor=pointer]:
+              - /url: /en/register
+    - main [ref=e49]:
+      - generic [ref=e51]:
+        - generic [ref=e52]:
+          - heading "Sign In" [level=3] [ref=e53]
+          - paragraph [ref=e54]: Sign in to access your dashboard and links
+        - generic [ref=e55]:
+          - generic [ref=e56]:
+            - button "Google" [ref=e57] [cursor=pointer]:
+              - img [ref=e58]
+              - text: Google
+            - button "GitHub" [ref=e63] [cursor=pointer]:
+              - img [ref=e64]
+              - text: GitHub
+          - generic [ref=e71]: Or continue with
+          - generic [ref=e72]:
+            - generic [ref=e73]:
+              - text: Email
+              - generic [ref=e74]:
+                - img [ref=e75]
+                - textbox "Email" [ref=e78]:
+                  - /placeholder: name@example.com
+            - generic [ref=e79]:
+              - generic [ref=e80]:
+                - generic [ref=e81]: Password
+                - link "Forgot password?" [ref=e82] [cursor=pointer]:
+                  - /url: /en/forgot-password
+              - generic [ref=e83]:
+                - img [ref=e84]
+                - textbox "Password" [ref=e87]:
+                  - /placeholder: Enter your password
+            - button "Sign In" [ref=e88] [cursor=pointer]
+        - paragraph [ref=e90]:
+          - text: Don't have an account?
+          - link "Sign Up" [ref=e91] [cursor=pointer]:
+            - /url: /en/register
+    - contentinfo [ref=e92]:
+      - generic [ref=e94]:
+        - generic [ref=e95]:
+          - img [ref=e96]
+          - generic [ref=e99]: URL Shortener
+        - navigation [ref=e100]:
+          - link "Privacy Policy" [ref=e101] [cursor=pointer]:
+            - /url: /en
+          - link "Terms of Service" [ref=e102] [cursor=pointer]:
+            - /url: /en
+          - link "Contact" [ref=e103] [cursor=pointer]:
+            - /url: /en
+        - paragraph [ref=e104]: © 2026 URL Shortener. All rights reserved.
+  - region "Notifications (F8)":
+    - list
+  - alert [ref=e105]
+```

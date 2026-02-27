@@ -1,7 +1,7 @@
 'use client';
 
 import { useState, useEffect, useCallback, useMemo } from 'react';
-import { useTranslations } from 'next-intl';
+import { useTranslations, useLocale } from 'next-intl';
 import { Input } from '@/components/ui/input';
 import { Button } from '@/components/ui/button';
 import { Card, CardContent } from '@/components/ui/card';
@@ -20,6 +20,7 @@ import type { Link, SortOption, FilterOption } from '@/types';
 
 function DashboardContent() {
   const t = useTranslations();
+  const locale = useLocale();
   const [links, setLinks] = useState<Link[]>([]);
   const [loading, setLoading] = useState(true);
   const [search, setSearch] = useState('');
@@ -35,14 +36,29 @@ function DashboardContent() {
       if (filter && filter !== 'all') params.set('filter', filter);
 
       const response = await fetch(`/api/links?${params}`);
+
+      if (!response.ok) {
+        // Handle unauthorized or other errors gracefully
+        if (response.status === 401) {
+          // User is not authenticated - redirect to login with locale
+          window.location.href = `/${locale}/login`;
+          return;
+        }
+        console.error('Failed to fetch links:', response.status);
+        setLinks([]);
+        return;
+      }
+
       const data = await response.json();
-      setLinks(data);
+      // Ensure data is an array before setting
+      setLinks(Array.isArray(data) ? data : []);
     } catch (error) {
       console.error('Failed to fetch links:', error);
+      setLinks([]);
     } finally {
       setLoading(false);
     }
-  }, [search, sort, filter]);
+  }, [search, sort, filter, locale]);
 
   useEffect(() => {
     fetchLinks();

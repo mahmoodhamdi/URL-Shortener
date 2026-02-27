@@ -66,11 +66,12 @@ npm run db:studio              # Open Prisma Studio
 |--------|---------|
 | `url/` | URL shortening, validation (Zod), QR generation, UTM params |
 | `auth/` | NextAuth.js v5 config with Google, GitHub, Credentials providers |
+| `db/prisma.ts` | Prisma client singleton (import as `import { prisma } from '@/lib/db/prisma'`) |
 | `analytics/` | Click tracking and device detection (ua-parser-js) |
 | `stripe/` | Stripe subscriptions, checkout, webhooks |
 | `payment/` | Multi-gateway payments (Stripe, Paymob, PayTabs, Paddle) |
 | `limits/` | Plan-based feature limit checking |
-| `rate-limit/` | API rate limiting per user/plan |
+| `rate-limit/` | API rate limiting per user/plan (Redis with in-memory fallback) |
 | `targeting/` | Device/geo/browser-based URL targeting |
 | `webhooks/` | Webhook CRUD, HMAC signatures, event dispatching |
 | `workspace/` | Multi-tenant workspace permissions, invitations |
@@ -84,17 +85,46 @@ npm run db:studio              # Open Prisma Studio
 | `domains/` | Custom domain verification and SSL |
 | `security/` | SSRF protection for URL validation |
 | `firebase/` | Firebase Admin SDK, FCM push notifications, token management |
-| `api/` | Shared API utilities and response helpers |
+| `api/` | Shared API utilities, `ApiError` factory, response helpers |
+| `utils.ts` | `cn()` utility (clsx + tailwind-merge) for className composition |
 
 ### Key Patterns
+
 - **Internationalization**: Uses `next-intl` with locale routing (`/en/...`, `/ar/...`). Translation files in `src/messages/`. When adding UI text, update both `en.json` and `ar.json`. Use navigation exports from `src/i18n/routing.ts` (`Link`, `redirect`, `usePathname`, `useRouter`) instead of next/navigation.
-- **Firebase Client**: In React components, import Firebase client directly from `@/lib/firebase/client` to avoid importing server-side code.
-- **Path Alias**: Use `@/` to import from `src/` (configured in tsconfig and vitest)
+- **Middleware**: Only `next-intl` middleware is configured (`src/middleware.ts`). Authentication is NOT handled in middleware — it's checked per-route via `auth()`.
 - **Authentication**: NextAuth.js v5 with JWT strategy. Import `auth`, `signIn`, `signOut` from `@/lib/auth`. Get session via `auth()` in server components/API routes. User ID available in `session.user.id`.
+- **Database**: Import `{ prisma }` from `@/lib/db/prisma`. Uses singleton pattern with global caching. Dev mode enables query logging.
+- **State Management**: Zustand for client-side state.
+- **Firebase Client**: In React components, import from `@/lib/firebase/client` to avoid importing server-side code.
+- **Path Alias**: Use `@/` to import from `src/` (configured in tsconfig and vitest).
 - **Plan Limits**: Feature availability is gated by subscription plan (FREE, STARTER, PRO, BUSINESS, ENTERPRISE). Each module has a `*_LIMITS` constant (e.g., `WEBHOOK_LIMITS`, `TARGETING_LIMITS`). Use `checkLinkLimit()`, `checkWebhookLimits()`, etc. before creating resources.
-- **Validation**: Zod schemas in `src/lib/url/validator.ts` for URL and alias validation
-- **Short Code Generation**: Uses `nanoid` (7 chars) in `src/lib/url/shortener.ts`
-- **Password Protection**: bcryptjs for hashing link passwords
+- **Validation**: Zod schemas in `src/lib/url/validator.ts` for URL and alias validation.
+- **Short Code Generation**: Uses `nanoid` (7 chars) in `src/lib/url/shortener.ts`.
+- **Password Protection**: bcryptjs for hashing link passwords.
+- **Standalone Output**: `next.config.js` uses `output: 'standalone'` for Docker deployment.
+
+### Standard API Route Pattern
+
+API routes follow a consistent pattern (see `src/app/api/shorten/route.ts` as reference):
+
+1. Get session: `const session = await auth()`
+2. Rate limit: `checkRateLimit(identifier, RATE_LIMIT_PRESETS.api.shorten)`
+3. Validate input: `schema.parse(body)` with Zod
+4. Check plan limits: `checkLinkLimit(userId)` (if authenticated)
+5. Execute business logic
+6. Return `NextResponse.json()` with rate limit headers
+7. Error handling: `ZodError` → `handleZodError()`, others → `ApiError.internal()`
+
+Key imports for API routes:
+```typescript
+import { auth } from '@/lib/auth';
+import { ApiError, handleZodError } from '@/lib/api/errors';
+import { checkRateLimit, getRateLimitHeaders } from '@/lib/rate-limit';
+```
+
+### Locale Layout Pattern
+
+`src/app/[locale]/layout.tsx` sets `<html lang={locale} dir={dir}>` where `dir` is `'ltr'` or `'rtl'` based on locale. Wraps children in `SessionProvider` → `NextIntlClientProvider`. Uses `unstable_setRequestLocale(locale)` for static generation and `suppressHydrationWarning` for theme flash prevention.
 
 ### Database Schema (Prisma)
 Key models (see `prisma/schema.prisma` for full schema):
@@ -125,9 +155,7 @@ Core:
 Payment (Multi-Gateway):
 - `POST /api/payment/checkout` - Unified checkout with auto gateway selection
 - `GET /api/payment/methods` - Get available payment methods for region
-- `POST /api/payment/webhooks/paymob` - Paymob webhook handler
-- `POST /api/payment/webhooks/paytabs` - PayTabs webhook handler
-- `POST /api/payment/webhooks/paddle` - Paddle webhook handler
+- `POST /api/payment/webhooks/{paymob,paytabs,paddle}` - Gateway webhook handlers
 
 Advanced Features:
 - `/api/links/[id]/targets` - Link targeting rules
@@ -140,45 +168,24 @@ Advanced Features:
 - `/api/extension/` - Browser extension endpoints
 
 ### Testing Structure
-- Unit tests: `__tests__/unit/` - 1054 tests for isolated utilities (`vitest.config.ts`)
-- Integration tests: `__tests__/integration/` - 218 tests with database (`vitest.integration.config.ts`, 30s timeout)
-- E2E tests: `__tests__/e2e/` - 16 Playwright test files (Chromium + Mobile Chrome)
-- Test setup: `src/test/setup.ts` - Testing Library and DOM matchers
+- Unit tests: `__tests__/unit/` - `*.test.ts` files (`vitest.config.ts`)
+- Integration tests: `__tests__/integration/` - `*.test.ts` files (`vitest.integration.config.ts`, 30s timeout)
+- E2E tests: `__tests__/e2e/` - `*.spec.ts` files (Playwright, Chromium + Mobile Chrome)
+- Test setup: `src/test/setup.ts` - Testing Library, DOM matchers, mocks for next/navigation, next-intl, clipboard
 
 ## Environment Variables
 
-Required:
-- `DATABASE_URL` - PostgreSQL connection string
-- `AUTH_SECRET` - NextAuth.js secret
+Required: `DATABASE_URL` (PostgreSQL), `AUTH_SECRET` (NextAuth.js secret).
 
-OAuth (optional):
-- `GOOGLE_CLIENT_ID`, `GOOGLE_CLIENT_SECRET`
-- `GITHUB_CLIENT_ID`, `GITHUB_CLIENT_SECRET`
-
-Stripe (optional):
-- `STRIPE_SECRET_KEY`, `STRIPE_WEBHOOK_SECRET`
-- `NEXT_PUBLIC_STRIPE_PUBLISHABLE_KEY`
-
-Paymob (Egyptian payments, optional):
-- `PAYMOB_API_KEY`, `PAYMOB_INTEGRATION_ID_CARD`, `PAYMOB_HMAC_SECRET`
-- `PAYMOB_IFRAME_ID`, `PAYMOB_INTEGRATION_ID_WALLET`
-
-PayTabs (MENA region, optional):
-- `PAYTABS_PROFILE_ID`, `PAYTABS_SERVER_KEY`, `PAYTABS_REGION`
-
-Paddle (Global MoR, optional):
-- `PADDLE_API_KEY`, `PADDLE_VENDOR_ID`, `PADDLE_PUBLIC_KEY`
-- `NEXT_PUBLIC_PADDLE_CLIENT_TOKEN`, `PADDLE_ENVIRONMENT`
-
-Redis (optional):
-- `REDIS_URL` - Redis connection URL (falls back to in-memory rate limiting)
-
-Firebase (optional):
-- `FIREBASE_PROJECT_ID`, `FIREBASE_CLIENT_EMAIL`, `FIREBASE_PRIVATE_KEY` - Admin SDK
-- `NEXT_PUBLIC_FIREBASE_API_KEY`, `NEXT_PUBLIC_FIREBASE_AUTH_DOMAIN`, etc. - Client SDK
-
-Other:
-- `NEXT_PUBLIC_APP_URL` - Base URL (default: http://localhost:3000)
+Optional groups (see `.env.example` for full list):
+- **OAuth**: `GOOGLE_CLIENT_ID/SECRET`, `GITHUB_CLIENT_ID/SECRET`
+- **Stripe**: `STRIPE_SECRET_KEY`, `STRIPE_WEBHOOK_SECRET`, `NEXT_PUBLIC_STRIPE_PUBLISHABLE_KEY`
+- **Paymob** (Egypt): `PAYMOB_API_KEY`, `PAYMOB_INTEGRATION_ID_CARD`, `PAYMOB_HMAC_SECRET`, `PAYMOB_IFRAME_ID`, `PAYMOB_INTEGRATION_ID_WALLET`
+- **PayTabs** (MENA): `PAYTABS_PROFILE_ID`, `PAYTABS_SERVER_KEY`, `PAYTABS_REGION`
+- **Paddle** (Global): `PADDLE_API_KEY`, `PADDLE_VENDOR_ID`, `PADDLE_PUBLIC_KEY`, `NEXT_PUBLIC_PADDLE_CLIENT_TOKEN`, `PADDLE_ENVIRONMENT`
+- **Redis**: `REDIS_URL` (falls back to in-memory rate limiting)
+- **Firebase**: Admin SDK vars + `NEXT_PUBLIC_FIREBASE_*` client vars
+- **App**: `NEXT_PUBLIC_APP_URL` (default: http://localhost:3000)
 
 ## Docker
 
