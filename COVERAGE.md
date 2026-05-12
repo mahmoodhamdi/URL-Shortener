@@ -4,16 +4,16 @@
 
 | Metric     | Coverage |
 |------------|----------|
-| Statements | 52.04%   |
-| Branches   | 85.10%   |
-| Functions  | 66.66%   |
-| Lines      | 52.04%   |
+| Statements | 55.04%   |
+| Branches   | 84.83%   |
+| Functions  | 70.82%   |
+| Lines      | 55.04%   |
 
 Test counts:
-- Unit tests: **1,067** (Vitest, jsdom)
+- Unit tests: **1,151** (Vitest, jsdom)
 - Integration tests: **295** (Vitest, 30s timeout)
-- E2E tests: **310** (Playwright, system Chrome) — **100% pass rate**
-- **Total: 1,672 tests, all passing**
+- E2E tests: **620** (Playwright, system Chrome — chromium + Mobile Chrome) — **100% pass rate**
+- **Total: 2,066 tests, all passing**
 
 ## Coverage Configuration
 
@@ -42,14 +42,15 @@ coverage measurement:
 
 ## Modules with the largest remaining uncovered surface
 
-| Module | Statements | Notes |
-|--------|------------|-------|
-| `lib/stripe/subscription.ts` | 7.26 % | Heavy use of Stripe SDK calls; integration tests cover the happy paths, but error branches around webhook idempotency are not unit-tested. |
-| `lib/url/shortener.ts` (`shortener.ts` overload) | 9.97 % | A single very long file that mixes DB writes, rate-limit checks, and analytics fan-out. Worth refactoring into smaller pure functions before pushing coverage higher. |
-| `lib/workspace/invitations.ts` | 0 % | Database-bound flow; reachable end-to-end but lacks isolated unit tests. |
-| `lib/payment/providers/{stripe,paymob,paytabs,paddle}/index.ts` | 13–24 % | Each provider wraps an external SDK. Sandbox keys would be required to extend unit coverage; integration tests already exercise the public surface. |
-| `lib/webhooks/sender.ts` | 42.91 % | HTTP fan-out with retry/backoff. The retry path needs fake-timer tests. |
-| `lib/zapier/index.ts` | 34.1 % | Trigger fan-out — same shape as the webhook sender. |
+| Module | Before sales prep | After PR #3 | Notes |
+|--------|-------------------|-------------|-------|
+| `lib/workspace/invitations.ts` | 0 % | **100 %** | Full state machine covered. |
+| `lib/workspace/index.ts` | 0 % | **~80 %** | Slug + role + member CRUD covered. |
+| `lib/stripe/subscription.ts` | 7.26 % | **34.94 %** | getUserSubscription / cancel / resume / usage tracking now under test; Stripe-SDK-bound webhook handlers remain integration-only. |
+| `lib/zapier/index.ts` | 34.1 % | **~70 %** | Subscription CRUD + limit checks covered. |
+| `lib/url/shortener.ts` | 9.97 % | **40.12 %** | Anonymous create-link path, lookups, update + delete contracts covered. The signed-in transactional path still leans on integration tests. |
+| `lib/payment/providers/{stripe,paymob,paytabs,paddle}/index.ts` | 13–24 % | unchanged | Each provider wraps an external SDK. Sandbox keys would be required to extend unit coverage; integration tests already exercise the public surface. |
+| `lib/webhooks/sender.ts` | 42.91 % | unchanged | HTTP fan-out with retry/backoff. The retry path needs fake-timer tests. |
 
 ## Path to higher coverage
 
