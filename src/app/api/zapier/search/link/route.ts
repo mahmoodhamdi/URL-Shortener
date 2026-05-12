@@ -3,6 +3,8 @@ import { auth } from '@/lib/auth';
 
 import { prisma } from '@/lib/db/prisma';
 
+export const dynamic = 'force-dynamic';
+
 /**
  * GET /api/zapier/search/link - Search for links
  * Supports searching by shortCode, customAlias, or originalUrl
