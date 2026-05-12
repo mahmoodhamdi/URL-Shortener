@@ -8,9 +8,9 @@ import {
 } from '@/lib/errors/reporter';
 
 describe('error reporter', () => {
-  let logSpy: ReturnType<typeof vi.spyOn>;
-  let warnSpy: ReturnType<typeof vi.spyOn>;
-  let errorSpy: ReturnType<typeof vi.spyOn>;
+  let logSpy: any;
+  let warnSpy: any;
+  let errorSpy: any;
   let defaultReporter: ErrorReporter;
 
   beforeEach(() => {
@@ -73,9 +73,12 @@ describe('error reporter', () => {
     it('setErrorReporter swaps the implementation', () => {
       const captured: unknown[] = [];
       const custom: ErrorReporter = {
-        captureException: (err, ctx) => captured.push({ type: 'exc', err, ctx }),
-        captureMessage: (msg, level, ctx) =>
-          captured.push({ type: 'msg', msg, level, ctx }),
+        captureException: (err, ctx) => {
+          captured.push({ type: 'exc', err, ctx });
+        },
+        captureMessage: (msg, level, ctx) => {
+          captured.push({ type: 'msg', msg, level, ctx });
+        },
       };
       setErrorReporter(custom);
 
