@@ -5,6 +5,7 @@ import { Card, CardContent, CardHeader, CardTitle, CardDescription } from '@/com
 import { Label } from '@/components/ui/label';
 import { ThemeToggle } from '@/components/layout/ThemeToggle';
 import { LanguageSwitcher } from '@/components/layout/LanguageSwitcher';
+import { ApiKeysCard } from '@/components/settings/ApiKeysCard';
 
 export default function SettingsPage() {
   const t = useTranslations();
@@ -35,6 +36,8 @@ export default function SettingsPage() {
               </div>
             </CardContent>
           </Card>
+
+          <ApiKeysCard />
         </div>
       </div>
     </div>
