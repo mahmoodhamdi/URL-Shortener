@@ -27,8 +27,12 @@ export function Header() {
     <header className="sticky top-0 z-50 w-full border-b bg-background/95 backdrop-blur supports-[backdrop-filter]:bg-background/60">
       <div className="container flex h-14 items-center justify-between">
         <div className="flex items-center gap-6">
-          <Link href="/" className="flex items-center gap-2 font-bold text-xl">
-            <Link2 className="h-6 w-6 text-primary" />
+          <Link
+            href="/"
+            className="flex items-center gap-2 font-bold text-xl"
+            aria-label={t('common.appName')}
+          >
+            <Link2 className="h-6 w-6 text-primary" aria-hidden />
             <span className="hidden sm:inline-block">{t('common.appName')}</span>
           </Link>
 
@@ -65,11 +69,13 @@ export function Header() {
             size="icon"
             className="md:hidden"
             onClick={() => setMobileMenuOpen(!mobileMenuOpen)}
+            aria-label={mobileMenuOpen ? t('common.closeMenu') : t('common.openMenu')}
+            aria-expanded={mobileMenuOpen}
           >
             {mobileMenuOpen ? (
-              <X className="h-5 w-5" />
+              <X className="h-5 w-5" aria-hidden />
             ) : (
-              <Menu className="h-5 w-5" />
+              <Menu className="h-5 w-5" aria-hidden />
             )}
           </Button>
         </div>
