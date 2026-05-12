@@ -5,10 +5,10 @@ mobile profile. Numbers below are the final scores after the targeted fixes.
 
 | Page | Performance | Accessibility | Best Practices | SEO |
 |------|-------------|---------------|----------------|-----|
-| `/en` | **95** | **100** | **100** | **100** |
-| `/ar` | **94** | **100** | **100** | **100** |
+| `/en` | **96** | **100** | **100** | **100** |
+| `/ar` | **96** | **100** | **100** | **100** |
 
-Raw reports live in `.agent/lighthouse/` (`en-final.json`, `ar-final.json`).
+Raw reports live in `.agent/lighthouse/` (`en-perf4.json`, `ar-perf4.json`).
 LHCI config is in `lighthouserc.json` and points the CI flow at these URLs.
 
 ## Targeted fixes applied during sales prep

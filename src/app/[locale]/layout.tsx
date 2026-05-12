@@ -8,10 +8,15 @@ import { Footer } from '@/components/layout/Footer';
 import { MobileNav } from '@/components/layout/MobileNav';
 import { Toaster } from '@/components/ui/toaster';
 import { SessionProvider } from '@/components/auth/SessionProvider';
+import { cookies } from 'next/headers';
 import { CookieConsent } from '@/components/consent/CookieConsent';
 import '../globals.css';
 
-const inter = Inter({ subsets: ['latin'] });
+const inter = Inter({
+  subsets: ['latin'],
+  display: 'swap',
+  adjustFontFallback: true,
+});
 
 export function generateStaticParams() {
   return locales.map((locale) => ({ locale }));
@@ -93,6 +98,11 @@ export default async function LocaleLayout({
   unstable_setRequestLocale(locale);
   const messages = await getMessages();
   const dir = localeDirection[locale];
+  // Read consent server-side so the banner isn't rendered for returning
+  // visitors. Avoids a late client-only paint that Lighthouse picks up as LCP.
+  const consentCookie = cookies().get('cookie-consent-v1')?.value;
+  const consentResolved =
+    consentCookie === 'accepted' || consentCookie === 'rejected';
 
   return (
     <html lang={locale} dir={dir} suppressHydrationWarning>
@@ -124,7 +134,7 @@ export default async function LocaleLayout({
               <MobileNav />
             </div>
             <Toaster />
-            <CookieConsent />
+            <CookieConsent defaultHidden={consentResolved} />
           </NextIntlClientProvider>
         </SessionProvider>
       </body>

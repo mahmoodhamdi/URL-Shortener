@@ -12,10 +12,18 @@ function readChoice(): Choice {
   try {
     const v = window.localStorage.getItem(STORAGE_KEY);
     if (v === 'accepted' || v === 'rejected') return v;
-    return null;
   } catch {
-    return null;
+    // ignore
   }
+  try {
+    const m = document.cookie.match(/(?:^|; )cookie-consent-v1=([^;]+)/);
+    if (m && (m[1] === 'accepted' || m[1] === 'rejected')) {
+      return m[1];
+    }
+  } catch {
+    // ignore
+  }
+  return null;
 }
 
 function writeChoice(c: Exclude<Choice, null>) {
@@ -28,45 +36,55 @@ function writeChoice(c: Exclude<Choice, null>) {
   }
 }
 
-export function CookieConsent() {
-  const [choice, setChoice] = useState<Choice>(null);
-  const [mounted, setMounted] = useState(false);
+/**
+ * The wrapper renders server-side as an inert placeholder. On the client we
+ * hydrate, read the stored consent, and decide whether to show the banner.
+ * Critically, this avoids a late post-hydration mount paint — Lighthouse was
+ * picking the banner up as the LCP element when it appeared after first paint.
+ */
+export function CookieConsent({ defaultHidden }: { defaultHidden?: boolean }) {
+  const [visible, setVisible] = useState<boolean>(!defaultHidden);
 
   useEffect(() => {
-    setMounted(true);
-    setChoice(readChoice());
+    const stored = readChoice();
+    if (stored !== null) {
+      setVisible(false);
+    } else {
+      setVisible(true);
+    }
   }, []);
 
-  if (!mounted || choice !== null) return null;
+  if (!visible) return null;
 
   const accept = () => {
     writeChoice('accepted');
-    setChoice('accepted');
+    setVisible(false);
   };
   const reject = () => {
     writeChoice('rejected');
-    setChoice('rejected');
+    setVisible(false);
   };
 
   return (
-    <div
+    <aside
       role="dialog"
       aria-label="Cookie consent"
-      className="fixed bottom-0 inset-x-0 z-50 bg-background border-t shadow-lg"
+      className="fixed bottom-4 left-1/2 -translate-x-1/2 z-50 max-w-sm w-[calc(100%-2rem)] rounded-lg border bg-background shadow-lg"
     >
-      <div className="container mx-auto max-w-5xl px-4 py-4 flex flex-col md:flex-row md:items-center md:justify-between gap-3">
-        <p className="text-sm text-muted-foreground">
-          We use essential cookies to keep you signed in and a few analytics
-          cookies to understand usage. You can accept all or reject everything
-          except essentials at any time.
+      <div className="px-4 py-3 flex flex-col gap-2">
+        <p className="text-xs text-muted-foreground">
+          Essential cookies keep you signed in. Optional analytics cookies are
+          off until you accept.
         </p>
-        <div className="flex gap-2 shrink-0">
-          <Button variant="outline" onClick={reject}>
-            Reject non-essential
+        <div className="flex gap-2 justify-end">
+          <Button variant="outline" size="sm" onClick={reject}>
+            Reject
           </Button>
-          <Button onClick={accept}>Accept all</Button>
+          <Button size="sm" onClick={accept}>
+            Accept
+          </Button>
         </div>
       </div>
-    </div>
+    </aside>
   );
 }
