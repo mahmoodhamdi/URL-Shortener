@@ -108,6 +108,104 @@ describe('Stripe Subscription', () => {
     });
   });
 
+  describe('getUserSubscription', () => {
+    it('returns an existing subscription when one is on file', async () => {
+      const { prisma } = await import('@/lib/db/prisma');
+      const { getUserSubscription } = await import('@/lib/stripe/subscription');
+      const sub = { id: 's1', userId: 'u1', plan: 'PRO' };
+      (prisma.subscription.findUnique as ReturnType<typeof vi.fn>).mockResolvedValue(sub);
+      const result = await getUserSubscription('u1');
+      expect(result).toBe(sub);
+    });
+
+    it('creates a FREE subscription on first lookup', async () => {
+      const { prisma } = await import('@/lib/db/prisma');
+      const { getUserSubscription } = await import('@/lib/stripe/subscription');
+      (prisma.subscription.findUnique as ReturnType<typeof vi.fn>).mockResolvedValue(null);
+      (prisma.subscription.create as ReturnType<typeof vi.fn>).mockResolvedValue({
+        id: 's-new',
+        plan: 'FREE',
+      });
+      await getUserSubscription('u-new');
+      const call = (prisma.subscription.create as ReturnType<typeof vi.fn>).mock
+        .calls[0][0];
+      expect(call.data).toMatchObject({ userId: 'u-new', plan: 'FREE', status: 'ACTIVE' });
+    });
+  });
+
+  describe('cancelSubscription / resumeSubscription', () => {
+    it('cancelSubscription throws when no stripe subscription is on file', async () => {
+      const { prisma } = await import('@/lib/db/prisma');
+      const { cancelSubscription } = await import('@/lib/stripe/subscription');
+      (prisma.subscription.findUnique as ReturnType<typeof vi.fn>).mockResolvedValue(null);
+      await expect(cancelSubscription('u1')).rejects.toThrow(/No active subscription/);
+    });
+
+    it('cancelSubscription marks Stripe + DB as cancel-at-period-end', async () => {
+      const { prisma } = await import('@/lib/db/prisma');
+      const { stripe } = await import('@/lib/stripe/client');
+      const { cancelSubscription } = await import('@/lib/stripe/subscription');
+      (prisma.subscription.findUnique as ReturnType<typeof vi.fn>).mockResolvedValue({
+        id: 's1',
+        userId: 'u1',
+        stripeSubscriptionId: 'sub_123',
+      });
+      (stripe.subscriptions.update as ReturnType<typeof vi.fn>).mockResolvedValue({});
+      (prisma.subscription.update as ReturnType<typeof vi.fn>).mockResolvedValue({});
+
+      await cancelSubscription('u1');
+      expect(stripe.subscriptions.update).toHaveBeenCalledWith('sub_123', {
+        cancel_at_period_end: true,
+      });
+      const dbCall = (prisma.subscription.update as ReturnType<typeof vi.fn>).mock.calls[0][0];
+      expect(dbCall.where).toEqual({ userId: 'u1' });
+      expect(dbCall.data.cancelAtPeriodEnd).toBe(true);
+    });
+
+    it('resumeSubscription clears cancel-at-period-end on Stripe + DB', async () => {
+      const { prisma } = await import('@/lib/db/prisma');
+      const { stripe } = await import('@/lib/stripe/client');
+      const { resumeSubscription } = await import('@/lib/stripe/subscription');
+      (prisma.subscription.findUnique as ReturnType<typeof vi.fn>).mockResolvedValue({
+        id: 's1',
+        userId: 'u1',
+        stripeSubscriptionId: 'sub_123',
+      });
+      (stripe.subscriptions.update as ReturnType<typeof vi.fn>).mockResolvedValue({});
+      (prisma.subscription.update as ReturnType<typeof vi.fn>).mockResolvedValue({});
+
+      await resumeSubscription('u1');
+      expect(stripe.subscriptions.update).toHaveBeenCalledWith('sub_123', {
+        cancel_at_period_end: false,
+      });
+      const dbCall = (prisma.subscription.update as ReturnType<typeof vi.fn>).mock.calls[0][0];
+      expect(dbCall.data.cancelAtPeriodEnd).toBe(false);
+    });
+  });
+
+  describe('usage tracking', () => {
+    it('incrementLinkUsage adds 1 for the given user', async () => {
+      const { prisma } = await import('@/lib/db/prisma');
+      const { incrementLinkUsage } = await import('@/lib/stripe/subscription');
+      (prisma.subscription.update as ReturnType<typeof vi.fn>).mockResolvedValue({});
+      await incrementLinkUsage('u1');
+      const call = (prisma.subscription.update as ReturnType<typeof vi.fn>).mock.calls[0][0];
+      expect(call.where).toEqual({ userId: 'u1' });
+      expect(call.data.linksUsedThisMonth.increment).toBe(1);
+    });
+
+    it('resetMonthlyUsage zeros linksUsedThisMonth across all subscriptions', async () => {
+      const { prisma } = await import('@/lib/db/prisma');
+      const { resetMonthlyUsage } = await import('@/lib/stripe/subscription');
+      (prisma.subscription.updateMany as ReturnType<typeof vi.fn>).mockResolvedValue({
+        count: 7,
+      });
+      await resetMonthlyUsage();
+      const call = (prisma.subscription.updateMany as ReturnType<typeof vi.fn>).mock.calls[0][0];
+      expect(call.data.linksUsedThisMonth).toBe(0);
+    });
+  });
+
   describe('Subscription exports', () => {
     it('should export getOrCreateStripeCustomer', async () => {
       const { getOrCreateStripeCustomer } = await import('@/lib/stripe/subscription');
