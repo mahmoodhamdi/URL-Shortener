@@ -1,7 +1,7 @@
 import { test, expect } from '@playwright/test';
 
 test.describe('Link Cloaking', () => {
-  const baseUrl = 'http://127.0.0.1:3000';
+  const baseUrl = process.env.BASE_URL || `http://127.0.0.1:${process.env.PORT || 3000}`;
 
   test.describe('Redirect API with Cloaking', () => {
     test('should respond to redirect endpoint', async ({ request }) => {

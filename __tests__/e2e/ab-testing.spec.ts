@@ -1,7 +1,7 @@
 import { test, expect } from '@playwright/test';
 
 test.describe('A/B Testing API', () => {
-  const baseUrl = 'http://127.0.0.1:3000';
+  const baseUrl = process.env.BASE_URL || `http://127.0.0.1:${process.env.PORT || 3000}`;
 
   test.describe('A/B Test CRUD Operations', () => {
     test('should handle A/B test creation flow', async ({ request }) => {
