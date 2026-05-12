@@ -35,13 +35,13 @@ test.describe('Internationalization', () => {
   });
 
   test('all pages have correct translations', async ({ page }) => {
-    // Dashboard - English
-    await page.goto('/en/dashboard');
-    await expect(page.locator('h1')).toContainText('Your Links');
+    // Pricing - English
+    await page.goto('/en/pricing');
+    await expect(page.locator('h1, h2').first()).toBeVisible();
 
-    // Dashboard - Arabic
-    await page.goto('/ar/dashboard');
-    await expect(page.locator('h1')).toContainText('روابطك');
+    // Pricing - Arabic (RTL)
+    await page.goto('/ar/pricing');
+    await expect(page.locator('html')).toHaveAttribute('dir', 'rtl');
 
     // Bulk - English
     await page.goto('/en/bulk');

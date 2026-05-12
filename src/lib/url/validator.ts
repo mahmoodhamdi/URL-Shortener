@@ -16,14 +16,24 @@ export const aliasSchema = z
   .regex(/^[a-zA-Z0-9-]+$/, 'Alias can only contain letters, numbers, and hyphens')
   .optional();
 
-export const createLinkSchema = z.object({
-  url: urlSchema,
-  customAlias: aliasSchema,
-  password: z.string().optional(),
-  expiresAt: z.string().datetime().optional(),
-  title: z.string().max(200).optional(),
-  description: z.string().max(500).optional(),
-});
+export const createLinkSchema = z
+  .object({
+    url: urlSchema,
+    customAlias: aliasSchema,
+    // `alias` is accepted as a synonym for customAlias so older clients keep
+    // working; both feed the same validator so XSS payloads are rejected here
+    // rather than silently ignored.
+    alias: aliasSchema,
+    password: z.string().optional(),
+    expiresAt: z.string().datetime().optional(),
+    title: z.string().max(200).optional(),
+    description: z.string().max(500).optional(),
+  })
+  .strict()
+  .transform((v) => {
+    const { alias, ...rest } = v;
+    return { ...rest, customAlias: rest.customAlias ?? alias };
+  });
 
 export const updateLinkSchema = z.object({
   originalUrl: urlSchema.optional(),

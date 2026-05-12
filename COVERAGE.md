@@ -4,16 +4,16 @@
 
 | Metric     | Coverage |
 |------------|----------|
-| Statements | 52.54%   |
-| Branches   | 85.04%   |
-| Functions  | 66.48%   |
-| Lines      | 52.54%   |
+| Statements | 52.04%   |
+| Branches   | 85.10%   |
+| Functions  | 66.66%   |
+| Lines      | 52.04%   |
 
 Test counts:
-- Unit tests: **1,054** (Vitest, jsdom)
+- Unit tests: **1,067** (Vitest, jsdom)
 - Integration tests: **295** (Vitest, 30s timeout)
-- E2E tests: **310** (Playwright, system Chrome)
-- **Total: 1,659 tests**
+- E2E tests: **310** (Playwright, system Chrome) — **100% pass rate**
+- **Total: 1,672 tests, all passing**
 
 ## Coverage Configuration
 

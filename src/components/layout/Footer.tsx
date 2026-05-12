@@ -17,14 +17,17 @@ export function Footer() {
             <span className="font-semibold">{t('common.appName')}</span>
           </div>
 
-          <nav className="flex items-center gap-4 text-sm text-muted-foreground">
-            <Link href="/" className="hover:text-foreground transition-colors">
+          <nav
+            aria-label={t('footer.legal')}
+            className="flex items-center gap-4 text-sm text-muted-foreground"
+          >
+            <Link href="/privacy" className="hover:text-foreground transition-colors">
               {t('footer.privacy')}
             </Link>
-            <Link href="/" className="hover:text-foreground transition-colors">
+            <Link href="/terms" className="hover:text-foreground transition-colors">
               {t('footer.terms')}
             </Link>
-            <Link href="/" className="hover:text-foreground transition-colors">
+            <Link href="/contact" className="hover:text-foreground transition-colors">
               {t('footer.contact')}
             </Link>
           </nav>

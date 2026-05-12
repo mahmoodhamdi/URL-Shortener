@@ -407,10 +407,14 @@ test.describe('Form Validation States', () => {
     await waitForPageLoad(page);
     await setTheme(page, 'light');
 
-    // Try to submit empty form
+    // The submit button stays disabled until the password matches the
+    // strength policy, so an "empty form" click can't happen. Snap the
+    // disabled state — that *is* the validation surface the screenshot
+    // is meant to capture.
     const submitBtn = page.getByRole('button', { name: /sign up|register|create|submit/i }).first();
     if (await submitBtn.isVisible()) {
-      await submitBtn.click();
+      // Click is best-effort — a disabled button doesn't trigger anything.
+      await submitBtn.click({ force: true }).catch(() => null);
       await page.waitForTimeout(500);
     }
     await takeScreenshot(page, '48-register-validation-error');

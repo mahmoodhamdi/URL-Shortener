@@ -309,16 +309,15 @@ test.describe('Error Handling Scenarios', () => {
 
   test.describe('Browser Navigation', () => {
     test('should handle back/forward navigation', async ({ page }) => {
+      // Use public pages so we don't fight the dashboard auth redirect.
       await page.goto('/en');
-      await page.goto('/en/dashboard');
+      await page.goto('/en/api-docs');
       await page.goto('/en/pricing');
 
-      // Go back
       await page.goBack();
       await page.waitForLoadState('networkidle');
-      expect(page.url()).toContain('dashboard');
+      expect(page.url()).toContain('api-docs');
 
-      // Go forward
       await page.goForward();
       await page.waitForLoadState('networkidle');
       expect(page.url()).toContain('pricing');
