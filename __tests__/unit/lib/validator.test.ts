@@ -5,6 +5,7 @@ import {
   normalizeUrl,
   urlSchema,
   aliasSchema,
+  createLinkSchema,
 } from '@/lib/url/validator';
 
 describe('URL Validator', () => {
@@ -87,6 +88,48 @@ describe('URL Validator', () => {
     it('should throw for invalid aliases', () => {
       expect(() => aliasSchema.parse('ab')).toThrow();
       expect(() => aliasSchema.parse('invalid_alias!')).toThrow();
+    });
+  });
+
+  describe('createLinkSchema (strict mode + alias synonym)', () => {
+    it('accepts the documented shape', () => {
+      const out = createLinkSchema.parse({
+        url: 'https://example.com',
+        customAlias: 'my-link',
+        title: 'My link',
+      });
+      expect(out.customAlias).toBe('my-link');
+      expect(out.url).toBe('https://example.com');
+    });
+
+    it('treats `alias` as a synonym for customAlias', () => {
+      const out = createLinkSchema.parse({
+        url: 'https://example.com',
+        alias: 'sneaky-name',
+      });
+      expect(out.customAlias).toBe('sneaky-name');
+    });
+
+    it('rejects XSS payloads passed through the alias synonym', () => {
+      expect(() =>
+        createLinkSchema.parse({
+          url: 'https://example.com',
+          alias: '<script>alert(1)</script>',
+        })
+      ).toThrow();
+    });
+
+    it('rejects unknown keys (strict mode)', () => {
+      expect(() =>
+        createLinkSchema.parse({
+          url: 'https://example.com',
+          backdoor: 'admin',
+        })
+      ).toThrow();
+    });
+
+    it('rejects non-URL values', () => {
+      expect(() => createLinkSchema.parse({ url: 'not-a-url' })).toThrow();
     });
   });
 });
