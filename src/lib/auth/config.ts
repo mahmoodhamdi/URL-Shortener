@@ -9,6 +9,9 @@ import { syncFirebaseUser } from '@/lib/firebase/auth';
 
 export const authConfig: NextAuthConfig = {
   adapter: PrismaAdapter(prisma),
+  // Required for self-hosted deployments outside Vercel; the env-driven
+  // AUTH_TRUST_HOST is unreliable in some bundler/runtime combinations.
+  trustHost: true,
   session: {
     strategy: 'jwt',
   },
