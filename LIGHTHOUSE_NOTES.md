@@ -5,10 +5,10 @@ mobile profile. Numbers below are the final scores after the targeted fixes.
 
 | Page | Performance | Accessibility | Best Practices | SEO |
 |------|-------------|---------------|----------------|-----|
-| `/en` | **93** | **89** | **96** | **92** |
-| `/ar` | **91** | **89** | **96** | **92** |
+| `/en` | **95** | **100** | **100** | **100** |
+| `/ar` | **94** | **100** | **100** | **100** |
 
-Raw reports live in `.agent/lighthouse/` (`en-prod.json`, `ar-prod.json`).
+Raw reports live in `.agent/lighthouse/` (`en-final.json`, `ar-final.json`).
 LHCI config is in `lighthouserc.json` and points the CI flow at these URLs.
 
 ## Targeted fixes applied during sales prep
@@ -20,50 +20,45 @@ LHCI config is in `lighthouserc.json` and points the CI flow at these URLs.
 - **Mobile menu toggle without name** → added `aria-label` + `aria-expanded`
   bound to the open/close state, with localized strings (`common.openMenu`,
   `common.closeMenu` in both `en.json` and `ar.json`).
+- **Result-card icon buttons without name** → added `aria-label` for Copy and
+  Open-in-new-tab in `UrlResult.tsx`, with `aria-hidden` on the inner lucide
+  SVGs.
+- **Heading order on the home page** → feature cards now use `<h2>` (with a
+  smaller font class) instead of `<h3>` so they descend cleanly from the
+  hero `<h1>`.
+- **Footer placeholder links** → privacy / terms / contact now point at real
+  routes under `src/app/[locale]/{privacy,terms,contact}/` rendered by a
+  shared `LegalPage` component. The Footer nav carries an `aria-label` so it
+  reads as a labelled landmark.
 - **`rel=canonical` mismatch** → removed the hard-coded `/` canonical from the
-  locale layout so Next.js falls back to the page URL (which matches the
-  request). `metadataBase` still drives the hreflang alternates.
+  locale layout so Next.js falls back to the page URL.
 - **SEO description and OpenGraph** → added a fuller `description`, full
   `openGraph` block, `twitter` card metadata, and `keywords`.
+- **Console errors → 0** → `trustHost: true` is set on the NextAuth config so
+  self-hosted deployments stop logging `UntrustedHost` warnings.
 
-## Why the remaining gaps don't justify a 100 chase
+## What the remaining performance gap is
 
-### Performance 91–93
-The single biggest factor is LCP (`largest-contentful-paint`: 85). The hero
-section uses the Inter web font and renders client-side translations from
-`next-intl`, so the LCP element is text that depends on a small JS chunk. The
-shaved-off points are recoverable, but every available lever (`next/font`
-preconnect, font-display: swap) is already in place.
+Both pages hit **100** on Accessibility, Best Practices, and SEO after the
+follow-up PR landed. Performance sits at **95 / 94** because of LCP:
 
-### Accessibility 89
-Three audits remain:
-- `button-name` (weight 10): one icon-only button outside the layout chrome
-  (`src/components/url/UrlResult.tsx` Copy/QR controls) is rendered inside a
-  shadcn `<Tooltip>` that supplies an accessible name at runtime via ARIA — but
-  Lighthouse's static crawler doesn't follow the tooltip wiring. Adding a
-  redundant `aria-label` would duplicate the tooltip text and create a
-  hostile screen-reader experience.
-- `link-name` (weight 7): a Footer placeholder link to `/` (privacy/terms/
-  contact) where the visible text is translation-controlled and the link
-  target is a placeholder for the buyer's actual T&C URLs. Once the buyer
-  points these at real pages, this clears.
-- `heading-order` (weight 3): the pricing page jumps from h2 (tier name) to h4
-  (feature row label) inside `Card`. Re-leveling cards would be a styling
-  change without a real semantic improvement.
+- `largest-contentful-paint`: ~2.7 s (score 0.85). The LCP element is the hero
+  `<h1>` rendered with the Inter web font from `next/font/google`. The font
+  loads through the optimised `next/font` pipeline, but on a cold cache the
+  text waits for the woff2 to arrive before its final paint. Tested font
+  tunings (`display: 'swap'`, custom fallback metrics, explicit preload) made
+  it slightly worse on subsequent runs, so we kept the simple
+  `Inter({ subsets: ['latin'] })` form that Next.js recommends.
 
-### Best Practices 96
-`errors-in-console`: NextAuth.js logs an `UntrustedHost` warning when
-`AUTH_TRUST_HOST` is not set for non-Vercel deployments. The buyer sets this
-during DNS cutover (documented in `sales/DEPLOYMENT.md`).
+For the buyer, this gap is recoverable in production with:
+- A CDN edge node closer to the user (Lighthouse runs locally over the dev
+  loopback, which exaggerates font fetch time).
+- Serving the static landing page through a worker / edge function so the HTML
+  arrives ahead of the JS bundle.
+- Replacing Inter with a system-font stack for the H1 only.
 
-### SEO 92
-`canonical` fired once during the first Lighthouse run because of the bug
-fixed above. The 8-point gap that remains comes from `meta:description` length
-heuristics on the Arabic page; the description is fully translated but
-`next-intl`'s server rendering serves the English meta during the initial
-crawl, which is a known [next-intl issue](https://github.com/amannn/next-intl/issues/1147).
-The patch is queued with the next-intl upgrade tracked in
-`SECURITY_NOTES.md`.
+None of these are worth doing in the sales-prep cycle because they change a
+UX-visible decision (the brand font).
 
 ## How to reproduce
 
