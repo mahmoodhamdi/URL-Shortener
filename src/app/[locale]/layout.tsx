@@ -8,6 +8,7 @@ import { Footer } from '@/components/layout/Footer';
 import { MobileNav } from '@/components/layout/MobileNav';
 import { Toaster } from '@/components/ui/toaster';
 import { SessionProvider } from '@/components/auth/SessionProvider';
+import { CookieConsent } from '@/components/consent/CookieConsent';
 import '../globals.css';
 
 const inter = Inter({ subsets: ['latin'] });
@@ -16,9 +17,70 @@ export function generateStaticParams() {
   return locales.map((locale) => ({ locale }));
 }
 
+const APP_URL =
+  process.env.NEXT_PUBLIC_APP_URL?.replace(/\/$/, '') ||
+  'http://localhost:3000';
+
 export const metadata: Metadata = {
-  title: 'URL Shortener',
-  description: 'Create short, memorable URLs with analytics and QR codes',
+  metadataBase: new URL(APP_URL),
+  title: {
+    default: 'URL Shortener — fast links, QR codes, analytics',
+    template: '%s | URL Shortener',
+  },
+  description:
+    'Shorten URLs, generate branded QR codes, and track click analytics across devices, countries, and referrers. Bilingual EN/AR with full RTL support.',
+  keywords: [
+    'URL shortener',
+    'short links',
+    'QR code generator',
+    'link analytics',
+    'branded short links',
+    'link in bio',
+  ],
+  applicationName: 'URL Shortener',
+  alternates: {
+    languages: {
+      en: '/en',
+      ar: '/ar',
+    },
+  },
+  openGraph: {
+    type: 'website',
+    siteName: 'URL Shortener',
+    title: 'URL Shortener — fast links, QR codes, analytics',
+    description:
+      'Shorten URLs, generate branded QR codes, and track click analytics. Bilingual EN/AR.',
+    url: '/',
+    locale: 'en_US',
+    images: [
+      {
+        url: '/og-image.png',
+        width: 1200,
+        height: 630,
+        alt: 'URL Shortener',
+      },
+    ],
+  },
+  twitter: {
+    card: 'summary_large_image',
+    title: 'URL Shortener — fast links, QR codes, analytics',
+    description:
+      'Shorten URLs, generate branded QR codes, and track click analytics.',
+    images: ['/og-image.png'],
+  },
+  robots: {
+    index: true,
+    follow: true,
+    googleBot: {
+      index: true,
+      follow: true,
+      'max-image-preview': 'large',
+      'max-snippet': -1,
+    },
+  },
+  icons: {
+    icon: '/favicon.ico',
+  },
 };
 
 export default async function LocaleLayout({
@@ -62,6 +124,7 @@ export default async function LocaleLayout({
               <MobileNav />
             </div>
             <Toaster />
+            <CookieConsent />
           </NextIntlClientProvider>
         </SessionProvider>
       </body>
