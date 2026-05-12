@@ -24,7 +24,9 @@
     "or": "or",
     "switchToLight": "Switch to light mode",
     "switchToDark": "Switch to dark mode",
-    "changeLanguage": "Change language"
+    "changeLanguage": "Change language",
+    "openMenu": "Open menu",
+    "closeMenu": "Close menu"
   },
   "nav": {
     "home": "Home",

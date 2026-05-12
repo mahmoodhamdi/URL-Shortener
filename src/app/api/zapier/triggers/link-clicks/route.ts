@@ -3,6 +3,8 @@ import { auth } from '@/lib/auth';
 
 import { prisma } from '@/lib/db/prisma';
 
+export const dynamic = 'force-dynamic';
+
 /**
  * GET /api/zapier/triggers/link-clicks - Polling trigger for link clicks
  * Returns recent clicks for Zapier polling

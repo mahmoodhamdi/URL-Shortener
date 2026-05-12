@@ -1,7 +1,7 @@
 import { test, expect } from '@playwright/test';
 
 test.describe('Zapier Integration API', () => {
-  const baseUrl = 'http://127.0.0.1:3000';
+  const baseUrl = process.env.BASE_URL || `http://127.0.0.1:${process.env.PORT || 3000}`;
 
   test.describe('Subscribe/Unsubscribe API', () => {
     test('should require authentication to list subscriptions', async ({ request }) => {

@@ -16,6 +16,8 @@ import {
 } from '@/lib/firebase/tokens';
 import { z } from 'zod';
 
+export const dynamic = 'force-dynamic';
+
 const preferencesSchema = z.object({
   linkClicks: z.boolean().optional(),
   linkMilestones: z.boolean().optional(),

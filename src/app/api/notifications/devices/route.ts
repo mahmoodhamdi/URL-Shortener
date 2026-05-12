@@ -9,6 +9,8 @@ import { NextResponse } from 'next/server';
 import { auth } from '@/lib/auth';
 import { getUserFCMTokenDetails } from '@/lib/firebase/tokens';
 
+export const dynamic = 'force-dynamic';
+
 /**
  * Get registered devices
  */

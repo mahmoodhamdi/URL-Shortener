@@ -4,6 +4,8 @@ import { getAllLinks } from '@/lib/url/shortener';
 import { ApiError } from '@/lib/api/errors';
 import type { SortOption, FilterOption } from '@/types';
 
+export const dynamic = 'force-dynamic';
+
 export async function GET(request: NextRequest) {
   try {
     // Authentication check
