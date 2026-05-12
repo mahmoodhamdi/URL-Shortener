@@ -68,7 +68,8 @@
     "createAnother": "Create Another",
     "share": "Share",
     "expiresAt": "Expires at",
-    "password": "Password protected"
+    "password": "Password protected",
+    "openInNewTab": "Open in new tab"
   },
   "dashboard": {
     "title": "Your Links",
@@ -230,7 +231,8 @@
     "copyright": "© {year} URL Shortener. All rights reserved.",
     "privacy": "Privacy Policy",
     "terms": "Terms of Service",
-    "contact": "Contact"
+    "contact": "Contact",
+    "legal": "Legal"
   },
   "meta": {
     "homeTitle": "URL Shortener - Shorten Links Instantly",
@@ -1037,6 +1039,20 @@
       "encrypted": "Your payment is encrypted and secure",
       "pci": "PCI DSS Compliant",
       "ssl": "SSL Encrypted"
+    }
+  },
+  "legalPages": {
+    "privacy": {
+      "title": "Privacy Policy",
+      "placeholder": "This is a placeholder. Replace this content with your jurisdiction-specific Privacy Policy before going to production."
+    },
+    "terms": {
+      "title": "Terms of Service",
+      "placeholder": "This is a placeholder. Replace this content with your jurisdiction-specific Terms of Service before going to production."
+    },
+    "contact": {
+      "title": "Contact Us",
+      "placeholder": "Replace this placeholder with your support email, phone number, address, and any preferred contact channels."
     }
   }
 }

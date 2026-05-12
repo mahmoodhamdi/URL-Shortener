@@ -58,7 +58,7 @@ export default function HomePage({ params: { locale } }: PageProps) {
               <div className="inline-flex items-center justify-center w-12 h-12 rounded-full bg-primary/10 text-primary mb-4">
                 <feature.icon className="h-6 w-6" />
               </div>
-              <h3 className="font-semibold mb-2">{feature.title}</h3>
+              <h2 className="font-semibold mb-2 text-base">{feature.title}</h2>
               <p className="text-sm text-muted-foreground">
                 {feature.description}
               </p>

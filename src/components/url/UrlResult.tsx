@@ -66,11 +66,12 @@ export function UrlResult({ link, onReset }: UrlResultProps) {
               size="icon"
               onClick={handleCopy}
               className="shrink-0"
+              aria-label={copied ? t('result.copySuccess') : t('common.copy')}
             >
               {copied ? (
-                <Check className="h-4 w-4 text-green-500" />
+                <Check className="h-4 w-4 text-green-500" aria-hidden />
               ) : (
-                <Copy className="h-4 w-4" />
+                <Copy className="h-4 w-4" aria-hidden />
               )}
             </Button>
             <Button
@@ -79,8 +80,13 @@ export function UrlResult({ link, onReset }: UrlResultProps) {
               asChild
               className="shrink-0"
             >
-              <a href={shortUrl} target="_blank" rel="noopener noreferrer">
-                <ExternalLink className="h-4 w-4" />
+              <a
+                href={shortUrl}
+                target="_blank"
+                rel="noopener noreferrer"
+                aria-label={t('result.openInNewTab')}
+              >
+                <ExternalLink className="h-4 w-4" aria-hidden />
               </a>
             </Button>
           </div>
