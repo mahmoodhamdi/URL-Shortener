@@ -41,12 +41,15 @@ export async function GET() {
   const dbHealthy = database.status === 'up';
   const overall = dbHealthy ? 'healthy' : 'unhealthy';
 
+  // Top-level `database` is preserved for backward compatibility with the
+  // pre-sales-prep shape; richer per-component data lives under `components`.
   return NextResponse.json(
     {
       status: overall,
       timestamp: new Date().toISOString(),
       version: packageJson.version,
       uptime_s: Math.floor(process.uptime()),
+      database: dbHealthy ? 'connected' : 'disconnected',
       components: { database, redis },
     },
     { status: overall === 'healthy' ? 200 : 503 }

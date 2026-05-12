@@ -1,6 +1,7 @@
 import { NextRequest, NextResponse } from 'next/server';
-import { createShortLink } from '@/lib/url/shortener';
+import { createShortLink, getShortUrl } from '@/lib/url/shortener';
 import { createLinkSchema } from '@/lib/url/validator';
+import { validateUrlForSSRF } from '@/lib/security/ssrf';
 import { auth } from '@/lib/auth';
 import { checkLinkLimit } from '@/lib/limits';
 import { checkRateLimit, getClientIp, getRateLimitHeaders, RATE_LIMIT_PRESETS } from '@/lib/rate-limit';
@@ -38,6 +39,12 @@ export async function POST(request: NextRequest) {
     // Validate input
     const validatedData = createLinkSchema.parse(body);
 
+    // SSRF guard — reject URLs that target private/loopback/link-local hosts.
+    const ssrfCheck = validateUrlForSSRF(validatedData.url);
+    if (!ssrfCheck.safe) {
+      return ApiError.badRequest(ssrfCheck.reason || 'URL points to a blocked host');
+    }
+
     // Check limits if user is authenticated
     if (userId) {
       const limitCheck = await checkLinkLimit(userId);
@@ -59,7 +66,8 @@ export async function POST(request: NextRequest) {
       userId,
     });
 
-    const response = NextResponse.json(link, { status: 201 });
+    const shortUrl = getShortUrl(link.customAlias || link.shortCode);
+    const response = NextResponse.json({ ...link, shortUrl }, { status: 201 });
     const headers = getRateLimitHeaders(rateLimitResult);
     Object.entries(headers).forEach(([key, value]) => {
       response.headers.set(key, value);
