@@ -208,9 +208,9 @@ describe('workspace module', () => {
 
     it('addWorkspaceMember persists the membership', async () => {
       prismaMock.workspaceMember.create.mockResolvedValue({ id: 'm1' });
-      await addWorkspaceMember('w1', 'user-2', 'EDITOR');
+      await addWorkspaceMember('w1', 'user-2', 'ADMIN');
       const call = prismaMock.workspaceMember.create.mock.calls[0][0];
-      expect(call.data).toMatchObject({ workspaceId: 'w1', userId: 'user-2', role: 'EDITOR' });
+      expect(call.data).toMatchObject({ workspaceId: 'w1', userId: 'user-2', role: 'ADMIN' });
     });
 
     it('updateMemberRole updates the role', async () => {
