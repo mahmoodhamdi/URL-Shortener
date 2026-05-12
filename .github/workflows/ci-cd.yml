@@ -30,6 +30,13 @@ jobs:
       - name: Run linting
         run: npm run lint
 
+      - name: Type check
+        run: npx tsc --noEmit
+
+      - name: Security audit (prod, high+)
+        run: npm audit --omit=dev --audit-level=high
+        continue-on-error: true
+
   # Run Tests
   test:
     runs-on: ubuntu-latest
@@ -73,6 +80,16 @@ jobs:
 
       - name: Run unit tests
         run: npm run test:unit
+        env:
+          DATABASE_URL: postgresql://postgres:postgres@localhost:5432/urlshortener_test
+
+      - name: Run integration tests
+        run: npm run test:integration
+        env:
+          DATABASE_URL: postgresql://postgres:postgres@localhost:5432/urlshortener_test
+
+      - name: Run coverage report
+        run: npm run test:coverage
         env:
           DATABASE_URL: postgresql://postgres:postgres@localhost:5432/urlshortener_test
 
