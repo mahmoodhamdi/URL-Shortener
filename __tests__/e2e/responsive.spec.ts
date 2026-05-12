@@ -39,14 +39,19 @@ test.describe('Responsive Design', () => {
   });
 
   test('Dashboard responsive', async ({ page }) => {
-    // Mobile
+    // Mobile — dashboard auth-redirects to /login for unauthed visits, which
+    // is the documented behavior; let the redirect settle before snapping.
     await page.setViewportSize({ width: 375, height: 667 });
     await page.goto('/en/dashboard');
+    await page.waitForLoadState('networkidle');
+    await page.waitForURL(/\/(login|dashboard)/, { timeout: 5000 }).catch(() => null);
     await page.screenshot({ path: 'screenshots/11-dashboard-mobile.png', fullPage: true });
 
     // Desktop
     await page.setViewportSize({ width: 1280, height: 720 });
     await page.goto('/en/dashboard');
+    await page.waitForLoadState('networkidle');
+    await page.waitForURL(/\/(login|dashboard)/, { timeout: 5000 }).catch(() => null);
     await page.screenshot({ path: 'screenshots/12-dashboard-desktop.png', fullPage: true });
   });
 
