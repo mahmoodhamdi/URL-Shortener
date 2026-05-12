@@ -23,19 +23,21 @@ export function PricingTable({ currentPlan, locale = 'en' }: PricingTableProps) 
   const [selectedPlan, setSelectedPlan] = useState<Plan | null>(null);
 
   const handleSelectPlan = async (plan: Plan) => {
-    if (plan === 'FREE') {
-      // Already on free or downgrading, redirect to settings
-      router.push(`/${locale}/dashboard/settings`);
-      return;
-    }
-
     if (!session) {
-      // Redirect to login with callback to pricing
+      // Anonymous user — funnel everything through login first so the
+      // callback URL can reopen the right plan after sign-in.
       router.push(`/${locale}/login?callbackUrl=/${locale}/pricing`);
       return;
     }
 
-    // Open the payment checkout dialog
+    if (plan === 'FREE') {
+      // Signed-in user picked Free — send them to their settings page to
+      // manage their subscription (downgrade or stay).
+      router.push(`/${locale}/settings`);
+      return;
+    }
+
+    // Paid plan, authenticated — open the checkout dialog.
     setSelectedPlan(plan);
     setCheckoutOpen(true);
   };
