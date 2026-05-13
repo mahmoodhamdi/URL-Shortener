@@ -8,12 +8,14 @@ regenerated against any running instance of the app.
 
 ```
 marketing/
-├── screenshots/        # 12 PNGs at desktop / tablet / mobile, EN + AR, light + dark
+├── screenshots/             # 12 PNGs at desktop / tablet / mobile, EN + AR, light + dark
 ├── videos/
-│   └── demo-short.mp4  # ~14 s product walkthrough (anatomy → shorten → pricing → RTL → status)
+│   ├── demo-short.mp4       # ~14 s teaser (anatomy → shorten → pricing → RTL → status)
+│   └── walkthrough.mp4      # ~68 s long-form (home → shorten → bulk → pricing → AR/RTL → API docs → status → privacy)
 └── scripts/
-    ├── screenshots.ts  # Re-captures the curated screenshot set
-    └── demo-video.ts   # Re-records the short walkthrough and transcodes to MP4
+    ├── screenshots.ts       # Re-captures the curated screenshot set
+    ├── demo-video.ts        # Re-records the short teaser and transcodes to MP4
+    └── walkthrough-video.ts # Re-records the long-form walkthrough
 ```
 
 ## Regenerating

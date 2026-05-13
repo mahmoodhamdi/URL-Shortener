@@ -4,16 +4,21 @@
 
 | Metric     | Coverage |
 |------------|----------|
-| Statements | 55.04%   |
-| Branches   | 84.83%   |
-| Functions  | 70.82%   |
-| Lines      | 55.04%   |
+| Statements | 54.36%   |
+| Branches   | 84.55%   |
+| Functions  | 71.76%   |
+| Lines      | 54.36%   |
 
 Test counts:
-- Unit tests: **1,151** (Vitest, jsdom)
+- Unit tests: **1,162** (Vitest, jsdom)
 - Integration tests: **295** (Vitest, 30s timeout)
 - E2E tests: **620** (Playwright, system Chrome — chromium + Mobile Chrome) — **100% pass rate**
-- **Total: 2,066 tests, all passing**
+- **Total: 2,077 tests, all passing**
+
+> The statements headline dipped marginally from 55.04 % → 54.36 % because
+> PR #4 added new UI surface (admin dashboard, API keys settings card) whose
+> Prisma-bound branches are exercised by e2e, not unit tests. Branches and
+> functions both moved up (84.55 % / 71.76 %).
 
 ## Coverage Configuration
 

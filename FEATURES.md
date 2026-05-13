@@ -44,13 +44,21 @@ Snapshot of the feature audit performed during sales-readiness preparation.
 | `next-intl` locale return fix | `src/i18n/request.ts` | Returns `locale` explicitly to satisfy the next-major next-intl API. |
 | Forced-dynamic markers on header-using routes | 11 API routes under `src/app/api/...` | Eliminates the "Dynamic server usage" warnings that the build was emitting. |
 
-## Deliberately deferred (not in the sales-prep scope)
+## Shipped in PR #4 (previously deferred)
+
+| Feature | Status | Notes |
+|---------|--------|-------|
+| API key management **UI** | ✅ Shipped | `src/components/settings/ApiKeysCard.tsx` — create / list / revoke against the existing `/api/api-keys` endpoints. Plaintext key shown once. |
+| Admin panel (read-only v1) | ✅ Shipped | `src/app/[locale]/admin/page.tsx` — gated by `ADMIN_EMAILS`. Stats tiles + plan breakdown + recent users + recent links. Mutations are still Phase-2. |
+| Long-form walkthrough video | ✅ Shipped | `marketing/videos/walkthrough.mp4`, 68 s. Recorder is `marketing/scripts/walkthrough-video.ts`. |
+
+## Deliberately deferred (still not in sales-prep scope)
 
 | Feature | Reason for deferral |
 |---------|---------------------|
-| Admin panel (users / links / subscriptions) | Multi-week build; the buyer typically wants this scoped to their own audit & role model. Documented as a Phase-2 deliverable in `sales/CLIENT-ONBOARDING.md`. |
+| Admin panel — **mutations** (user role changes, link removal, refund actions) | Needs the buyer's role model and audit log decisions. The current read-only panel is the safe v1; CLIENT-ONBOARDING.md lists this as Phase-2. |
 | 2FA TOTP with backup codes | Needs UX, recovery flow, and audit trail — too large to drop in without a dedicated discovery cycle. The auth layer (NextAuth.js v5) supports adding a second-factor provider when needed. |
-| API key management **UI** | The endpoints are now in place. A simple settings page can be added in a follow-up sprint and is listed in onboarding. |
+| Real-time analytics dashboards (WebSocket / SSE) | Performance tuning under load. The existing dashboard polls. |
 
 ## How to verify the additions
 
