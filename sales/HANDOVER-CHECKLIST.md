@@ -15,11 +15,7 @@ a signed PDF, and the engagement is closed.
 ## Documentation handed over
 
 - [ ] `README.md` — onboarding / quick start.
-- [ ] `CLAUDE.md` — architecture cheat-sheet for whoever owns the codebase.
 - [ ] `FEATURES.md` — full feature inventory.
-- [ ] `COVERAGE.md` — test coverage breakdown and exclusion rationale.
-- [ ] `SECURITY_NOTES.md` — current security posture and known advisories.
-- [ ] `LIGHTHOUSE_NOTES.md` — performance / a11y / SEO score baseline.
 - [ ] `sales/DEPLOYMENT.md` — both deployment variants.
 - [ ] `sales/SUPPORT-PLANS.md` — selected plan acknowledged in writing.
 - [ ] `sales/CLIENT-ONBOARDING.md` — Phase-2 roadmap initialled.
