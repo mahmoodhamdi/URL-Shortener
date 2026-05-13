@@ -47,7 +47,7 @@ async function recordShort() {
   const input = page.getByRole('textbox').first();
   if (await input.isVisible().catch(() => false)) {
     await input.click();
-    await input.pressSequentially('https://anthropic.com/news', { delay: 60 });
+    await input.pressSequentially('https://example.com/articles/long-marketing-url-with-tracking', { delay: 60 });
     await pause(page, 800);
   }
 

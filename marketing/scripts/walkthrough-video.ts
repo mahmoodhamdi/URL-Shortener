@@ -49,7 +49,7 @@ async function record() {
   const input = page.getByRole('textbox').first();
   if (await input.isVisible().catch(() => false)) {
     await input.click();
-    await input.pressSequentially('https://anthropic.com/news', { delay: 45 });
+    await input.pressSequentially('https://example.com/articles/long-marketing-url-with-tracking', { delay: 45 });
     await pause(page, 800);
 
     const submit = page.getByRole('button', { name: /shorten|create|generate/i }).first();
